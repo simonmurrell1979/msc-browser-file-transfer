@@ -1,5 +1,7 @@
 
 using FileTransfer.Common.Configuration;
+using FileTransfer.Common.Storage;
+using FileTransfer.Services.Storage;
 
 namespace FileTransfer.RestAPI
 {
@@ -17,6 +19,8 @@ namespace FileTransfer.RestAPI
 
             // Add Configuration
             builder.Services.Configure<R2Options>(builder.Configuration.GetSection(R2Options.SectionName));
+            // Add Services
+            builder.Services.AddSingleton<IR2StorageService, R2StorageService>();
 
             // Add Controllers and OpenAPI
             builder.Services.AddControllers();
