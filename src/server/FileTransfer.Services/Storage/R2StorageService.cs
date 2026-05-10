@@ -1,4 +1,6 @@
-﻿using FileTransfer.Common.Configuration;
+﻿using Amazon.S3;
+using Amazon.S3.Model;
+using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Storage;
 using Microsoft.Extensions.Options;
 
@@ -11,7 +13,8 @@ namespace FileTransfer.Services.Storage
         #region Variables
 
         // Private Variables
-        private readonly R2Options _r2Options;
+        private readonly R2Options _options;
+        private readonly IAmazonS3 _client;
 
         #endregion
 
@@ -21,7 +24,18 @@ namespace FileTransfer.Services.Storage
         {
 
             // Initialize Variables
-            _r2Options = r2Options.Value;
+            _options = r2Options.Value;
+
+            // Initialize Amazon S3 Client
+            var config = new AmazonS3Config
+            {
+                ServiceURL = $"https://{_options.AccountId}.r2.cloudflarestorage.com",
+                ForcePathStyle = true
+            };
+            // Initialize Class
+            _client = new AmazonS3Client(_options.AccessKeyId, 
+                _options.SecretAccessKey, 
+                config);
 
         }
 
@@ -29,10 +43,33 @@ namespace FileTransfer.Services.Storage
 
         #region TestConnectionAsync
 
-        public Task<bool> TestConnectionAsync()
+        public async Task<bool> TestConnectionAsync()
         {
-            
-            return Task.FromResult(true);
+
+            // Source Code used from https://developers.cloudflare.com/r2/examples/aws/aws-sdk-net/
+
+            try
+            {
+
+                // Build Request
+                var request = new ListObjectsV2Request
+                {
+                    BucketName = _options.BucketName,
+                    MaxKeys = 1
+                };
+                // Execute Request
+                await _client.ListObjectsV2Async(request);
+                // Return
+                return true;
+
+            }
+            catch
+            {
+
+                // Return
+                return false;
+
+            }
 
         }
 
