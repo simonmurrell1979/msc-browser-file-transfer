@@ -4,7 +4,7 @@
     public interface IR2StorageService
     {
 
-        Task<bool> TestConnectionAsync();
+        Task<(bool Connected, string? ErrorMessage)> TestConnectionAsync();
 
     }
 

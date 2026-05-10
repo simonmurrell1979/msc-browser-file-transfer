@@ -43,7 +43,7 @@ namespace FileTransfer.Services.Storage
 
         #region TestConnectionAsync
 
-        public async Task<bool> TestConnectionAsync()
+        public async Task<(bool Connected, string? ErrorMessage)> TestConnectionAsync()
         {
 
             // Source Code used from https://developers.cloudflare.com/r2/examples/aws/aws-sdk-net/
@@ -60,14 +60,23 @@ namespace FileTransfer.Services.Storage
                 // Execute Request
                 await _client.ListObjectsV2Async(request);
                 // Return
-                return true;
+                return (true, null) ;
 
             }
-            catch
+            catch (AmazonS3Exception ex)
             {
 
                 // Return
-                return false;
+                return (false, $"Error encountered on server. " +
+                    $"Error: '{ex.ErrorCode}'. " +
+                    $"Message:'{ex.Message}' when listing objects");
+
+            }
+            catch (Exception ex) 
+            {
+
+                // Return   
+                return (false, ex.Message);
 
             }
 

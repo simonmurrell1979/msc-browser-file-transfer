@@ -39,12 +39,21 @@ namespace FileTransfer.RestAPI.Controllers
         {
 
             // Test Connection
-            var connected = await _storageService.TestConnectionAsync();
-            // Return
-            return JsonResponseFactory.SuccessResponse(new 
+            var (connected, errorMessage) = await _storageService.TestConnectionAsync();
+            
+            // Check Value
+            if (!connected)
             {
-                Connected = connected
-            });
+
+                // Log Warning
+                _logger.LogWarning("Storage connection test failed: {ErrorMessage}", errorMessage);
+                // Return
+                return Ok(JsonResponseFactory.ErrorResponse(errorMessage ?? "Unknown error"));
+
+            }
+
+            // Return
+            return Ok(JsonResponseFactory.SuccessResponse());
 
         }
 
