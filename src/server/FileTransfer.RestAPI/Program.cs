@@ -1,4 +1,6 @@
 
+using FileTransfer.Common.Configuration;
+
 namespace FileTransfer.RestAPI
 {
 
@@ -10,6 +12,9 @@ namespace FileTransfer.RestAPI
 
             // Create Builder
             var builder = WebApplication.CreateBuilder(args);
+
+            // Add Configuration
+            builder.Services.Configure<R2Options>(builder.Configuration.GetSection(R2Options.SectionName));
 
             // Add Controllers and OpenAPI
             builder.Services.AddControllers();
