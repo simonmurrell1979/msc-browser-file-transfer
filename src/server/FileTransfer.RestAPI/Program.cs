@@ -34,6 +34,8 @@ namespace FileTransfer.RestAPI
                 app.MapOpenApi();
             }
 
+            // Use Bath Path /api/
+            app.UsePathBase("/api/");
             // Use HTTPS Redirection and Authorization
             app.UseHttpsRedirection();
             app.UseAuthorization();
