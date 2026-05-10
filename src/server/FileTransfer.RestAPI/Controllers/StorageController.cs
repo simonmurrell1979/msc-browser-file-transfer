@@ -1,4 +1,5 @@
-﻿using FileTransfer.Common.Storage;
+﻿using FileTransfer.Common.Factories;
+using FileTransfer.Common.Storage;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FileTransfer.RestAPI.Controllers
@@ -34,13 +35,13 @@ namespace FileTransfer.RestAPI.Controllers
         #region TestConnection
 
         [HttpGet]
-        public async Task<IActionResult> TestConnection()
+        public async Task<object> TestConnection()
         {
 
             // Test Connection
             var connected = await _storageService.TestConnectionAsync();
             // Return
-            return Ok(new
+            return JsonResponseFactory.SuccessResponse(new 
             {
                 Connected = connected
             });

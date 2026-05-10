@@ -1,7 +1,10 @@
 
 using FileTransfer.Common.Configuration;
+using FileTransfer.Common.Helpers;
 using FileTransfer.Common.Storage;
 using FileTransfer.Services.Storage;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.Json.Serialization;
 
 namespace FileTransfer.RestAPI
 {
@@ -23,7 +26,19 @@ namespace FileTransfer.RestAPI
             builder.Services.AddSingleton<IR2StorageService, R2StorageService>();
 
             // Add Controllers and OpenAPI
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+
+                    // Use PascalCase for JSON properties (matches C# conventions)
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                    options.JsonSerializerOptions.WriteIndented = false;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+
+                    // Apply custom JSON defaults
+                    JsonHelper.ApplyDefaults(options.JsonSerializerOptions);
+
+                });
             builder.Services.AddOpenApi();
             // Add Services
             var app = builder.Build();
