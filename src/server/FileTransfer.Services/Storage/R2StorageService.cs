@@ -84,6 +84,37 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
+        #region GeneratePutUrlAsync
+
+        public Task<string> GeneratePutUrlAsync(string ObjectKey)
+        {
+
+            // Check Value
+            if (string.IsNullOrWhiteSpace(ObjectKey))
+            {
+
+                // Throw Exception
+                throw new ArgumentException("ObjectKey cannot be null or empty.", 
+                    nameof(ObjectKey));
+
+            }
+            // Build Request
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey,
+                Verb = HttpVerb.PUT,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            };
+            // Generate URL
+            var url = _client.GetPreSignedURL(request);
+            // Return
+            return Task.FromResult(url);
+
+        }
+
+        #endregion
+
     }
 
 }

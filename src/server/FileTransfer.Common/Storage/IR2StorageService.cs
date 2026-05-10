@@ -5,6 +5,7 @@
     {
 
         Task<(bool Connected, string? ErrorMessage)> TestConnectionAsync();
+        Task<string> GeneratePutUrlAsync(string ObjectKey);
 
     }
 

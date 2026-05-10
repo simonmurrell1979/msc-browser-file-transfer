@@ -20,7 +20,7 @@ namespace FileTransfer.RestAPI.Controllers
 
         #region Constructor
 
-        public StorageController(ILogger<StorageController> logger, 
+        public StorageController(ILogger<StorageController> logger,
             IR2StorageService storageService)
         {
 
@@ -40,7 +40,7 @@ namespace FileTransfer.RestAPI.Controllers
 
             // Test Connection
             var (connected, errorMessage) = await _storageService.TestConnectionAsync();
-            
+
             // Check Value
             if (!connected)
             {
@@ -54,6 +54,38 @@ namespace FileTransfer.RestAPI.Controllers
 
             // Return
             return Ok(JsonResponseFactory.SuccessResponse());
+
+        }
+
+        #endregion
+
+        #region GetUploadUrl
+
+        [HttpGet]
+        public async Task<IActionResult> GetUploadUrl(string ObjectKey)
+        {
+
+            try
+            {
+
+                // Generate URL
+                var url = await _storageService.GeneratePutUrlAsync(ObjectKey);
+                // Log Information
+                _logger.LogInformation("Generated pre-signed URL for ObjectKey '{ObjectKey}'", ObjectKey);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse(url));
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'", ObjectKey);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the pre-signed URL: {ex.Message}"));
+
+            }
 
         }
 
