@@ -7,6 +7,8 @@ namespace FileTransfer.RestAPI
     public class Program
     {
 
+        #region Main
+
         public static void Main(string[] args)
         {
 
@@ -38,6 +40,8 @@ namespace FileTransfer.RestAPI
             app.Run();
 
         }
+
+        #endregion
 
     }
 
