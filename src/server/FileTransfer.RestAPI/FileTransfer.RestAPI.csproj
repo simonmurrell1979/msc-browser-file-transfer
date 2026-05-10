@@ -14,4 +14,9 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FileTransfer.Common\FileTransfer.Common.csproj" />
+    <ProjectReference Include="..\FileTransfer.Services\FileTransfer.Services.csproj" />
+  </ItemGroup>
+
 </Project>

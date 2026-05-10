@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FileTransfer.Common\FileTransfer.Common.csproj" />
+  </ItemGroup>
+
 </Project>
