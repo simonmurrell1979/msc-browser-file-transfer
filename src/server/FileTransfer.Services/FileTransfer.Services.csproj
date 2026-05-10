@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="4.0.23" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FileTransfer.Common\FileTransfer.Common.csproj" />
   </ItemGroup>
 
