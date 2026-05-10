@@ -1,34 +1,39 @@
 
 namespace FileTransfer.RestAPI
 {
+
     public class Program
     {
+
         public static void Main(string[] args)
         {
+
+            // Create Builder
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
+            // Add Controllers and OpenAPI
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-
+            // Add Services
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Check if in development environment and map OpenAPI
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
             }
 
+            // Use HTTPS Redirection and Authorization
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
+            // Map Controllers
             app.MapControllers();
 
+            // Run Application
             app.Run();
+
         }
+
     }
+
 }
