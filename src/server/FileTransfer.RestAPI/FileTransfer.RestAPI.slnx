@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="../FileTransfer.Common/FileTransfer.Common.csproj" />
+  <Project Path="../FileTransfer.Services/FileTransfer.Services.csproj" />
   <Project Path="FileTransfer.RestAPI.csproj" />
 </Solution>
