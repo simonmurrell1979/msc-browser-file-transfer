@@ -13,6 +13,31 @@ function logMessage(message) {
 
 cmdUpload.addEventListener("click", async () => {
 
-    logMessage("Hello World!");    
+    // Clear Status
+    uploadStatus.textContent = "";
+
+    // Load File
+    var file = fileUpload.files[0];
+    // Check Value
+    if (!file) {
+
+        // Log Message
+        logMessage("Please select a file to upload.");
+        // Exit
+        return;
+
+    }
+    
+    try {
+
+        throw new Error("Hello World!");
+
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("Error: " + error.message);
+
+    }
 
 });
