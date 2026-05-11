@@ -3,7 +3,6 @@ using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Helpers;
 using FileTransfer.Common.Storage;
 using FileTransfer.Services.Storage;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json.Serialization;
 
 namespace FileTransfer.RestAPI
