@@ -42,15 +42,35 @@ cmdUpload.addEventListener("click", async () => {
         const response = await fetch(requestUrl);
         const json = await response.json();
         const uploadUrl = json.ReturnedObject;
-        
+
         // Log Message
-        logMessage("Upload URL: " + uploadUrl);
+        logMessage("Starting upload to R2");
+
+        // Upload File
+        const uploadResponse = await fetch(uploadUrl, {
+            method: "PUT",
+            body: file
+        });
+
+        // Check Value
+        if (uploadResponse.ok) {
+            
+            // Log Message
+            logMessage("File uploaded successfully!");
+
+        }
+        else {
+            
+            // Log Message
+            logMessage("File upload failed with status: " + uploadResponse.status);
+
+        }
 
     }
     catch (error) {
 
         // Log Message
-        logMessage("Error: " + error.message);
+        logMessage("An error occurred while uploading file: " + error.message);
 
     }
 
