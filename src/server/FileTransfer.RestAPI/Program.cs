@@ -25,6 +25,22 @@ namespace FileTransfer.RestAPI
             // Add Services
             builder.Services.AddSingleton<IR2StorageService, R2StorageService>();
 
+            // Add CORS Policy
+            builder.Services.AddCors(options =>
+            {
+
+                // Add Development Policy
+                options.AddPolicy("AllowLocalhost", policy =>
+                {
+
+                    // Allow request from localhost -> Remember to add security later for production!!!
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+
+                });
+
+            });
             // Add Controllers and OpenAPI
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
@@ -46,7 +62,18 @@ namespace FileTransfer.RestAPI
             // Check if in development environment and map OpenAPI
             if (app.Environment.IsDevelopment())
             {
+
+                // Map OpenAPI
                 app.MapOpenApi();
+                // Use CORS Policy
+                app.UseCors("AllowLocalhost");
+
+            }
+            else
+            {
+
+                // Use CORS Policy - Remember to add for production environment
+
             }
 
             // Use Bath Path /api/
