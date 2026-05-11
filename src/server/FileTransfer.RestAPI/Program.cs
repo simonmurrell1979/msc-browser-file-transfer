@@ -33,7 +33,7 @@ namespace FileTransfer.RestAPI
                 {
 
                     // Allow request from localhost -> Remember to add security later for production!!!
-                    policy.WithOrigins("http://localhost:4200")
+                    policy.WithOrigins("http://localhost:3000", "http://localhost:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
 
