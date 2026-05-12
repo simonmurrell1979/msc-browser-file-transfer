@@ -143,7 +143,7 @@ namespace FileTransfer.RestAPI.Controllers
                 // Generate Multipart Upload URL
                 var url = await _storageService.GenerateMultipartUploadUrlAsync(Request.ObjectKey,
                     Request.UploadId,
-                    int.Parse(Request.PartNumber));
+                    Request.PartNumber);
                 // Log Information
                 _logger.LogInformation("Generated multipart upload URL for ObjectKey '{ObjectKey}', UploadId '{UploadId}', PartNumber '{PartNumber}'", 
                     Request.ObjectKey, 

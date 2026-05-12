@@ -6,7 +6,7 @@
 
         public string ObjectKey { get; set; } = "";
         public string UploadId { get; set; } = "";
-        public string PartNumber { get; set; } = "";
+        public int PartNumber { get; set; } = 0;
 
     }
 
