@@ -34,21 +34,6 @@ cmdUpload.addEventListener("click", async () => {
         logMessage("Uploading file: " + file.name);
 
         // Assign Value
-        var objectKey = encodeURIComponent(file.name);
-
-        // Assign Value
-        var requestUrl = apiBaseUrl + "/GetUploadUrl?objectKey=" + objectKey;
-        // Log Message
-        logMessage("Request URL: " + requestUrl);
-
-        // Get Upload URL
-        const response = await fetch(requestUrl);
-        const json = await response.json();
-        const uploadUrl = json.ReturnedObject;
-        // Log Message
-        logMessage("Upload URL: " + uploadUrl);
-
-        // Assign Value
         var initialRequestUrl = apiBaseUrl + "/InitiateMultipartUpload";
         // Log Message
         logMessage("Initial Request URL: " + initialRequestUrl);
