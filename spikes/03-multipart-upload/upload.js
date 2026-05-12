@@ -95,7 +95,34 @@ cmdUpload.addEventListener("click", async () => {
                 new Uint8Array(partSize / 5)  // Part 3 - 1MB
             ];
 
+            // Search for each part
+            for (let i = 0; i < fileParts.length; i++) {
 
+                // Assign Value
+                var generateMultipartUploadUrl = apiBaseUrl + "/GenerateMultipartUploadUrl";
+                // Log Message
+                logMessage("Generate URL: " + generateMultipartUploadUrl);
+
+                // Build Body
+                var multipartUploadUrlRequestBody = {
+                    ObjectKey: file.name,
+                    UploadId: uploadId,
+                    PartNumber: i + 1
+                };
+                // Get Initial Upload URL
+                const multipartUploadUrlResponse = await fetch(generateMultipartUploadUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(multipartUploadUrlRequestBody)
+                });
+                const multipartUploadUrlJson = await multipartUploadUrlResponse.json();
+                const multipartUploadUrl = multipartUploadUrlJson.ReturnedObject;
+                // Log Message
+                logMessage("Multipart Upload URL: " + multipartUploadUrl);
+
+            }
 
         }
         catch {
