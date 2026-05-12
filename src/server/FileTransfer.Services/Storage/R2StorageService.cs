@@ -2,6 +2,7 @@
 using Amazon.S3.Model;
 using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Storage;
+using Uploads = FileTransfer.Common.Models.Uploads;
 using Microsoft.Extensions.Options;
 
 namespace FileTransfer.Services.Storage
@@ -167,7 +168,7 @@ namespace FileTransfer.Services.Storage
 
         public async Task CompleteMultipartUploadAsync(string ObjectKey,
             string UploadId,
-            List<(string ETag, int PartNumber)> Parts)
+            List<Uploads.UploadPart> Parts)
         {
 
             // Build Request
