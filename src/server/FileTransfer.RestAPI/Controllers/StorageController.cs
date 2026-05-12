@@ -171,7 +171,7 @@ namespace FileTransfer.RestAPI.Controllers
 
         #endregion
 
-        #region GenerateMultipartUploadUrl
+        #region CompleteMultipartUploadAsync
 
         [HttpPost]
         public async Task<IActionResult> CompleteMultipartUploadAsync(CompleteMultipartUploadRequest Request)
