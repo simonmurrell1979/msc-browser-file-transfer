@@ -22,6 +22,7 @@
 
         // Multipart Uploads
         Task<string> InitiateMultipartUploadAsync(string ObjectKey, string ContentType = "application/octet-stream");
+        Task<string> GenerateMultipartUploadUrlAsync(string ObjectKey, string UploadId, int PartNumber);
 
     }
 

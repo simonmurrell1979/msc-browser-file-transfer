@@ -137,6 +137,32 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
+        #region GenerateMultipartUploadUrlAsync
+
+        public Task<string> GenerateMultipartUploadUrlAsync(string ObjectKey, 
+            string UploadId, 
+            int PartNumber)
+        {
+
+            // Build Request
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey,
+                Verb = HttpVerb.PUT,
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                UploadId = UploadId,
+                PartNumber = PartNumber
+            };
+            // Generate URL
+            var url = _client.GetPreSignedURL(request);
+            // Return
+            return Task.FromResult(url);
+
+        }
+
+        #endregion
+
     }
 
 }
