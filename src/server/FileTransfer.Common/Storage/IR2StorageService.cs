@@ -1,4 +1,6 @@
-﻿namespace FileTransfer.Common.Storage
+﻿using FileTransfer.Common.Models.Uploads;
+
+namespace FileTransfer.Common.Storage
 {
     
     public interface IR2StorageService
@@ -23,7 +25,7 @@
         // Multipart Uploads
         Task<string> InitiateMultipartUploadAsync(string ObjectKey, string ContentType = "application/octet-stream");
         Task<string> GenerateMultipartUploadUrlAsync(string ObjectKey, string UploadId, int PartNumber);
-        Task CompleteMultipartUploadAsync(string ObjectKey, string UploadId, List<(string ETag, int PartNumber)> Parts);
+        Task CompleteMultipartUploadAsync(string ObjectKey, string UploadId, List<UploadPart> Parts);
 
     }
 

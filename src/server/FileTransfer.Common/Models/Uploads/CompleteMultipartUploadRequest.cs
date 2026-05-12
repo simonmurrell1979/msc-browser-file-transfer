@@ -6,7 +6,7 @@
 
         public string ObjectKey { get; set; } = "";
         public string UploadId { get; set; } = "";
-        public List<(string ETag, int PartNumber)> Parts { get; set; } = new List<(string ETag, int PartNumber)>();
+        public List<UploadPart> Parts { get; set; } = new List<UploadPart>();
 
     }
 
