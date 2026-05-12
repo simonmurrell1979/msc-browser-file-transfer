@@ -17,6 +17,10 @@ namespace FileTransfer.Common.Storage
         // Delete Objects
         // https://developers.cloudflare.com/r2/objects/delete-objects/
 
+        // Amazon S3 
+        // https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
+        // 
+
         Task<(bool Connected, string? ErrorMessage)> TestConnectionAsync();
 
         // Single Uploads
