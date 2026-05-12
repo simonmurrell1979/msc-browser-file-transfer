@@ -163,6 +163,32 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
+        #region CompleteMultipartUploadAsync
+
+        public async Task CompleteMultipartUploadAsync(string ObjectKey,
+            string UploadId,
+            List<(string ETag, int PartNumber)> Parts)
+        {
+
+            // Build Request
+            var request = new CompleteMultipartUploadRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey,
+                UploadId = UploadId,
+                PartETags = Parts.Select(p => new PartETag
+                {
+                    ETag = p.ETag,
+                    PartNumber = p.PartNumber
+                }).ToList()
+            };
+            // Complete Multipart Upload
+            var response = await _client.CompleteMultipartUploadAsync(request);
+
+        }
+
+        #endregion
+
     }
 
 }

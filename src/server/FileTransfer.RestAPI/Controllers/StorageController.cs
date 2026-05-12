@@ -171,6 +171,44 @@ namespace FileTransfer.RestAPI.Controllers
 
         #endregion
 
+        #region GenerateMultipartUploadUrl
+
+        [HttpPost]
+        public async Task<IActionResult> CompleteMultipartUploadAsync(CompleteMultipartUploadRequest Request)
+        {
+
+            try
+            {
+
+                // Complete Multipart Upload
+                await _storageService.CompleteMultipartUploadAsync(Request.ObjectKey,
+                    Request.UploadId,
+                    Request.Parts);
+                // Log Information
+                _logger.LogInformation("Completed multipart upload for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
+                    Request.ObjectKey,
+                    Request.UploadId);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse());
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error completing multipart upload for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
+                    Request.ObjectKey,
+                    Request.UploadId);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while completing the multipart upload: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
     }
 
 }
