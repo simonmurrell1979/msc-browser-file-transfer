@@ -26,6 +26,13 @@ async function postJSON(url,
     });
     // Extract JSON
     const json = await initialResponse.json();
+    // Check Value
+    if (!json.Success) {
+
+        // Throw Exception
+        throw new Error(json.Message || "Unknown Server Error");
+
+    }
     // Return
     return json.ReturnedObject;
 
@@ -123,6 +130,15 @@ cmdUpload.addEventListener("click", async () => {
 
             }
 
+            // Check Value
+            if (uploadedParts.length !== totalParts) {
+
+                // Log Message
+                logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                // Throw Exception
+                throw new Error("Not all parts were uploaded successfully.");
+
+            }
             // Complete Multipart Upload
             await postJSON("/CompleteMultipartUpload", {
                 ObjectKey: file.name,
@@ -134,35 +150,28 @@ cmdUpload.addEventListener("click", async () => {
             logMessage("All parts uploaded successfully. Completed multipart upload...");
 
         }
-        catch {
+        catch (error) {
 
-            // TODO -> Call future abort method
+            // Log Message
+            logMessage("An error occurred during multipart upload: " + error.message);            
+
+            try {
+
+                // Abort Multipart Upload
+                await postJSON("/AbortMultipartUpload", {
+                    ObjectKey: file.name,
+                    UploadId: uploadId
+                });
+
+            }
+            catch (abortError) {
+
+                // Log Message
+                logMessage("Failed to abort multipart upload: " + abortError.message);
+
+            }
 
         }
-
-
-        // // Log Message
-        // logMessage("Starting upload to R2");
-
-        // // Upload File
-        // const uploadResponse = await fetch(uploadUrl, {
-        //     method: "PUT",
-        //     body: file
-        // });
-
-        // // Check Value
-        // if (uploadResponse.ok) {
-            
-        //     // Log Message
-        //     logMessage("File uploaded successfully!");
-
-        // }
-        // else {
-            
-        //     // Log Message
-        //     logMessage("File upload failed with status: " + uploadResponse.status);
-
-        // }
 
     }
     catch (error) {
