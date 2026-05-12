@@ -115,6 +115,15 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
+        #region InitiateMultipartUploadAsync
+
+        public Task<string> InitiateMultipartUploadAsync(string ObjectKey)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
     }
 
 }

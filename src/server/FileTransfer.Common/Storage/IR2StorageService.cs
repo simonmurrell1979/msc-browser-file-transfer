@@ -21,8 +21,7 @@
         Task<string> GeneratePutUrlAsync(string ObjectKey);
 
         // Multipart Uploads
-        
-
+        Task<string> InitiateMultipartUploadAsync(string ObjectKey);
 
     }
 
