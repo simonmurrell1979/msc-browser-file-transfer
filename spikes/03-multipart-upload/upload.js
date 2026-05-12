@@ -54,11 +54,10 @@ cmdUpload.addEventListener("click", async () => {
         logMessage("Uploading file: " + file.name);
 
         // Initialize Multipart Upload
-        const uploadId = await postJSON("/InitiateMultipartUpload", 
-            {
-                ObjectKey: file.name,
-                ContentType: file.type || "application/octet-stream"
-            });
+        const uploadId = await postJSON("/InitiateMultipartUpload", {
+            ObjectKey: file.name,
+            ContentType: file.type || "application/octet-stream"
+        });
         // Check Value
         if (!uploadId) {
          
@@ -87,14 +86,31 @@ cmdUpload.addEventListener("click", async () => {
             for (let i = 0; i < fileParts.length; i++) {
 
                 // Generate Multipart Upload URL
-                const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", 
-                    {
-                        ObjectKey: file.name,
-                        UploadId: uploadId,
-                        PartNumber: i + 1
-                    });
+                const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", {
+                    ObjectKey: file.name,
+                    UploadId: uploadId,
+                    PartNumber: i + 1
+                });
                 
-                
+                // Upload to R2
+                const uploadPartResponse = await fetch(multipartUploadUrl, {
+                    method: "PUT",
+                    body: fileParts[i]
+                });
+                // Check Value
+                if (!uploadPartResponse.ok) {
+
+                    // Log Message
+                    logMessage("Failed to upload part " + (i + 1) + " with status: " + uploadPartResponse.status);
+                    // Throw Exception
+                    throw new Error("Failed to upload part");
+
+                }
+
+                // Assign Value
+                const eTag = uploadPartResponse.headers.get("ETag");
+                // Log Message
+                logMessage("Part " + (i + 1) + " uploaded successfully with ETag: " + eTag);
                 
             }
 
