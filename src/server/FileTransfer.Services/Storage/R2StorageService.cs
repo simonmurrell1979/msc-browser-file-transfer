@@ -190,6 +190,26 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
+        #region AbortMultipartUploadAsync
+
+        public async Task AbortMultipartUploadAsync(string ObjectKey,
+            string UploadId)
+        {
+
+            // Build Request
+            var request = new AbortMultipartUploadRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey,
+                UploadId = UploadId
+            };
+            // Abort Multipart Upload
+            var response = await _client.AbortMultipartUploadAsync(request);
+
+        }
+
+        #endregion
+
     }
 
 }

@@ -209,6 +209,43 @@ namespace FileTransfer.RestAPI.Controllers
 
         #endregion
 
+        #region AbortMultipartUpload
+
+        [HttpPost]
+        public async Task<IActionResult> AbortMultipartUpload(AbortMultipartUploadRequest Request)
+        {
+
+            try
+            {
+
+                // Abort Multipart Upload
+                await _storageService.AbortMultipartUploadAsync(Request.ObjectKey,
+                    Request.UploadId);
+                // Log Information
+                _logger.LogInformation("Aborted multipart upload for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
+                    Request.ObjectKey,
+                    Request.UploadId);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse());
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error aborting multipart upload for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
+                    Request.ObjectKey,
+                    Request.UploadId);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while aborting the multipart upload: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
     }
 
 }
