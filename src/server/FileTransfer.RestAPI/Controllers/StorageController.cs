@@ -1,4 +1,5 @@
 ﻿using FileTransfer.Common.Factories;
+using FileTransfer.Common.Models.Uploads;
 using FileTransfer.Common.Storage;
 using Microsoft.AspNetCore.Mvc;
 
@@ -84,6 +85,39 @@ namespace FileTransfer.RestAPI.Controllers
                 _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'", ObjectKey);
                 // Return Error Response
                 return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the pre-signed URL: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
+        #region InitiateMultipartUpload
+
+        [HttpPost]
+        public async Task<IActionResult> InitiateMultipartUpload(InitiateMultipartUploadRequest Request)
+        {
+
+            try
+            {
+
+                // Generate Upload ID
+                var uploadId = await _storageService.InitiateMultipartUploadAsync(Request.ObjectKey,
+                    Request.ContentType);
+                // Log Information
+                _logger.LogInformation("Generated multipart upload ID for ObjectKey '{ObjectKey}'", Request.ObjectKey);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse(uploadId));
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error generating multipart upload ID for ObjectKey '{ObjectKey}'", Request.ObjectKey);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the multipart upload ID: {ex.Message}"));
 
             }
 
