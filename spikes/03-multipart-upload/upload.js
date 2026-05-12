@@ -11,6 +11,26 @@ function logMessage(message) {
 
 }
 
+async function postJSON(url,
+    body) {
+
+    // Assign Value
+    var postUrl = apiBaseUrl + url;
+    // Send Request
+    const initialResponse = await fetch(postUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+    // Extract JSON
+    const json = await initialResponse.json();
+    // Return
+    return json.ReturnedObject;
+
+}
+
 cmdUpload.addEventListener("click", async () => {
 
     // Clear Status
