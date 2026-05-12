@@ -33,6 +33,9 @@ async function postJSON(url,
 
 cmdUpload.addEventListener("click", async () => {
 
+    // Initialize Uploaded Parts Array
+    const uploadedParts = [];
+
     // Clear Status
     uploadStatus.textContent = "";
 
@@ -85,11 +88,14 @@ cmdUpload.addEventListener("click", async () => {
             // Search for each part
             for (let i = 0; i < fileParts.length; i++) {
 
+                // Assign Value
+                var partIndex = i + 1;
+
                 // Generate Multipart Upload URL
                 const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", {
                     ObjectKey: file.name,
                     UploadId: uploadId,
-                    PartNumber: i + 1
+                    PartNumber: partIndex
                 });
                 
                 // Upload to R2
@@ -101,18 +107,28 @@ cmdUpload.addEventListener("click", async () => {
                 if (!uploadPartResponse.ok) {
 
                     // Log Message
-                    logMessage("Failed to upload part " + (i + 1) + " with status: " + uploadPartResponse.status);
+                    logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
                     // Throw Exception
-                    throw new Error("Failed to upload part");
+                    throw new Error("Failed to upload part " + partIndex);
 
                 }
 
                 // Assign Value
                 const eTag = uploadPartResponse.headers.get("ETag");
                 // Log Message
-                logMessage("Part " + (i + 1) + " uploaded successfully with ETag: " + eTag);
-                
+                logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
+                // Add to Uploaded Parts Array
+                uploadedParts.push({
+                    PartNumber: partIndex,
+                    ETag: eTag
+                });
+
             }
+
+            // Log Message
+            logMessage("All parts uploaded successfully. Completing multipart upload...");
+
+            // TODO -> Call future complete method with uploadedParts array
 
         }
         catch {
