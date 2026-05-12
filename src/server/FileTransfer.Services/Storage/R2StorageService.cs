@@ -117,9 +117,22 @@ namespace FileTransfer.Services.Storage
 
         #region InitiateMultipartUploadAsync
 
-        public Task<string> InitiateMultipartUploadAsync(string ObjectKey)
+        public async Task<string> InitiateMultipartUploadAsync(string ObjectKey,
+            string ContentType = "application/octet-stream")
         {
-            throw new NotImplementedException();
+
+            // Build Request
+            var request = new InitiateMultipartUploadRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey,
+                ContentType = ContentType
+            };
+            // Execute Request
+            var response = await _client.InitiateMultipartUploadAsync(request);
+            // Return
+            return response.UploadId;
+
         }
 
         #endregion
