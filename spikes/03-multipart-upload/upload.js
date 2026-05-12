@@ -34,7 +34,10 @@ cmdUpload.addEventListener("click", async () => {
         logMessage("Uploading file: " + file.name);
 
         // Assign Value
-        var requestUrl = apiBaseUrl + "/GetUploadUrl?objectKey=" + encodeURIComponent(file.name);
+        var objectKey = encodeURIComponent(file.name);
+
+        // Assign Value
+        var requestUrl = apiBaseUrl + "/GetUploadUrl?objectKey=" + objectKey;
         // Log Message
         logMessage("Request URL: " + requestUrl);
 
@@ -42,29 +45,54 @@ cmdUpload.addEventListener("click", async () => {
         const response = await fetch(requestUrl);
         const json = await response.json();
         const uploadUrl = json.ReturnedObject;
-
         // Log Message
-        logMessage("Starting upload to R2");
+        logMessage("Upload URL: " + uploadUrl);
 
-        // Upload File
-        const uploadResponse = await fetch(uploadUrl, {
-            method: "PUT",
-            body: file
+        // Assign Value
+        var initialRequestUrl = apiBaseUrl + "/InitiateMultipartUpload";
+        // Log Message
+        logMessage("Initial Request URL: " + initialRequestUrl);
+
+        // Build Body
+        var initialRequestBody = {
+            ObjectKey: file.name,
+            ContentType: file.type || "application/octet-stream"
+        };
+        // Get Initial Upload URL
+        const initialResponse = await fetch(initialRequestUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(initialRequestBody)
         });
+        const initialJson = await initialResponse.json();
+        const uploadId = initialJson.ReturnedObject;
+        // Log Message
+        logMessage("Upload ID: " + uploadId);
 
-        // Check Value
-        if (uploadResponse.ok) {
+        // // Log Message
+        // logMessage("Starting upload to R2");
+
+        // // Upload File
+        // const uploadResponse = await fetch(uploadUrl, {
+        //     method: "PUT",
+        //     body: file
+        // });
+
+        // // Check Value
+        // if (uploadResponse.ok) {
             
-            // Log Message
-            logMessage("File uploaded successfully!");
+        //     // Log Message
+        //     logMessage("File uploaded successfully!");
 
-        }
-        else {
+        // }
+        // else {
             
-            // Log Message
-            logMessage("File upload failed with status: " + uploadResponse.status);
+        //     // Log Message
+        //     logMessage("File upload failed with status: " + uploadResponse.status);
 
-        }
+        // }
 
     }
     catch (error) {
