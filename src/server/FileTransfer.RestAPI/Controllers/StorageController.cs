@@ -171,10 +171,10 @@ namespace FileTransfer.RestAPI.Controllers
 
         #endregion
 
-        #region CompleteMultipartUploadAsync
+        #region CompleteMultipartUpload
 
         [HttpPost]
-        public async Task<IActionResult> CompleteMultipartUploadAsync(CompleteMultipartUploadRequest Request)
+        public async Task<IActionResult> CompleteMultipartUpload(CompleteMultipartUploadRequest Request)
         {
 
             try
