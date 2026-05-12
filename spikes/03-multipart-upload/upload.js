@@ -53,28 +53,12 @@ cmdUpload.addEventListener("click", async () => {
         // Log Message
         logMessage("Uploading file: " + file.name);
 
-        // Assign Value
-        var initialRequestUrl = apiBaseUrl + "/InitiateMultipartUpload";
-        // Log Message
-        logMessage("Initial Request URL: " + initialRequestUrl);
-
-        // Build Body
-        var initialRequestBody = {
-            ObjectKey: file.name,
-            ContentType: file.type || "application/octet-stream"
-        };
-        // Get Initial Upload URL
-        const initialResponse = await fetch(initialRequestUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(initialRequestBody)
-        });
-        const initialJson = await initialResponse.json();
-        const uploadId = initialJson.ReturnedObject;
-        // Log Message
-        logMessage("Upload ID: " + uploadId);
+        // Initialize Multipart Upload
+        const uploadId = await postJSON("/InitiateMultipartUpload", 
+            {
+                ObjectKey: file.name,
+                ContentType: file.type || "application/octet-stream"
+            });
 
         // Check Value
         if (!uploadId) {
