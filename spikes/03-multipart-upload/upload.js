@@ -71,6 +71,40 @@ cmdUpload.addEventListener("click", async () => {
         // Log Message
         logMessage("Upload ID: " + uploadId);
 
+        // Check Value
+        if (!uploadId) {
+         
+            // Log Message
+            logMessage("Failed to initiate multipart upload.");
+            // Exit
+            return;
+
+        }
+
+        // Following high level flow based on developer documentation
+
+        try {
+
+            // Assign Value
+            const partSize = 5 * 1024 * 1024; // 5MB
+
+            // Mock File Parts
+            const fileParts = [
+                new Uint8Array(partSize), // Part 1 - 5MB
+                new Uint8Array(partSize), // Part 2 - 5MB
+                new Uint8Array(partSize / 5)  // Part 3 - 1MB
+            ];
+
+
+
+        }
+        catch {
+
+            // TODO -> Call future abort method
+
+        }
+
+
         // // Log Message
         // logMessage("Starting upload to R2");
 
