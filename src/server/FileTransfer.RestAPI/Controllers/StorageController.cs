@@ -72,7 +72,8 @@ namespace FileTransfer.RestAPI.Controllers
                 // Generate URL
                 var url = await _storageService.GeneratePutUrlAsync(ObjectKey);
                 // Log Information
-                _logger.LogInformation("Generated pre-signed URL for ObjectKey '{ObjectKey}'", ObjectKey);
+                _logger.LogInformation("Generated pre-signed URL for ObjectKey '{ObjectKey}'", 
+                    ObjectKey);
 
                 // Return
                 return Ok(JsonResponseFactory.SuccessResponse(url));
@@ -82,7 +83,8 @@ namespace FileTransfer.RestAPI.Controllers
             {
 
                 // Log Error
-                _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'", ObjectKey);
+                _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'", 
+                    ObjectKey);
                 // Return Error Response
                 return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the pre-signed URL: {ex.Message}"));
 
@@ -105,7 +107,9 @@ namespace FileTransfer.RestAPI.Controllers
                 var uploadId = await _storageService.InitiateMultipartUploadAsync(Request.ObjectKey,
                     Request.ContentType);
                 // Log Information
-                _logger.LogInformation("Generated multipart upload ID for ObjectKey '{ObjectKey}'", Request.ObjectKey);
+                _logger.LogInformation("Generated multipart upload ID for ObjectKey '{ObjectKey}', ContentType '{ContentType}'", 
+                    Request.ObjectKey,
+                    Request.ContentType);
 
                 // Return
                 return Ok(JsonResponseFactory.SuccessResponse(uploadId));
@@ -115,9 +119,51 @@ namespace FileTransfer.RestAPI.Controllers
             {
 
                 // Log Error
-                _logger.LogError(ex, "Error generating multipart upload ID for ObjectKey '{ObjectKey}'", Request.ObjectKey);
+                _logger.LogError(ex, "Error generating multipart upload ID for ObjectKey '{ObjectKey}', ContentType '{ContentType}'", 
+                    Request.ObjectKey,
+                    Request.ContentType);
                 // Return Error Response
                 return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the multipart upload ID: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
+        #region GenerateMultipartUploadUrl
+
+        [HttpPost]
+        public async Task<IActionResult> GenerateMultipartUploadUrl(GenerateMultipartUploadUrlRequest Request)
+        {
+
+            try
+            {
+
+                // Generate Multipart Upload URL
+                var url = await _storageService.GenerateMultipartUploadUrlAsync(Request.ObjectKey,
+                    Request.UploadId,
+                    int.Parse(Request.PartNumber));
+                // Log Information
+                _logger.LogInformation("Generated multipart upload URL for ObjectKey '{ObjectKey}', UploadId '{UploadId}', PartNumber '{PartNumber}'", 
+                    Request.ObjectKey, 
+                    Request.UploadId, 
+                    Request.PartNumber);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse(url));
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error generating multipart upload URL for ObjectKey '{ObjectKey}', UploadId '{UploadId}', PartNumber '{PartNumber}'", 
+                    Request.ObjectKey, 
+                    Request.UploadId, 
+                    Request.PartNumber);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the multipart upload URL: {ex.Message}"));
 
             }
 
