@@ -77,19 +77,17 @@ cmdUpload.addEventListener("click", async () => {
 
             // Assign Value
             const partSize = 5 * 1024 * 1024; // 5MB
-
-            // Mock File Parts
-            const fileParts = [
-                new Uint8Array(partSize), // Part 1 - 5MB
-                new Uint8Array(partSize), // Part 2 - 5MB
-                new Uint8Array(partSize / 5)  // Part 3 - 1MB
-            ];
+            // Calculate Number of Parts
+            var totalParts = Math.ceil(file.size / partSize);
 
             // Search for each part
-            for (let i = 0; i < fileParts.length; i++) {
+            for (let i = 0; i < totalParts; i++) {
 
                 // Assign Value
                 var partIndex = i + 1;
+                var fileStart = i * partSize;
+                var fileEnd = Math.min(fileStart + partSize, file.size);
+                var fileChunk = file.slice(fileStart, fileEnd);
 
                 // Generate Multipart Upload URL
                 const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", {
@@ -101,7 +99,7 @@ cmdUpload.addEventListener("click", async () => {
                 // Upload to R2
                 const uploadPartResponse = await fetch(multipartUploadUrl, {
                     method: "PUT",
-                    body: fileParts[i]
+                    body: fileChunk
                 });
                 // Check Value
                 if (!uploadPartResponse.ok) {
