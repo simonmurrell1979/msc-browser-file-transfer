@@ -59,7 +59,6 @@ cmdUpload.addEventListener("click", async () => {
                 ObjectKey: file.name,
                 ContentType: file.type || "application/octet-stream"
             });
-
         // Check Value
         if (!uploadId) {
          
@@ -87,30 +86,16 @@ cmdUpload.addEventListener("click", async () => {
             // Search for each part
             for (let i = 0; i < fileParts.length; i++) {
 
-                // Assign Value
-                var generateMultipartUploadUrl = apiBaseUrl + "/GenerateMultipartUploadUrl";
-                // Log Message
-                logMessage("Generate URL: " + generateMultipartUploadUrl);
-
-                // Build Body
-                var multipartUploadUrlRequestBody = {
-                    ObjectKey: file.name,
-                    UploadId: uploadId,
-                    PartNumber: i + 1
-                };
-                // Get Initial Upload URL
-                const multipartUploadUrlResponse = await fetch(generateMultipartUploadUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(multipartUploadUrlRequestBody)
-                });
-                const multipartUploadUrlJson = await multipartUploadUrlResponse.json();
-                const multipartUploadUrl = multipartUploadUrlJson.ReturnedObject;
-                // Log Message
-                logMessage("Multipart Upload URL: " + multipartUploadUrl);
-
+                // Generate Multipart Upload URL
+                const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", 
+                    {
+                        ObjectKey: file.name,
+                        UploadId: uploadId,
+                        PartNumber: i + 1
+                    });
+                
+                
+                
             }
 
         }
