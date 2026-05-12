@@ -114,7 +114,7 @@ cmdUpload.addEventListener("click", async () => {
                 }
 
                 // Assign Value
-                const eTag = uploadPartResponse.headers.get("ETag");
+                const eTag = uploadPartResponse.headers.get("ETag").replaceAll('"', "");
                 // Log Message
                 logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
                 // Add to Uploaded Parts Array
@@ -125,10 +125,15 @@ cmdUpload.addEventListener("click", async () => {
 
             }
 
-            // Log Message
-            logMessage("All parts uploaded successfully. Completing multipart upload...");
+            // Complete Multipart Upload
+            await postJSON("/CompleteMultipartUpload", {
+                ObjectKey: file.name,
+                UploadId: uploadId,
+                Parts: uploadedParts
+            });
 
-            // TODO -> Call future complete method with uploadedParts array
+            // Log Message
+            logMessage("All parts uploaded successfully. Completed multipart upload...");
 
         }
         catch {
