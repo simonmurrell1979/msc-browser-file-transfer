@@ -1,5 +1,5 @@
 // Import Database Functions
-import { addUploadedPart, createUploadRecord } from "./db.js";
+import { addUploadedPart, createUploadRecord, deleteUpload } from "./db.js";
 
 // Set up variables
 const apiBaseUrl = "https://localhost:7222/api/storage";
@@ -165,6 +165,11 @@ cmdUpload.addEventListener("click", async () => {
             // Log Message
             logMessage("All parts uploaded successfully. Completed multipart upload...");
 
+            // Delete Record
+            await deleteUpload(uploadId);
+            // Log Message
+            logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
         }
         catch (error) {
 
@@ -178,6 +183,11 @@ cmdUpload.addEventListener("click", async () => {
                     ObjectKey: file.name,
                     UploadId: uploadId
                 });
+
+                // Delete Record
+                await deleteUpload(uploadId);
+                // Log Message
+                logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
 
             }
             catch (abortError) {

@@ -79,6 +79,30 @@ export async function saveUpload(record) {
 
 }
 
+export async function deleteUpload(uploadId) {
+
+    // Open Database
+    const database = await openDatabase();
+
+    // Initialize Promise
+    return new Promise((resolve, reject) => {
+
+        // Open Transaction
+        const transaction = database.transaction(storeName, "readwrite");
+        // Get Object Store
+        const objectStore = transaction.objectStore(storeName);
+        // Delete Record
+        const request = objectStore.delete(uploadId);
+
+        // Handle Success
+        request.onsuccess = () => resolve();
+        // Handle Error
+        request.onerror = (event) => reject(event.target.error);
+
+    });
+
+}
+
 export async function getUpload(uploadId) {
 
     // Open Database
