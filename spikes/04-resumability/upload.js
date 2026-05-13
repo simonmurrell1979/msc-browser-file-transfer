@@ -141,26 +141,8 @@ async function uploadParts(file,
 
 }
 
-cmdUpload.addEventListener("click", async () => {
+async function newUpload(file) {
 
-    // Initialize Uploaded Parts Array
-    const uploadedParts = [];
-
-    // Clear Status
-    uploadStatus.textContent = "";
-
-    // Load File
-    var file = fileUpload.files[0];
-    // Check Value
-    if (!file) {
-
-        // Log Message
-        logMessage("Please select a file to upload.");
-        // Exit
-        return;
-
-    }
-    
     try {
 
         // Log Message
@@ -181,24 +163,31 @@ cmdUpload.addEventListener("click", async () => {
 
         }
 
-        // Following high level flow based on developer documentation
+        // Assign Value
+        const partSize = 5 * 1024 * 1024; // 5MB
+        // Calculate Number of Parts
+        var totalParts = Math.ceil(file.size / partSize);
+
+        // Create Record
+        await createUploadRecord(uploadId, 
+            file,
+            partSize, 
+            totalParts);
+        // Log Message
+        logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
+
+        // Initialize Parts
+        const uploadedParts = [];
 
         try {
 
-            // Assign Value
-            const partSize = 5 * 1024 * 1024; // 5MB
-            // Calculate Number of Parts
-            var totalParts = Math.ceil(file.size / partSize);
-
-            // Create Record
-            await createUploadRecord(uploadId, 
-                file,
-                partSize, 
-                totalParts);
-            // Log Message
-            logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
-
-            
+            // Upload Parts
+            await uploadParts(file,
+                uploadId,
+                partSize,
+                totalParts,
+                new Set(),
+                uploadedParts);
 
             // Check Value
             if (uploadedParts.length !== totalParts) {
@@ -258,6 +247,154 @@ cmdUpload.addEventListener("click", async () => {
 
         // Log Message
         logMessage("An error occurred while uploading file: " + error.message);
+
+    }
+
+}
+
+async function resumeUpload(file,
+    existingRecord) {
+
+    try {
+
+        // Check Value
+        if (file.name !== existingRecord.fileIdentifier.name ||
+            file.size !== existingRecord.fileIdentifier.size ||
+            file.lastModified !== existingRecord.fileIdentifier.lastModified) {
+
+            // Log Message
+            logMessage("Selected file does not match pending upload. Aborting upload!");
+            // Exit
+            return;
+
+        }
+
+        // Log Message
+        logMessage("Resuming upload for file: " + existingRecord.objectKey);
+
+        // Assign Values
+        const uploadId = existingRecord.uploadId;
+        const partSize = existingRecord.partSize;
+        const totalParts = existingRecord.totalParts;
+
+        // Initialize Skipped Parts
+        const skippedParts = new Set(existingRecord.uploadedParts.map(part => part.PartNumber));
+        // Initialize Uploaded Parts
+        const uploadedParts = existingRecord.uploadedParts.map(part => ({
+            PartNumber: part.PartNumber,
+            ETag: part.ETag
+        }));
+
+        // Log Message
+        logMessage(skippedParts.size + " out of " + totalParts + " parts already uploaded. Resuming upload...");
+
+        try {
+
+            // Upload Parts
+            await uploadParts(file,
+                uploadId,
+                partSize,
+                totalParts,
+                skippedParts,
+                uploadedParts);
+
+            // Check Value
+            if (uploadedParts.length !== totalParts) {
+
+                // Log Message
+                logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                // Throw Exception
+                throw new Error("Not all parts were uploaded successfully.");
+
+            }
+            // Complete Multipart Upload
+            await postJSON("/CompleteMultipartUpload", {
+                ObjectKey: file.name,
+                UploadId: uploadId,
+                Parts: uploadedParts
+            });
+
+            // Log Message
+            logMessage("All parts uploaded successfully. Completed multipart upload...");
+
+            // Delete Record
+            await deleteUpload(uploadId);
+            // Log Message
+            logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+            // Reset
+            pendingUpload = null;
+            cmdUpload.textContent = "Upload";
+            cmdCancel.style.display = "none";
+
+        }
+        catch (error) {
+
+            // Log Message
+            logMessage("An error occurred during multipart upload: " + error.message);            
+
+            try {
+
+                // Abort Multipart Upload
+                await postJSON("/AbortMultipartUpload", {
+                    ObjectKey: file.name,
+                    UploadId: uploadId
+                });
+
+                // Delete Record
+                await deleteUpload(uploadId);
+                // Log Message
+                logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+            }
+            catch (abortError) {
+
+                // Log Message
+                logMessage("Failed to abort multipart upload: " + abortError.message);
+
+            }
+
+        }
+
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("An error occurred while uploading file: " + error.message);
+
+    }
+
+}
+
+cmdUpload.addEventListener("click", async () => {
+
+    // Clear Status
+    uploadStatus.textContent = "";
+
+    // Load File
+    var file = fileUpload.files[0];
+    // Check Value
+    if (!file) {
+
+        // Log Message
+        logMessage("Please select a file to upload.");
+        // Exit
+        return;
+
+    }
+    
+    // Check Value
+    if (pendingUpload) {
+
+        // Resume Upload
+        await resumeUpload(file,
+            pendingUpload);
+
+    }
+    else {
+
+        // New Upload
+        await newUpload(file);
 
     }
 
