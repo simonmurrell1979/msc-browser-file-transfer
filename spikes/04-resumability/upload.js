@@ -254,7 +254,7 @@ cmdCancel.addEventListener("click", async () => {
 
         // Abort Multipart Upload
         await postJSON("/AbortMultipartUpload", {
-            ObjectKey: pendingUpload.ObjectKey,
+            ObjectKey: pendingUpload.objectKey,
             UploadId: pendingUpload.uploadId
         });
         // Log Message
