@@ -1,11 +1,34 @@
 // Import Database Functions
-import { addUploadedPart, createUploadRecord, deleteUpload } from "./db.js";
+import {
+    addUploadedPart,
+    createUploadRecord,
+    deleteUpload,
+    findLatestUpload
+} from "./db.js";
 
 // Set up variables
 const apiBaseUrl = "https://localhost:7222/api/storage";
 const fileUpload = document.getElementById("fileUpload");
 const cmdUpload = document.getElementById("cmdUpload");
 const uploadStatus = document.getElementById("uploadStatus");
+
+// Find Latest Upload
+const latestUpload = await findLatestUpload();
+// Check Value
+if (latestUpload) {
+
+    // Log Message
+    logMessage("Found existing upload with Upload ID: " + latestUpload.uploadId.substring(0, 50) + "... " +
+        " (" + latestUpload.uploadedParts.length + " of " + latestUpload.totalParts + " parts uploaded). " +
+        "You can resume this upload or select a new file to start a new upload.");
+
+}
+else {
+
+    // Log Message
+    logMessage("No existing uploads found. Please select a file to upload.");
+
+}
 
 function logMessage(message) {
 

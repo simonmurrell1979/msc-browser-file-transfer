@@ -205,3 +205,21 @@ export async function addUploadedPart(uploadId,
     return record;
 
 }
+
+export async function findLatestUpload(file) {
+
+    // Get All Uploads
+    const uploads = await getUploads();
+    // Check Value
+    if (!uploads || uploads.length === 0) {
+
+        // Return
+        return null;
+
+    }
+    // Sort
+    uploads.sort((a, b) => b.createDate - a.createDate);
+    // Return
+    return uploads[0];
+
+}
