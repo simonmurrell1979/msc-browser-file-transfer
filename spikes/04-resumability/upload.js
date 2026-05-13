@@ -1,5 +1,5 @@
 // Import Database Functions
-import { createUploadRecord } from "./db.js";
+import { addUploadedPart, createUploadRecord } from "./db.js";
 
 // Set up variables
 const apiBaseUrl = "https://localhost:7222/api/storage";
@@ -138,6 +138,11 @@ cmdUpload.addEventListener("click", async () => {
                     PartNumber: partIndex,
                     ETag: eTag
                 });
+
+                // Update Record
+                await addUploadedPart(uploadId,
+                    partIndex,
+                    eTag);
 
             }
 

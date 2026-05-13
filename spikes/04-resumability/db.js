@@ -79,6 +79,54 @@ export async function saveUpload(record) {
 
 }
 
+export async function getUpload(uploadId) {
+
+    // Open Database
+    const database = await openDatabase();
+
+    // Initialize Promise
+    return new Promise((resolve, reject) => {
+
+        // Open Transaction
+        const transaction = database.transaction(storeName, "readonly");
+        // Get Object Store
+        const objectStore = transaction.objectStore(storeName);
+        // Get Record
+        const request = objectStore.get(uploadId);
+
+        // Handle Success
+        request.onsuccess = (event) => resolve(event.target.result || null);
+        // Handle Error
+        request.onerror = (event) => reject(event.target.error);
+
+    });
+
+}
+
+export async function getUploads() {
+
+    // Open Database
+    const database = await openDatabase();
+
+    // Initialize Promise
+    return new Promise((resolve, reject) => {
+
+        // Open Transaction
+        const transaction = database.transaction(storeName, "readonly");
+        // Get Object Store
+        const objectStore = transaction.objectStore(storeName);
+        // Get Records
+        const request = objectStore.getAll();
+
+        // Handle Success
+        request.onsuccess = (event) => resolve(event.target.result || null);
+        // Handle Error
+        request.onerror = (event) => reject(event.target.error);
+
+    });
+
+}
+
 export async function createUploadRecord(uploadId,
     file,
     partSize,
@@ -104,5 +152,32 @@ export async function createUploadRecord(uploadId,
     await saveUpload(newRecord);
     // Return
     return newRecord;
+
+}
+
+export async function addUploadedPart(uploadId, 
+    partNumber, 
+    eTag) {
+
+    // Get Record
+    const record = await getUpload(uploadId);
+    // Check Value
+    if (!record) {
+
+        // Throw Exception
+        throw new Error("Upload record not found for uploadId: " + uploadId);
+
+    }
+
+    // Add Uploaded Part
+    record.uploadedParts.push({
+        PartNumber: partNumber,
+        ETag: eTag,
+        uploadedAt: Date.now()
+    });
+    // Save Record
+    await saveUpload(record);
+    // Return
+    return record;
 
 }
