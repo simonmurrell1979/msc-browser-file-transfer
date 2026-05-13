@@ -23,11 +23,26 @@ function openDatabase() {
                 if (!database.objectStoreNames.contains(storeName)) {
 
                     // Create Store
-                    database.createObjectStore(storeName, { keyPath: "id" });
+                    database.createObjectStore(storeName, { keyPath: "uploadId" });
 
                 }
+
+            };    
+
+            // Handle Success
+            request.onsuccess = (event) => {
+
+                // Resolve
+                resolve(event.target.result);
                 
-            };         
+            };
+            // Handle Error
+            request.onerror = (event) => {
+
+                // Reject
+                reject(event.target.error);
+
+            }
 
         });
 
