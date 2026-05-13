@@ -1,3 +1,6 @@
+// Web pages used
+// https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
+
 const databaseName = "FileTransfer";
 const databaseVersion = 1;
 const storeName = "uploads";
