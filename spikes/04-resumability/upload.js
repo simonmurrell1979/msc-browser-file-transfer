@@ -10,13 +10,21 @@ import {
 const apiBaseUrl = "https://localhost:7222/api/storage";
 const fileUpload = document.getElementById("fileUpload");
 const cmdUpload = document.getElementById("cmdUpload");
+const cmdCancel = document.getElementById("cmdCancel");
 const uploadStatus = document.getElementById("uploadStatus");
+let pendingUpload = null;
 
 // Find Latest Upload
 const latestUpload = await findLatestUpload();
 // Check Value
 if (latestUpload) {
 
+    // Assign Value
+    pendingUpload = latestUpload;
+    // Update Button Text
+    cmdUpload.textContent = "Resume Upload";
+    // Show Cancel Button
+    cmdCancel.style.display = "inline-block";
     // Log Message
     logMessage("Found existing upload with Upload ID: " + latestUpload.uploadId.substring(0, 50) + "... " +
         " (" + latestUpload.uploadedParts.length + " of " + latestUpload.totalParts + " parts uploaded). " +
@@ -229,5 +237,46 @@ cmdUpload.addEventListener("click", async () => {
         logMessage("An error occurred while uploading file: " + error.message);
 
     }
+
+});
+
+cmdCancel.addEventListener("click", async () => {
+
+    // Query USer
+    if (!confirm("Cancel pending upload?")) {
+
+        // Exit
+        return;
+
+    }
+
+    try {
+
+        // Abort Multipart Upload
+        await postJSON("/AbortMultipartUpload", {
+            ObjectKey: pendingUpload.ObjectKey,
+            UploadId: pendingUpload.uploadId
+        });
+        // Log Message
+        logMessage("Aborted multipart upload with Upload ID: " + pendingUpload.uploadId);
+
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("An error occurred while cancelling upload: " + error.message);
+
+    }
+
+    // Delete Record
+    await deleteUpload(pendingUpload.uploadId);
+    // Log Message
+    logMessage("Deleted upload record from IndexedDB for Upload ID: " + pendingUpload.uploadId);
+
+    // Clear Pending Upload
+    pendingUpload = null;
+    // Assign Values
+    cmdUpload.textContent = "Upload";
+    cmdCancel.style.display = "none";
 
 });
