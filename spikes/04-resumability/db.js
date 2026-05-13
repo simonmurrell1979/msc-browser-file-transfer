@@ -78,3 +78,31 @@ export async function saveUpload(record) {
     });
 
 }
+
+export async function createUploadRecord(uploadId,
+    file,
+    partSize,
+    totalParts) {
+
+    // Build Record
+    var newRecord = {
+        uploadId: uploadId,
+        objectKey: file.name,
+        contentType: file.type || "application/octet-stream",
+        fileIdentifier: {
+            name: file.name,
+            size: file.size,
+            lastModified: file.lastModified,
+            hash: null
+        },
+        partSize: partSize,
+        totalParts: totalParts,
+        createDate: Date.now(),
+        uploadedParts: []
+    }
+    // Save Record
+    await saveUpload(newRecord);
+    // Return
+    return newRecord;
+
+}

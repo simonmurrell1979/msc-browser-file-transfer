@@ -1,16 +1,11 @@
 // Import Database Functions
-import { saveUpload } from "./db.js";
+import { createUploadRecord } from "./db.js";
 
 // Set up variables
 const apiBaseUrl = "https://localhost:7222/api/storage";
 const fileUpload = document.getElementById("fileUpload");
 const cmdUpload = document.getElementById("cmdUpload");
 const uploadStatus = document.getElementById("uploadStatus");
-
-await saveUpload({
-    uploadId: "12345",
-    objectKey: "example.txt"
-});
 
 function logMessage(message) {
 
@@ -94,6 +89,14 @@ cmdUpload.addEventListener("click", async () => {
             const partSize = 5 * 1024 * 1024; // 5MB
             // Calculate Number of Parts
             var totalParts = Math.ceil(file.size / partSize);
+
+            // Create Record
+            await createUploadRecord(uploadId, 
+                file,
+                partSize, 
+                totalParts);
+            // Log Message
+            logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
 
             // Search for each part
             for (let i = 0; i < totalParts; i++) {
