@@ -1,8 +1,16 @@
+// Import Database Functions
+import { saveUpload } from "./db.js";
+
 // Set up variables
 const apiBaseUrl = "https://localhost:7222/api/storage";
 const fileUpload = document.getElementById("fileUpload");
 const cmdUpload = document.getElementById("cmdUpload");
 const uploadStatus = document.getElementById("uploadStatus");
+
+await saveUpload({
+    uploadId: "12345",
+    objectKey: "example.txt"
+});
 
 function logMessage(message) {
 
