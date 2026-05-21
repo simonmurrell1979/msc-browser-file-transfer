@@ -3,7 +3,8 @@ import {
     addUploadedPart,
     createUploadRecord,
     deleteUpload,
-    findLatestUpload
+    findLatestUpload,
+    saveUpload
 } from "./db.js";
 
 // Set up variables
@@ -282,8 +283,10 @@ async function resumeUpload(file,
             ObjectKey: existingRecord.objectKey,
             UploadId: existingRecord.uploadId
         });
-
-        console.log("Server Parts:", JSON.stringify(serverParts));
+        // Update Existing Record
+        existingRecord.uploadedParts = serverParts;
+        // Save Record
+        await saveUpload(existingRecord);
 
         // Initialize Skipped Parts
         const skippedParts = new Set(existingRecord.uploadedParts.map(part => part.PartNumber));
