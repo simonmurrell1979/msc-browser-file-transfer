@@ -228,7 +228,7 @@ namespace FileTransfer.Services.Storage
             // Map Parts
             var parts = response.Parts.Select(p => new Uploads.UploadPart
             {
-                ETag = p.ETag,
+                ETag = p.ETag.Replace("\"", ""),
                 PartNumber = p.PartNumber
             }).ToList();
 
