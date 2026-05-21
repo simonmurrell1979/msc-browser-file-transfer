@@ -19,7 +19,8 @@ namespace FileTransfer.Common.Storage
 
         // Amazon S3 
         // https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
-        // 
+        // S3 API Compatibility
+        // https://developers.cloudflare.com/r2/api/s3/api/
 
         Task<(bool Connected, string? ErrorMessage)> TestConnectionAsync();
 
@@ -31,6 +32,7 @@ namespace FileTransfer.Common.Storage
         Task<string> GenerateMultipartUploadUrlAsync(string ObjectKey, string UploadId, int PartNumber);
         Task CompleteMultipartUploadAsync(string ObjectKey, string UploadId, List<UploadPart> Parts);
         Task AbortMultipartUploadAsync(string ObjectKey, string UploadId);
+        Task<List<UploadPart>> ListMultipartUploadParts(string ObjectKey, string UploadId);
 
     }
 
