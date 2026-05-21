@@ -277,6 +277,14 @@ async function resumeUpload(file,
         const partSize = existingRecord.partSize;
         const totalParts = existingRecord.totalParts;
 
+        // Load Server Parts
+        var serverParts = await postJSON("/ListMultipartUploadParts", {
+            ObjectKey: existingRecord.objectKey,
+            UploadId: existingRecord.uploadId
+        });
+
+        console.log("Server Parts:", JSON.stringify(serverParts));
+
         // Initialize Skipped Parts
         const skippedParts = new Set(existingRecord.uploadedParts.map(part => part.PartNumber));
         // Initialize Uploaded Parts
