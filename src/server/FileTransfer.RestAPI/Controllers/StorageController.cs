@@ -246,6 +246,43 @@ namespace FileTransfer.RestAPI.Controllers
 
         #endregion
 
+        #region ListMultipartUploadParts
+
+        [HttpPost]
+        public async Task<IActionResult> ListMultipartUploadParts(ListMultipartUploadRequest Request)
+        {
+
+            try
+            {
+
+                // List Multipart Uploads
+                await _storageService.ListMultipartUploadParts(Request.ObjectKey,
+                    Request.UploadId);
+                // Log Information
+                _logger.LogInformation("Listed multipart upload parts for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
+                    Request.ObjectKey,
+                    Request.UploadId);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse());
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error listing multipart upload parts for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
+                    Request.ObjectKey,
+                    Request.UploadId);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while listing the multipart upload parts: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
     }
 
 }
