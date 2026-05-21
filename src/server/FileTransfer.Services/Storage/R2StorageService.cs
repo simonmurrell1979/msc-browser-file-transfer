@@ -2,8 +2,8 @@
 using Amazon.S3.Model;
 using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Storage;
-using Uploads = FileTransfer.Common.Models.Uploads;
 using Microsoft.Extensions.Options;
+using Uploads = FileTransfer.Common.Models.Uploads;
 
 namespace FileTransfer.Services.Storage
 {
@@ -205,6 +205,35 @@ namespace FileTransfer.Services.Storage
             };
             // Abort Multipart Upload
             var response = await _client.AbortMultipartUploadAsync(request);
+
+        }
+
+        #endregion
+
+        #region ListMultipartUploadParts
+
+        public async Task<List<Uploads.UploadPart>> ListMultipartUploadParts(string ObjectKey, string UploadId)
+        {
+
+            // Build Request
+            var request = new ListPartsRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey,
+                UploadId = UploadId
+            };
+            // Abort Multipart Upload
+            var response = await _client.ListPartsAsync(request);
+
+            // Map Parts
+            var parts = response.Parts.Select(p => new Uploads.UploadPart
+            {
+                ETag = p.ETag,
+                PartNumber = p.PartNumber
+            }).ToList();
+
+            // Return
+            return parts;
 
         }
 

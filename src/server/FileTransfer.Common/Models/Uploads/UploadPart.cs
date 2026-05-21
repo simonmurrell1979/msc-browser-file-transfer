@@ -5,7 +5,7 @@
     {
 
         public string ETag { get; set; } = "";
-        public int PartNumber { get; set; }
+        public int? PartNumber { get; set; }
 
     }
 
