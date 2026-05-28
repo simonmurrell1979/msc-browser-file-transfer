@@ -1,47 +1,45 @@
-# Spike 04: IndexedDB Persistence
+# Spike 05: ListParts Reconciliation
 
 ## Goal
 
-Prove that an active multipart upload’s status can be stored in IndexedDB and retrieved following a page reload, allowing the upload to continue from its last point without re-sending processed parts.
+Demonstrate that upon resuming, the IndexedDB record can be matched with R2's actual state using the S3 'ListParts' operation, ensuring the upload continues based on server truth instead of the optimistic local cache.
 
 ## What's New
 
-- The 'db.js' module simplifies IndexedDB interactions by encapsulating operations such as 'saveUpload', 'getUpload', 'getUploads', 'deleteUpload', 'findLatestUpload', 'createUploadRecord', and 'addUploadedPart'.
-- Record structure: each upload is a single record identified by 'uploadId', containing an array of completed parts.
-- The file's fingerprint (name, size, lastModified) is stored with its upload status to confirm that the user picks the exact same file when resuming.
-- 'upload.js' has been refactored into 'uploadParts' (for the shared loop), 'newUpload' (to orchestrate new uploads), and 'resumeUpload' (to orchestrate resumed uploads). A small dispatcher now handles the click events.
-- When the script loads, IndexedDB is checked for any ongoing uploads.
-- Flow cancellation: A direct user action triggers an Abort on R2, then clears the IndexedDB record. If R2 is not accessible, it reverts to local-only cleanup.
+- The 'IR2StorageService' now includes a 'ListMultipartUploadParts' operation, which is a wrapper for the AWS SDK's 'ListPartsRequest'. It returns 'List<UploadPart>', which 'CompleteMultipartUpload' also accepts, allowing the reconciled list to be used downstream immediately without another DTO.
+- The client can now access the operation through a new '/ListMultipartUploadParts' controller action.
+- Prior to the upload loop, 'resumeUpload' within 'upload.js' contacts '/ListMultipartUploadParts', updates 'existingRecord.uploadedParts' from the server's data, and then saves it via 'saveUpload'. The reconciled record, not the raw one, is used to construct the 'skippedParts' set.
+- The reconciliation process results in the server's part list completely overriding the local one. 'ListParts' acts as the trust anchor, bypassing any merge or negotiation; IndexedDB is listening.
 
 ## How to Run
 
-1. Run the ASP.NET Core project.
-2. Launch the browser client by executing 'npx serve' on port 3000.
-3. Pick a file; since it's multi-part, it will be over 5 MB.
-4. Begin the upload and then close the tab mid-process.
-5. The page should reopen with "Resume Upload" displayed on the button and the log should indicate N out of M parts have been uploaded.
-6. Choose the same file again and press Resume.
-7. Verify that the missing parts have been uploaded, the fires have been completed, and the assembled object is visible on the R2 bucket dashboard.
+1. Execute the ASP.NET Core project.
+2. To start the browser client, run 'npx serve' on port 3000.
+3. Choose a file larger than 5 MB to activate multipart uploading.
+4. Start the upload, then close the tab before it's finished.
+5. Upon reopening the page, you'll see "Resume Upload."
+6. Choose the file again and click Resume.
+7. Note the log entry: "Reconciled with server.Prior to the resume loop commencing, "N parts confirmed on R2."
+8. Confirm the upload is finished and the object is visible on the R2 bucket dashboard.
 
 ## Key Findings
 
-- **R2 multipart provides server-side transport resumability for free.**
-Once started, R2 will retain parts forever. Clearing them needs an explicit Complete or Abort command, or a bucket lifecycle rule. The project's value lies in the client-side state-persistence layer, not in transport resumability itself, enabling functionality even after browser crashes.
+- **'ListParts' and the upload PUT response have differing ETag quote conventions.**
+The S3 multipart upload PUT response includes ETags enclosed in literal double quotes (e.g., '"abc123..."'), as discovered in Spike 03, whereas 'ListPartsResponse.Parts[].ETag' returns them unquoted. The discrepancy remains undetected until the combined data is checked against the local storage, revealing a mismatch. Because the client handles quote stripping upon upload, the server method doesn't need to do so when listing. A minor but verifiable instance of integration-boundary inconsistency, as characterized by Albrecht et al. (2024) as the primary failure point in operational E2EE file-sharing systems.
 
-- **Browsers cannot restore file selection across sessions.** 
-For security reasons, every browser intentionally discards the File reference when a tab is closed. Resuming necessitates either complete user re-selection using <input type="file"> or immediate permission granting through the File System Access API on Chromium browsers. A browser cannot achieve zero-interaction resumes, and this is not an issue requiring a fix.
+- **The optimistic local cache functions correctly under ideal circumstances and incorrectly at crucial moments.**
+The uploadedParts of existingRecord and R2 will match if all UploadPart operations and all IndexedDB writes are successful. Reconciliation lacks visibility. It's useful for the failure scenarios that the spike is designed to address, such as a response that gets lost, a write operation interrupted during a transaction, a bucket lifecycle rule deleting incomplete parts, or a resume action starting from an IndexedDB record that predates a server-side change. By expending one call per resume, 'ListParts' eliminates a whole category of failures.
 
-- **IndexedDB holds the upload "plan", R2 holds the "facts".** 
-The local record includes the file fingerprint and its planned part breakdown. R2 indicates the parts that have physically arrived. Spike 04 relies on the local record. Spike 05 (ListParts reconciliation) will confirm it.
+- **We must keep reconciling; it cannot be forgotten.**
+The initial version of the implementation modified 'existingRecord.uploadedParts' using JavaScript without invoking 'saveUpload'. The temporary edit in memory was enough for the resume to finish, but it disappeared when the tab was closed. A subsequent reload would re-read the stale base record if a second failure happened during the resume process. Before the upload loop starts, the corrected truth must be written back to IndexedDB, or the spike's thesis ("IndexedDB reflects server truth on resume") will only be valid in memory.
 
-- **JavaScript fails silently against incorrect property casing.** 
-record.objectKey versus record.ObjectKey serializes to an empty string with JSON.stringify. The problem is only detected at the server's validation check, which is far from where it started. It was encountered twice during this spike. Worthy of being highlighted as a failure mode typical of dynamic typing.
-
-- **Read-modify-write for incremental progress is acceptable at small part counts.** 
-A successful segment initiates a 'getUpload', mutation, and 'saveUpload' sequence. With approximately 1,000 parts, the total overhead is less than one second. Measuring batching (writing every N parts) is worthwhile for larger quantities.
+- **db.js is solely for data storage.**
+In 'upload.js', you'll find the 'postJSON' call for '/ListMultipartUploadParts'. 'db.js' is exclusively aware of IndexedDB. Spike 04's 'db.js' for IndexedDB and 'upload.js' for uploads established a clean separation, and keeping the API boundary out of the storage layer preserves this.
 
 ## Open Questions
 
-Spike 04 relies on the IndexedDB record for upload state information. If R2's real status differs from its local record, such as a part PUT succeeding without saving or a bucket rule deleting old parts, the resume might try to Complete with ETags R2 doesn't recognize. Spike 05 centers on reconciling with R2's actual state using the 'ListParts' operation.
+- **'ListParts' offers a maximum of 1,000 parts per invocation, utilizing 'PartNumberMarker' / 'IsTruncated' for pagination.** At the current 5 MB part size, files for single-page covers can reach ~5 GB, adequate for spike validation. Paging is a mechanical process that doesn't alter the reconciliation thesis. For the long run, the solution likely involves adjusting 'partSize' based on file size to maintain a part count below the single-page limit, rather than using paging. This will be revisited during the build phase.
 
-To restart, Spike 04 needs a button click from the user once the page has loaded. Uploads halt if the user leaves the page, closes the tab, or the browser crashes. R2's status is fine, yet the upload is on hold until the user resumes it. Saving the upload's execution context past the page's life, through a Service Worker, is the focus of Spike 06.
+- **No deliberate drift testing yet.** We can confirm the correctness of the natural-resume case due to this spike. Simulating a desynchronized local record and server, such as a failed bucket lifecycle reap or a missing UploadPart response, is for testing purposes, not development. This should be part of the evaluation phase's fault-injection protocol, not a separate experiment.
+
+- **Spike 06 (Service Worker resilience) addresses the remaining gap from Spike 04:** Users need to click "Resume" again if the page reloads. By integrating the upload loop into a Service Worker, it gains the ability to run autonomously from the page's event loop and relay progress updates via messaging.
