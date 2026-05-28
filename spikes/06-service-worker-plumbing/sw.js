@@ -20,3 +20,11 @@ self.addEventListener('activate', event => {
     console.log('Service Worker activating.');
 
 });
+
+// Add Sync Event
+self.addEventListener('sync', event => {
+
+    // Log Message
+    console.log('Service Worker sync event fired.');
+
+});
