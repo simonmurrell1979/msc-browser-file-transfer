@@ -11,7 +11,7 @@ including presigned URL generation and successful object upload via PowerShell.
 - Configuring S3 Bucket + permissions + CORS, etc.
 - Setting up initial ASP.NET API with AWS libraries configured for R2 account.
 - Setting up directory structures for the project going forward.
-- 'GetUploadUrl' endpoint is built to generate presigned URLs.
+- `GetUploadUrl` endpoint is built to generate presigned URLs.
 - PowerShell test to ensure the controller is working and files are being uploaded via presigned URLs.
 
 ## How to Run

@@ -8,7 +8,7 @@ Show how a browser can send a file to Cloudflare R2 using a presigned URL from a
 
 - Added an HTML and JavaScript client for browser-based uploads.
 - Choosing files with <input type="file"> and the browser File API.
-- File bytes are sent straight to R2 using 'fetch' and the 'PUT' method.
+- File bytes are sent straight to R2 using `fetch` and the `PUT` method.
 - Tested the R2 bucket's CORS settings through practical application.
 
 ## How to Run
