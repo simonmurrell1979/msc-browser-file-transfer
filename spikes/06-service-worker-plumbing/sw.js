@@ -10,5 +10,15 @@ self.addEventListener('install', event => {
     
     // Log Message
     console.log('Service Worker installing.');
+    // Skip waiting to activate the Service Worker immediately
+    self.skipWaiting();
     
+});
+
+// Add Activate Event
+self.addEventListener('activate', event => {
+
+    // Log Message
+    console.log('Service Worker activating.');
+
 });
