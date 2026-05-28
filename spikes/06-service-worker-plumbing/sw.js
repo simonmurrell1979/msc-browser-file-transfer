@@ -3,8 +3,6 @@
 // Sample Service Worker reference
 // https://gomakethings.com/writing-your-first-service-worker-with-vanilla-js/
 
-//console.log("Hello World!");
-
 // Add Install Event
 self.addEventListener('install', event => {
     
