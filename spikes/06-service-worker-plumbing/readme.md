@@ -12,9 +12,9 @@ Show that the page is capable of sending a message to a Service Worker and obtai
 
 ## How to Run
 
-1. Run 'npx serve' in the spike folder.
+1. Run `npx serve` in the spike folder.
 2. Go to the page. The status indicates that the Service Worker is registered and prepared.
-3. In the browser console, execute: 'sendServiceWorkerMessage("hello")'
+3. In the browser console, execute: `sendServiceWorkerMessage("hello")`
 4. The page status block displays:
    - "Sent message to Service Worker."
    - "Received message from Service Worker: {"type":"REPLY","message":"Service worker received your message: hello"}"
