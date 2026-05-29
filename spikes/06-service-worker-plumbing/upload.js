@@ -377,20 +377,6 @@ async function resumeUpload(file,
 
 }
 
-async function registerServiceWorker() {
-
-    // Register Service Worker
-    const registration = await navigator.serviceWorker.ready;
-    // Send Sync
-    await registration.sync.register("syncUploads");
-    // Log Message
-    logMessage("Registered sync event with Service Worker.");
-
-}
-
-// Exposing for Console Testing
-window.registerServiceWorker = registerServiceWorker;
-
 //**************************************************************************
 // Events
 //**************************************************************************
