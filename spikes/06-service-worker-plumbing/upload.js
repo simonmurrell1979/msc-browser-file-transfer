@@ -46,6 +46,18 @@ function logMessage(message) {
 
 }
 
+function addServiceWorkerMessageListener() {
+
+    // Add Listener for Messages from Service Worker
+    navigator.serviceWorker.addEventListener("message", event => {
+
+        // Log Message
+        logMessage("Received message from Service Worker: " + JSON.stringify(event.data));
+
+    });
+
+}
+
 async function initializeServiceWorker() {
 
     // Check Value
@@ -64,6 +76,8 @@ async function initializeServiceWorker() {
         await navigator.serviceWorker.register('sw.js');
         // Wait for Service Worker to be ready
         await navigator.serviceWorker.ready;
+        // Add Message Listener
+        addServiceWorkerMessageListener();
         // Log Message
         logMessage("Service Worker registered and ready.");
 
@@ -79,14 +93,6 @@ async function initializeServiceWorker() {
 
 // Initialize Service Worker
 await initializeServiceWorker();
-
-// Add Listener for Messages from Service Worker
-navigator.serviceWorker.addEventListener('message', event => {
-
-    // Log Message
-    logMessage("Received message from Service Worker: " + event.data);
-
-});
 
 async function sendServiceWorkerMessage(message) {
 
