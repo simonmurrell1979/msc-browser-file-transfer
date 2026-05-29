@@ -58,7 +58,27 @@ async function initializeServiceWorker() {
 
     }
 
+    try {
+
+        // Register Service Worker
+        await navigator.serviceWorker.register('sw.js');
+        // Wait for Service Worker to be ready
+        await navigator.serviceWorker.ready;
+        // Log Message
+        logMessage("Service Worker registered and ready.");
+
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("Failed to register Service Worker: " + error.message);
+
+    }
+
 }
+
+// Initialize Service Worker
+await initializeServiceWorker();
 
 async function postJSON(url,
     body) {
