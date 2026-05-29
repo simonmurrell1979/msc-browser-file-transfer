@@ -36,6 +36,21 @@ self.addEventListener('sync', event => {
 self.addEventListener('message', event => {
 
     // Log Message
-    console.log('Service Worker received message:', event.data);
+    console.log('Service Worker received message:', JSON.stringify(event.data));
+
+    // Add Reply
+    if (event.data &&
+        event.data.type === "MESSAGE") {
+
+        // Log Message
+        console.log("Replying...");
+        
+        // Reply back
+        event.source.postMessage({
+            type: "REPLY",
+            message: "Service worker received your message: " + event.data.message
+        });
+
+    }
 
 });
