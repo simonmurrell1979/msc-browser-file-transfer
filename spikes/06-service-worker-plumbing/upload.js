@@ -46,6 +46,20 @@ function logMessage(message) {
 
 }
 
+async function initializeServiceWorker() {
+
+    // Check Value
+    if (!('serviceWorker' in navigator)) {
+
+        // Log Message
+        logMessage("Service Workers are not supported in this browser.");
+        // Exit
+        return; 
+
+    }
+
+}
+
 async function postJSON(url,
     body) {
 
