@@ -80,6 +80,14 @@ async function initializeServiceWorker() {
 // Initialize Service Worker
 await initializeServiceWorker();
 
+// Add Listener for Messages from Service Worker
+navigator.serviceWorker.addEventListener('message', event => {
+
+    // Log Message
+    logMessage("Received message from Service Worker: " + event.data);
+
+});
+
 async function postJSON(url,
     body) {
 
