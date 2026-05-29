@@ -88,6 +88,31 @@ navigator.serviceWorker.addEventListener('message', event => {
 
 });
 
+async function sendServiceWorkerMessage(message) {
+
+    // Check Value
+    if (!navigator.serviceWorker.controller) {
+
+        // Log Message
+        logMessage("No active Service Worker to send message to.");
+        // Exit
+        return;
+
+    }
+
+    // Send Message
+    navigator.serviceWorker.controller.postMessage({
+        type: "MESSAGE",
+        message: message
+    });
+    // Log Message
+    logMessage("Sent message to Service Worker.");
+
+}
+
+// Allow console testing
+window.sendServiceWorkerMessage = sendServiceWorkerMessage;
+
 async function postJSON(url,
     body) {
 

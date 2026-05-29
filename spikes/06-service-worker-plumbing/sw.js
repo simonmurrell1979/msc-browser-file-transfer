@@ -1,5 +1,8 @@
 // API reference
 // https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+// Messaging
+// https://developer.mozilla.org/en-US/docs/Web/API/Client/postMessage
+// https://web.dev/articles/two-way-communication-guide
 // Sample Service Worker reference
 // https://gomakethings.com/writing-your-first-service-worker-with-vanilla-js/
 
