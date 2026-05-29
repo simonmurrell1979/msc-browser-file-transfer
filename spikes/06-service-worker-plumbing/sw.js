@@ -28,3 +28,11 @@ self.addEventListener('sync', event => {
     console.log('Service Worker sync event fired.');
 
 });
+
+// Add Message Event
+self.addEventListener('message', event => {
+
+    // Log Message
+    console.log('Service Worker received message:', event.data);
+
+});
