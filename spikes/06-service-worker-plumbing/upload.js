@@ -52,7 +52,7 @@ function addServiceWorkerMessageListener() {
     navigator.serviceWorker.addEventListener("message", event => {
 
         // Log Message
-        logMessage("Received message from Service Worker: " + JSON.stringify(event.data));
+        console.log("Received message from Service Worker: " + JSON.stringify(event.data));
 
     });
 
@@ -64,7 +64,7 @@ async function initializeServiceWorker() {
     if (!('serviceWorker' in navigator)) {
 
         // Log Message
-        logMessage("Service Workers are not supported in this browser.");
+        console.log("Service Workers are not supported in this browser.");
         // Exit
         return; 
 
@@ -79,13 +79,13 @@ async function initializeServiceWorker() {
         // Add Message Listener
         addServiceWorkerMessageListener();
         // Log Message
-        logMessage("Service Worker registered and ready.");
+        console.log("Service Worker registered and ready.");
 
     }
     catch (error) {
 
         // Log Message
-        logMessage("Failed to register Service Worker: " + error.message);
+        console.log("Failed to register Service Worker: " + error.message);
 
     }
 
@@ -100,7 +100,7 @@ async function sendServiceWorkerMessage(message) {
     if (!navigator.serviceWorker.controller) {
 
         // Log Message
-        logMessage("No active Service Worker to send message to.");
+        console.log("No active Service Worker to send message to.");
         // Exit
         return;
 
@@ -112,7 +112,7 @@ async function sendServiceWorkerMessage(message) {
         message: message
     });
     // Log Message
-    logMessage("Sent message to Service Worker.");
+    console.log("Sent message to Service Worker.");
 
 }
 
