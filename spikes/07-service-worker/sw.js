@@ -6,7 +6,38 @@
 // Sample Service Worker reference
 // https://gomakethings.com/writing-your-first-service-worker-with-vanilla-js/
 
+// Import API Functions
+import {
+    abortMultipartUpload,
+    completeMultipartUpload,
+    generateMultipartUploadUrl,
+    initiateMultipartUpload,
+    listMultipartUploadParts
+} from "./api.js";
+// Import Database Functions
+import {
+    addUploadedPart,
+    createUploadRecord,
+    deleteUpload,
+    saveUpload
+} from "./db.js";
 
+let serviceWorkerClient = null;
+
+function logMessage(message) {
+
+    // Check Value
+    if (serviceWorkerClient) {
+
+        // Post Message
+        serviceWorkerClient.postMessage({
+            type: "LOGMESSAGE",
+            message: message
+        });
+
+    }
+
+}
 
 async function uploadParts(file,
     uploadId,

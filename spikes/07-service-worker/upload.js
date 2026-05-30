@@ -1,12 +1,3 @@
-// Import API Functions
-import {
-    abortMultipartUpload
-} from "./api.js";
-// Import Database Functions
-import {
-    deleteUpload,
-    findLatestUpload
-} from "./db.js";
 // Import Service Worker Comms
 import {
     initializeServiceWorker,
