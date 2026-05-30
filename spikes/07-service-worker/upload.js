@@ -1,3 +1,7 @@
+// Import API Functions
+import {
+    generateMultipartUploadUrl,
+} from "./api.js";
 // Import Database Functions
 import {
     addUploadedPart,
@@ -175,11 +179,7 @@ async function uploadParts(file,
         var fileChunk = file.slice(fileStart, fileEnd);
 
         // Generate Multipart Upload URL
-        const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", {
-            ObjectKey: file.name,
-            UploadId: uploadId,
-            PartNumber: partIndex
-        });
+        const multipartUploadUrl = await generateMultipartUploadUrl(file.name, uploadId, partIndex);
         
         // Upload to R2
         const uploadPartResponse = await fetch(multipartUploadUrl, {
