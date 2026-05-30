@@ -20,6 +20,7 @@ import {
     addUploadedPart,
     createUploadRecord,
     deleteUpload,
+    getUpload,
     saveUpload
 } from "./db.js";
 // Import Message Type
@@ -211,10 +212,21 @@ async function newUpload(file) {
 }
 
 async function resumeUpload(file,
-    existingRecord) {
+    uploadId) {
 
     try {
 
+        // Get Record
+        const existingRecord = await getUpload(uploadId);
+        // Check Value
+        if (!existingRecord) {
+
+            // Log Message
+            logMessage("No pending upload found for Upload ID: " + uploadId);
+            // Exit
+            return;
+
+        }
         // Check Value
         if (file.name !== existingRecord.fileIdentifier.name ||
             file.size !== existingRecord.fileIdentifier.size ||
@@ -339,6 +351,8 @@ self.addEventListener('activate', event => {
 
     // Log Message
     console.log('Service Worker activating.');
+    // Claim clients to start controlling pages immediately
+    event.waitUntil(self.clients.claim());
 
 });
 
@@ -367,12 +381,23 @@ self.addEventListener('message', event => {
         return;
 
     }
-    
-    // Command Handler
-    if (data.type == MessageType.NEWUPLOAD) {
 
-        // New Upload
-        event.waitUntil(newUpload(data.file));
+    // Command Handler
+    switch (data.type) {
+
+        case MessageType.NEWUPLOAD:
+            
+            // New Upload
+            event.waitUntil(newUpload(data.file));
+            // Exit
+            break; 
+
+        case MessageType.RESUMEUPLOAD:
+
+            // Resume Upload
+            event.waitUntil(resumeUpload(data.file, data.uploadId));
+            // Exit
+            break;
 
     }
 

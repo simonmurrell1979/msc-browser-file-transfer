@@ -98,7 +98,8 @@ cmdUpload.addEventListener("click", async () => {
 
         // Resume Upload
         await sendCommand({
-            type: "RESUMEUPLOAD",
+            type: MessageType.RESUMEUPLOAD,
+            file: file,
             uploadId: pendingUpload.uploadId
         });
 
@@ -107,7 +108,7 @@ cmdUpload.addEventListener("click", async () => {
 
         // New Upload
         await sendCommand({
-            type: "NEWUPLOAD",
+            type: MessageType.NEWUPLOAD,
             file: file
         });
 
