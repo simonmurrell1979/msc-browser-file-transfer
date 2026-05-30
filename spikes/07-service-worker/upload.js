@@ -3,7 +3,8 @@ import {
     abortMultipartUpload,
     completeMultipartUpload,
     generateMultipartUploadUrl,
-    initializeMultipartUpload
+    initializeMultipartUpload,
+    listMultipartUploadParts
 } from "./api.js";
 // Import Database Functions
 import {
@@ -355,10 +356,8 @@ async function resumeUpload(file,
         const totalParts = existingRecord.totalParts;
 
         // Load Server Parts
-        var serverParts = await postJSON("/ListMultipartUploadParts", {
-            ObjectKey: existingRecord.objectKey,
-            UploadId: existingRecord.uploadId
-        });
+        var serverParts = await listMultipartUploadParts(existingRecord.objectKey, 
+            existingRecord.uploadId);
         // Update Existing Record
         existingRecord.uploadedParts = serverParts;
         // Save Record

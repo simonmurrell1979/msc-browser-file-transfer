@@ -22,6 +22,17 @@ async function initializeMultipartUpload(objectKey,
 
 }
 
+async function listMultipartUploadParts(objectKey,
+    uploadId) {
+
+    // Load Server Parts
+    return await postJSON("/ListMultipartUploadParts", {
+        ObjectKey: objectKey,
+        UploadId: uploadId
+    });
+
+}
+
 async function completeMultipartUpload(objectKey,
     uploadId,
     uploadedParts) {
@@ -51,6 +62,7 @@ export {
     abortMultipartUpload,
     completeMultipartUpload,
     generateMultipartUploadUrl,
-    initializeMultipartUpload
+    initializeMultipartUpload,
+    listMultipartUploadParts
 };
 
