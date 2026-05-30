@@ -52,7 +52,7 @@ function handleServiceWorkerMessage(message) {
     switch (message.type) {
 
         // Log Message
-        case "LOGMESSAGE":
+        case MessageType.LOGMESSAGE:
 
             // Log Message
             logMessage("Message from Service Worker: " + message.message);
@@ -138,8 +138,6 @@ cmdCancel.addEventListener("click", async () => {
 
     }
 
-    // Delete Record
-    await deleteUpload(pendingUpload.uploadId);
     // Log Message
     logMessage("Deleted upload record from IndexedDB for Upload ID: " + pendingUpload.uploadId);
 
