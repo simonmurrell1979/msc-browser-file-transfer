@@ -1,4 +1,8 @@
-// Import Service Worker Comms
+// Import Database Functions
+import {
+    findLatestUpload
+} from "./db.js";
+// Import Message Type
 import {
     MessageType
 } from "./messagetype.js";
