@@ -3,7 +3,7 @@ import {
     abortMultipartUpload,
     completeMultipartUpload,
     generateMultipartUploadUrl,
-    initializeMultipartUpload,
+    initiateMultipartUpload,
     listMultipartUploadParts
 } from "./api.js";
 // Import Database Functions
@@ -199,17 +199,7 @@ async function newUpload(file) {
         logMessage("Uploading file: " + file.name);
 
         // Initialize Multipart Upload
-        const uploadId = await initializeMultipartUpload(file.name, file.type);
-        // Check Value
-        if (!uploadId) {
-         
-            // Log Message
-            logMessage("Failed to initiate multipart upload.");
-            // Exit
-            return;
-
-        }
-
+        const uploadId = await initiateMultipartUpload(file.name, file.type);
         // Check Value
         if (!uploadId) {
          

@@ -41,7 +41,7 @@ async function generateMultipartUploadUrl(objectKey,
 
 }
 
-async function initializeMultipartUpload(objectKey,
+async function initiateMultipartUpload(objectKey,
     contentType) {
 
     // Initialize Multipart Upload
@@ -92,7 +92,7 @@ export {
     abortMultipartUpload,
     completeMultipartUpload,
     generateMultipartUploadUrl,
-    initializeMultipartUpload,
+    initiateMultipartUpload,
     listMultipartUploadParts
 };
 
