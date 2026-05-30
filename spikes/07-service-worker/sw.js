@@ -243,7 +243,6 @@ async function resumeUpload(file,
         logMessage("Resuming upload for file: " + existingRecord.objectKey);
 
         // Assign Values
-        const uploadId = existingRecord.uploadId;
         const partSize = existingRecord.partSize;
         const totalParts = existingRecord.totalParts;
 
@@ -295,11 +294,6 @@ async function resumeUpload(file,
             await deleteUpload(uploadId);
             // Log Message
             logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-
-            // Reset
-            pendingUpload = null;
-            cmdUpload.textContent = "Upload";
-            cmdCancel.style.display = "none";
 
         }
         catch (error) {
@@ -386,7 +380,7 @@ self.addEventListener('message', event => {
     switch (data.type) {
 
         case MessageType.NEWUPLOAD:
-            
+
             // New Upload
             event.waitUntil(newUpload(data.file));
             // Exit
