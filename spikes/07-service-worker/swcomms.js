@@ -35,7 +35,11 @@ async function initializeServiceWorker(onMessageHandler) {
         messageHandler = onMessageHandler;
 
         // Register Service Worker
-        await navigator.serviceWorker.register('sw.js');
+        await navigator.serviceWorker.register("sw.js", 
+            {
+                type: "module"
+            }
+        );
         // Wait for Service Worker to be ready
         await navigator.serviceWorker.ready;
         // Add Message Listener
