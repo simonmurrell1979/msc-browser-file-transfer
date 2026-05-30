@@ -1,7 +1,8 @@
 // Import Service Worker Comms
+import { MessageType } from "./messagetype.js";
 import {
     initializeServiceWorker,
-    sendServiceWorkerMessage
+    sendCommand
 } from "./swcomms.js";
 
 // Set up variables
@@ -45,8 +46,20 @@ function logMessage(message) {
 // Add Message Handler
 function handleServiceWorkerMessage(message) {
 
+    // Handle Different Message Types
+    switch (message.type) {
+
+        // Log Message
+        case "LOGMESSAGE":
+
+            // Log Message
+            logMessage("Message from Service Worker: " + message.message);
+            // Exit
+            break;
+
+    }
     // Log Message
-    console.log("Received message from Service Worker: " + JSON.stringify(message));
+    console.log("Received " + message.type + " message from Service Worker: " + message.message);
 
 }
 
@@ -80,14 +93,19 @@ cmdUpload.addEventListener("click", async () => {
     if (pendingUpload) {
 
         // Resume Upload
-        await resumeUpload(file,
-            pendingUpload);
+        await sendCommand({
+            type: "RESUMEUPLOAD",
+            uploadId: pendingUpload.uploadId
+        });
 
     }
     else {
 
         // New Upload
-        await newUpload(file);
+        await sendCommand({
+            type: "NEWUPLOAD",
+            file: file
+        });
 
     }
 
@@ -106,9 +124,11 @@ cmdCancel.addEventListener("click", async () => {
     try {
 
         // Abort Multipart Upload
-        await abortMultipartUpload(pendingUpload.objectKey, pendingUpload.uploadId);
-        // Log Message
-        logMessage("Aborted multipart upload with Upload ID: " + pendingUpload.uploadId);
+        await sendCommand({
+            type: MessageType.CANCELUPLOAD,
+            objectKey: pendingUpload.objectKey,
+            uploadId: pendingUpload.uploadId
+        });
 
     }
     catch (error) {
