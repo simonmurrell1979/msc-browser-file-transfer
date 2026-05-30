@@ -3,6 +3,7 @@
 // Messaging
 // https://developer.mozilla.org/en-US/docs/Web/API/Client/postMessage
 // https://web.dev/articles/two-way-communication-guide
+// https://developer.mozilla.org/en-US/docs/Web/API/ExtendableEvent/waitUntil
 // Sample Service Worker reference
 // https://gomakethings.com/writing-your-first-service-worker-with-vanilla-js/
 
@@ -348,21 +349,26 @@ self.addEventListener('sync', event => {
 // Add Message Event
 self.addEventListener('message', event => {
 
-    // Log Message
-    console.log('Service Worker received message:', JSON.stringify(event.data));
+    // Assign Value
+    serviceWorkerClient = event.source;
 
-    // Add Reply
-    if (event.data &&
-        event.data.type === "MESSAGE") {
+    // Assign Value
+    const data = event.data;
+    // Check Value
+    if (!data || !data.type) {
 
         // Log Message
-        console.log("Replying...");
-        
-        // Reply back
-        event.source.postMessage({
-            type: "REPLY",
-            message: "Service worker received your message: " + event.data.message
-        });
+        logMessage("Received invalid message in Service Worker.");
+        // Exit
+        return;
+
+    }
+    
+    // Command Handler
+    if (data.type == "NEWUPLOAD") {
+
+        // New Upload
+        event.waitUntil(newUpload(data.file));
 
     }
 
