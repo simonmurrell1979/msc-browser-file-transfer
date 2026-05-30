@@ -1,5 +1,7 @@
 // Import Service Worker Comms
-import { MessageType } from "./messagetype.js";
+import {
+    MessageType
+} from "./messagetype.js";
 import {
     initializeServiceWorker,
     sendCommand
