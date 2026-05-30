@@ -22,6 +22,10 @@ import {
     deleteUpload,
     saveUpload
 } from "./db.js";
+// Import Message Type
+import {
+    MessageType
+} from "./messagetype.js";
 
 let serviceWorkerClient = null;
 
@@ -32,7 +36,7 @@ function logMessage(message) {
 
         // Post Message
         serviceWorkerClient.postMessage({
-            type: "LOGMESSAGE",
+            type: MessageType.LOGMESSAGE,
             message: message
         });
 
@@ -365,7 +369,7 @@ self.addEventListener('message', event => {
     }
     
     // Command Handler
-    if (data.type == "NEWUPLOAD") {
+    if (data.type == MessageType.NEWUPLOAD) {
 
         // New Upload
         event.waitUntil(newUpload(data.file));
