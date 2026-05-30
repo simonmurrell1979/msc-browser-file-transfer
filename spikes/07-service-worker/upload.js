@@ -62,7 +62,7 @@ function logMessage(message) {
 function handleServiceWorkerMessage(message) {
 
     // Log Message
-    logMessage("Received message from Service Worker: " + JSON.stringify(message));
+    console.log("Received message from Service Worker: " + JSON.stringify(message));
 
 }
 
