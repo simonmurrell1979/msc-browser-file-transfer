@@ -67,8 +67,6 @@ function handleServiceWorkerMessage(message) {
 
 // Initialize Service Worker
 await initializeServiceWorker(handleServiceWorkerMessage);
-// Allow console testing
-window.sendServiceWorkerMessage = sendServiceWorkerMessage;
 
 //**************************************************************************
 // Events
