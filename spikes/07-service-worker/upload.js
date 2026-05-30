@@ -67,7 +67,7 @@ function handleServiceWorkerMessage(message) {
 }
 
 // Initialize Service Worker
-await initializeServiceWorker(handleServhandleServiceWorkerMessageiceWorkerMessage);
+await initializeServiceWorker(handleServiceWorkerMessage);
 // Allow console testing
 window.sendServiceWorkerMessage = sendServiceWorkerMessage;
 
