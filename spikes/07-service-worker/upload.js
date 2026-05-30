@@ -14,6 +14,11 @@ import {
     findLatestUpload,
     saveUpload
 } from "./db.js";
+// Import Service Worker Comms
+import {
+    initializeServiceWorker,
+    sendServiceWorkerMessage
+} from "./swcomms.js";
 
 // Set up variables
 const fileUpload = document.getElementById("fileUpload");
@@ -53,11 +58,18 @@ function logMessage(message) {
 
 }
 
-// Initialize Service Worker
-//await initializeServiceWorker();
+// Add Message Handler
+function handleServiceWorkerMessage(message) {
 
+    // Log Message
+    logMessage("Received message from Service Worker: " + JSON.stringify(message));
+
+}
+
+// Initialize Service Worker
+await initializeServiceWorker(handleServhandleServiceWorkerMessageiceWorkerMessage);
 // Allow console testing
-//window.sendServiceWorkerMessage = sendServiceWorkerMessage;
+window.sendServiceWorkerMessage = sendServiceWorkerMessage;
 
 async function uploadParts(file,
     uploadId,

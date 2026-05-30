@@ -87,7 +87,7 @@ async function abortMultipartUpload(objectKey,
 
 }
 
-// Exports
+// Export Functions
 export {
     abortMultipartUpload,
     completeMultipartUpload,

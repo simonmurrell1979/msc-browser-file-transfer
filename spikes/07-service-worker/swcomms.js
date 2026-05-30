@@ -1,16 +1,23 @@
+let messageHandler = null;
+
 function addServiceWorkerMessageListener() {
 
     // Add Listener for Messages from Service Worker
     navigator.serviceWorker.addEventListener("message", event => {
 
-        // Log Message
-        console.log("Received message from Service Worker: " + JSON.stringify(event.data));
+        // Check Value
+        if (messageHandler) {
+
+            // Call Message Handler
+            messageHandler(event.data);
+
+        }
 
     });
 
 }
 
-async function initializeServiceWorker() {
+async function initializeServiceWorker(onMessageHandler) {
 
     // Check Value
     if (!('serviceWorker' in navigator)) {
@@ -23,6 +30,9 @@ async function initializeServiceWorker() {
     }
 
     try {
+
+        // Assign Message Handler
+        messageHandler = onMessageHandler;
 
         // Register Service Worker
         await navigator.serviceWorker.register('sw.js');
@@ -64,3 +74,10 @@ async function sendServiceWorkerMessage(message) {
     console.log("Sent message to Service Worker.");
 
 }
+
+// Export Functions
+export {
+    initializeServiceWorker,
+    sendServiceWorkerMessage
+};
+
