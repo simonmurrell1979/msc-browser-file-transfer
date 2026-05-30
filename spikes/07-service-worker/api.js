@@ -35,9 +35,22 @@ async function completeMultipartUpload(objectKey,
 
 }
 
+async function abortMultipartUpload(objectKey,
+    uploadId) {
+
+    // Abort Multipart Upload
+    await postJSON("/AbortMultipartUpload", {
+        ObjectKey: objectKey,
+        UploadId: uploadId
+    });
+
+}
+
 // Exports
 export {
-    completeMultipartUpload, generateMultipartUploadUrl,
+    abortMultipartUpload,
+    completeMultipartUpload,
+    generateMultipartUploadUrl,
     initializeMultipartUpload
 };
 

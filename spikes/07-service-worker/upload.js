@@ -1,5 +1,6 @@
 // Import API Functions
 import {
+    abortMultipartUpload,
     completeMultipartUpload,
     generateMultipartUploadUrl,
     initializeMultipartUpload
@@ -302,11 +303,7 @@ async function newUpload(file) {
             try {
 
                 // Abort Multipart Upload
-                await postJSON("/AbortMultipartUpload", {
-                    ObjectKey: file.name,
-                    UploadId: uploadId
-                });
-
+                await abortMultipartUpload(file.name, uploadId);
                 // Delete Record
                 await deleteUpload(uploadId);
                 // Log Message
