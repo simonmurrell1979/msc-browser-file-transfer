@@ -57,7 +57,7 @@ async function initializeServiceWorker(onMessageHandler) {
 
 }
 
-async function sendServiceWorkerMessage(message) {
+async function sendCommand(message) {
 
     // Check Value
     if (!navigator.serviceWorker.controller) {
@@ -68,20 +68,14 @@ async function sendServiceWorkerMessage(message) {
         return;
 
     }
-
     // Send Message
-    navigator.serviceWorker.controller.postMessage({
-        type: "MESSAGE",
-        message: message
-    });
-    // Log Message
-    console.log("Sent message to Service Worker.");
+    navigator.serviceWorker.controller.postMessage(message);
 
 }
 
 // Export Functions
 export {
     initializeServiceWorker,
-    sendServiceWorkerMessage
+    sendCommand
 };
 
