@@ -1,6 +1,7 @@
 // Import API Functions
 import {
     generateMultipartUploadUrl,
+    initializeMultipartUpload
 } from "./api.js";
 // Import Database Functions
 import {
@@ -223,10 +224,17 @@ async function newUpload(file) {
         logMessage("Uploading file: " + file.name);
 
         // Initialize Multipart Upload
-        const uploadId = await postJSON("/InitiateMultipartUpload", {
-            ObjectKey: file.name,
-            ContentType: file.type || "application/octet-stream"
-        });
+        const uploadId = await initializeMultipartUpload(file.name, file.type);
+        // Check Value
+        if (!uploadId) {
+         
+            // Log Message
+            logMessage("Failed to initiate multipart upload.");
+            // Exit
+            return;
+
+        }
+
         // Check Value
         if (!uploadId) {
          

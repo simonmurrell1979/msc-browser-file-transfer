@@ -11,8 +11,20 @@ async function generateMultipartUploadUrl(objectKey,
 
 }
 
+async function initializeMultipartUpload(objectKey,
+    contentType) {
+
+    // Initialize Multipart Upload
+    return await postJSON("/InitiateMultipartUpload", {
+            ObjectKey: objectKey,
+            ContentType: contentType || "application/octet-stream"
+        });
+
+}
+
 // Exports
 export {
-    generateMultipartUploadUrl
+    generateMultipartUploadUrl,
+    initializeMultipartUpload
 };
 
