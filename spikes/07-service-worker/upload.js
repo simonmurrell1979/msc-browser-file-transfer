@@ -1,5 +1,6 @@
 // Import API Functions
 import {
+    completeMultipartUpload,
     generateMultipartUploadUrl,
     initializeMultipartUpload
 } from "./api.js";
@@ -280,12 +281,9 @@ async function newUpload(file) {
                 throw new Error("Not all parts were uploaded successfully.");
 
             }
+
             // Complete Multipart Upload
-            await postJSON("/CompleteMultipartUpload", {
-                ObjectKey: file.name,
-                UploadId: uploadId,
-                Parts: uploadedParts
-            });
+            await completeMultipartUpload(file.name, uploadId, uploadedParts);
 
             // Log Message
             logMessage("All parts uploaded successfully. Completed multipart upload...");

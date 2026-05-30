@@ -22,9 +22,22 @@ async function initializeMultipartUpload(objectKey,
 
 }
 
+async function completeMultipartUpload(objectKey,
+    uploadId,
+    uploadedParts) {
+
+    // Complete Multipart Upload
+    await postJSON("/CompleteMultipartUpload", {
+        ObjectKey: objectKey,
+        UploadId: uploadId,
+        Parts: uploadedParts
+    });
+
+}
+
 // Exports
 export {
-    generateMultipartUploadUrl,
+    completeMultipartUpload, generateMultipartUploadUrl,
     initializeMultipartUpload
 };
 
