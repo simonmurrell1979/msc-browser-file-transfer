@@ -1,3 +1,30 @@
+async function postJSON(url,
+    body) {
+
+    // Assign Value
+    var postUrl = apiBaseUrl + url;
+    // Send Request
+    const initialResponse = await fetch(postUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+    // Extract JSON
+    const json = await initialResponse.json();
+    // Check Value
+    if (!json.Success) {
+
+        // Throw Exception
+        throw new Error(json.Message || "Unknown Server Error");
+
+    }
+    // Return
+    return json.ReturnedObject;
+
+}
+
 async function generateMultipartUploadUrl(objectKey,
     uploadId,
     partNumber) {

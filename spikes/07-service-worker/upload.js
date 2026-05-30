@@ -127,33 +127,6 @@ async function sendServiceWorkerMessage(message) {
 // Allow console testing
 window.sendServiceWorkerMessage = sendServiceWorkerMessage;
 
-async function postJSON(url,
-    body) {
-
-    // Assign Value
-    var postUrl = apiBaseUrl + url;
-    // Send Request
-    const initialResponse = await fetch(postUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
-    // Extract JSON
-    const json = await initialResponse.json();
-    // Check Value
-    if (!json.Success) {
-
-        // Throw Exception
-        throw new Error(json.Message || "Unknown Server Error");
-
-    }
-    // Return
-    return json.ReturnedObject;
-
-}
-
 async function uploadParts(file,
     uploadId,
     partSize,
@@ -394,11 +367,7 @@ async function resumeUpload(file,
 
             }
             // Complete Multipart Upload
-            await postJSON("/CompleteMultipartUpload", {
-                ObjectKey: file.name,
-                UploadId: uploadId,
-                Parts: uploadedParts
-            });
+            await completeMultipartUpload(file.name, uploadId, uploadedParts);
 
             // Log Message
             logMessage("All parts uploaded successfully. Completed multipart upload...");
@@ -422,11 +391,7 @@ async function resumeUpload(file,
             try {
 
                 // Abort Multipart Upload
-                await postJSON("/AbortMultipartUpload", {
-                    ObjectKey: file.name,
-                    UploadId: uploadId
-                });
-
+                await abortMultipartUpload(file.name, uploadId);
                 // Delete Record
                 await deleteUpload(uploadId);
                 // Log Message
@@ -503,10 +468,7 @@ cmdCancel.addEventListener("click", async () => {
     try {
 
         // Abort Multipart Upload
-        await postJSON("/AbortMultipartUpload", {
-            ObjectKey: pendingUpload.objectKey,
-            UploadId: pendingUpload.uploadId
-        });
+        await abortMultipartUpload(pendingUpload.objectKey, pendingUpload.uploadId);
         // Log Message
         logMessage("Aborted multipart upload with Upload ID: " + pendingUpload.uploadId);
 
