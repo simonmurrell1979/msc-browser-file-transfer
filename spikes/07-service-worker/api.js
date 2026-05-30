@@ -1,3 +1,6 @@
+// Set up variables
+const apiBaseUrl = "https://localhost:7222/api/storage";
+
 async function postJSON(url,
     body) {
 

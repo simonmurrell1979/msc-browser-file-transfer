@@ -16,7 +16,6 @@ import {
 } from "./db.js";
 
 // Set up variables
-const apiBaseUrl = "https://localhost:7222/api/storage";
 const fileUpload = document.getElementById("fileUpload");
 const cmdUpload = document.getElementById("cmdUpload");
 const cmdCancel = document.getElementById("cmdCancel");
