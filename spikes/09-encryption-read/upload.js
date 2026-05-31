@@ -226,7 +226,7 @@ cmdDownload.addEventListener("click", async () => {
         // Create Download Link
         const downloadLink = document.createElement("a");
         downloadLink.href = URL.createObjectURL(decryptedFile);
-        downloadLink.download = "decrypted_file";
+        downloadLink.download = completedObjectKey;
         // Click Download Link
         downloadLink.click();
 
