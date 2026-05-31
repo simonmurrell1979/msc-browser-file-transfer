@@ -195,6 +195,8 @@ cmdDownload.addEventListener("click", async () => {
         
         // Get Decryption Key
         const decryptionKey = await getDecryptionKey(completedObjectKey);
+        // Initialize Decryption File Parts
+        const decryptedFileParts = [];
         // Reset File Position
         let filePosition = 0;
 
@@ -207,11 +209,22 @@ cmdDownload.addEventListener("click", async () => {
             const decryptedPart = await decryptFilePart(decryptionKey, encryptedPart);
             // Log Message
             logMessage("Decrypted part of size: " + decryptedPart.byteLength + " bytes.");
+            // Append Decrypted Part
+            decryptedFileParts.push(decryptedPart);
             // Update File Position
             filePosition += encryptedPartSize;
 
         }
-        
+
+        // Combine Decrypted Parts
+        const decryptedFile = new Blob(decryptedFileParts);
+        // Create Download Link
+        const downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(decryptedFile);
+        downloadLink.download = "decrypted_file";
+        // Click Download Link
+        downloadLink.click();
+
     }
     catch (error) {
 
