@@ -166,16 +166,8 @@ async function newUpload(file) {
 
             }
 
-            // Complete Multipart Upload
-            await completeMultipartUpload(file.name, uploadId, uploadedParts);
-
-            // Log Message
-            logMessage("All parts uploaded successfully. Completed multipart upload...");
-
-            // Delete Record
-            await deleteUpload(uploadId);
-            // Log Message
-            logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+            // Complete Upload
+            await completeUpload(file.name, uploadId, uploadedParts);
 
         }
         catch (error) {
@@ -183,22 +175,8 @@ async function newUpload(file) {
             // Log Message
             logMessage("An error occurred during multipart upload: " + error.message);            
 
-            try {
-
-                // Abort Multipart Upload
-                await abortMultipartUpload(file.name, uploadId);
-                // Delete Record
-                await deleteUpload(uploadId);
-                // Log Message
-                logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-
-            }
-            catch (abortError) {
-
-                // Log Message
-                logMessage("Failed to abort multipart upload: " + abortError.message);
-
-            }
+            // Cancel Upload
+            await cancelUpload(file.name, uploadId);
 
         }
 
@@ -285,16 +263,9 @@ async function resumeUpload(file,
                 throw new Error("Not all parts were uploaded successfully.");
 
             }
-            // Complete Multipart Upload
-            await completeMultipartUpload(file.name, uploadId, uploadedParts);
 
-            // Log Message
-            logMessage("All parts uploaded successfully. Completed multipart upload...");
-
-            // Delete Record
-            await deleteUpload(uploadId);
-            // Log Message
-            logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+            // Complete Upload
+            await completeUpload(file.name, uploadId, uploadedParts);
 
         }
         catch (error) {
@@ -302,22 +273,8 @@ async function resumeUpload(file,
             // Log Message
             logMessage("An error occurred during multipart upload: " + error.message);            
 
-            try {
-
-                // Abort Multipart Upload
-                await abortMultipartUpload(file.name, uploadId);
-                // Delete Record
-                await deleteUpload(uploadId);
-                // Log Message
-                logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-
-            }
-            catch (abortError) {
-
-                // Log Message
-                logMessage("Failed to abort multipart upload: " + abortError.message);
-
-            }
+            // Cancel Upload
+            await cancelUpload(file.name, uploadId);
 
         }
 
@@ -326,6 +283,68 @@ async function resumeUpload(file,
 
         // Log Message
         logMessage("An error occurred while uploading file: " + error.message);
+
+    }
+
+}
+
+async function cancelUpload(objectKey,
+    uploadId) {
+
+    try {
+
+        // Abort Multipart Upload
+        await abortMultipartUpload(file.name, uploadId);
+        // Log Message
+        logMessage("Aborted multipart upload for Upload ID: " + uploadId);
+
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("Failed while canceling multipart upload: " + error.message);
+
+    }
+
+    try {
+
+        // Delete Record
+        await deleteUpload(uploadId);
+        // Log Message
+        logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("Failed while deleting record: " + error.message);
+
+    }
+
+}
+
+async function completeUpload(objectKey,
+    uploadId,
+    uploadedParts) {
+
+    // Complete Multipart Upload
+    await completeMultipartUpload(objectKey, uploadId, uploadedParts);
+    // Log Message
+    logMessage("All parts uploaded successfully. Completed multipart upload...");
+
+    // Delete Record
+    await deleteUpload(uploadId);
+    // Log Message
+    logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+    // Check Value
+    if (serviceWorkerClient) {
+
+        // Complete Upload
+        serviceWorkerClient.postMessage({
+            type: MessageType.UPLOADCOMPLETE,
+            uploadId: uploadId
+        });
 
     }
 
@@ -348,14 +367,6 @@ self.addEventListener('activate', event => {
     console.log('Service Worker activating.');
     // Claim clients to start controlling pages immediately
     event.waitUntil(self.clients.claim());
-
-});
-
-// Add Sync Event
-self.addEventListener('sync', event => {
-
-    // Log Message
-    console.log('Service Worker sync event fired.');
 
 });
 
