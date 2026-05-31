@@ -1,7 +1,9 @@
+// Import API Functions
 // Import Database Functions
 import {
     findLatestUpload
 } from "./db.js";
+// Import Encryption Functions
 // Import Message Type
 import {
     MessageType
@@ -15,8 +17,12 @@ import {
 const fileUpload = document.getElementById("fileUpload");
 const cmdUpload = document.getElementById("cmdUpload");
 const cmdCancel = document.getElementById("cmdCancel");
+const cmdDownload = document.getElementById("cmdDownload");
 const uploadStatus = document.getElementById("uploadStatus");
 let pendingUpload = null;
+let completedObjectKey = null;
+const partSize = 5 * 1024 * 1024;
+const encryptedPartSize = partSize + 28;
 
 // Find Latest Upload
 const latestUpload = await findLatestUpload();
@@ -128,6 +134,41 @@ cmdUpload.addEventListener("click", async () => {
 });
 
 cmdCancel.addEventListener("click", async () => {
+
+    // Query USer
+    if (!confirm("Cancel pending upload?")) {
+
+        // Exit
+        return;
+
+    }
+
+    try {
+
+        // Abort Multipart Upload
+        await sendCommand({
+            type: MessageType.CANCELUPLOAD,
+            objectKey: pendingUpload.objectKey,
+            uploadId: pendingUpload.uploadId
+        });
+
+        // Clear Pending Upload
+        pendingUpload = null;
+        // Assign Values
+        cmdUpload.textContent = "Upload";
+        cmdCancel.style.display = "none";
+        
+    }
+    catch (error) {
+
+        // Log Message
+        logMessage("An error occurred while cancelling upload: " + error.message);
+
+    }
+
+});
+
+cmdDownload.addEventListener("click", async () => {
 
     // Query USer
     if (!confirm("Cancel pending upload?")) {
