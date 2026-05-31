@@ -14,6 +14,8 @@ namespace FileTransfer.Common.Storage
         // https://developers.cloudflare.com/r2/objects/upload-objects/
         // Download Objects
         // https://developers.cloudflare.com/r2/objects/download-objects/
+        // Presigned URLs for downloads
+        // https://developers.cloudflare.com/r2/api/s3/presigned-urls/
         // Delete Objects
         // https://developers.cloudflare.com/r2/objects/delete-objects/
 
@@ -26,6 +28,8 @@ namespace FileTransfer.Common.Storage
 
         // Single Uploads
         Task<string> GeneratePutUrlAsync(string ObjectKey);
+        // Single Downloads
+        Task<string> GenerateGetUrlAsync(string ObjectKey);
 
         // Multipart Uploads
         Task<string> InitiateMultipartUploadAsync(string ObjectKey, string ContentType = "application/octet-stream");

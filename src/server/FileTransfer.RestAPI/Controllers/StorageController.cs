@@ -72,7 +72,7 @@ namespace FileTransfer.RestAPI.Controllers
                 // Generate URL
                 var url = await _storageService.GeneratePutUrlAsync(ObjectKey);
                 // Log Information
-                _logger.LogInformation("Generated pre-signed URL for ObjectKey '{ObjectKey}'", 
+                _logger.LogInformation("Generated pre-signed URL for ObjectKey '{ObjectKey}'",
                     ObjectKey);
 
                 // Return
@@ -83,7 +83,41 @@ namespace FileTransfer.RestAPI.Controllers
             {
 
                 // Log Error
-                _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'", 
+                _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'",
+                    ObjectKey);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the pre-signed URL: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
+        #region GetDownloadUrl
+
+        [HttpGet]
+        public async Task<IActionResult> GetDownloadUrl(string ObjectKey)
+        {
+
+            try
+            {
+
+                // Generate URL
+                var url = await _storageService.GenerateGetUrlAsync(ObjectKey);
+                // Log Information
+                _logger.LogInformation("Generated pre-signed URL for ObjectKey '{ObjectKey}'",
+                    ObjectKey);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse(url));
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error generating pre-signed URL for ObjectKey '{ObjectKey}'",
                     ObjectKey);
                 // Return Error Response
                 return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while generating the pre-signed URL: {ex.Message}"));
