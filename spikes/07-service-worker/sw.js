@@ -434,5 +434,11 @@ self.addEventListener('message', event => {
         }
 
     }
+    else if (data.type === MessageType.CANCELUPLOAD) {
+
+        // Cancel Upload
+        event.waitUntil(cancelUpload(data.objectKey, data.uploadId));
+
+    }
 
 });
