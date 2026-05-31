@@ -186,6 +186,17 @@ cmdDownload.addEventListener("click", async () => {
         // Log Message
         logMessage("Downloaded file from R2, size: " + downloadedBytes.byteLength + " bytes.");
         
+        // Get Decryption Key
+        const decryptionKey = await getDecryptionKey(completedObjectKey);
+        // Reset File Position
+        let filePosition = 0;
+
+        // Decrypt File
+        while (filePosition < downloadedBytes.byteLength) {
+
+            
+
+        }
         
     }
     catch (error) {
