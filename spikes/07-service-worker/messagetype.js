@@ -2,6 +2,7 @@ const MessageType = Object.freeze({
     NEWUPLOAD: "NEWUPLOAD",
     RESUMEUPLOAD: "RESUMEUPLOAD",
     CANCELUPLOAD: "CANCELUPLOAD",
+    COMPLETEUPLOAD: "COMPLETEUPLOAD",
     LOGMESSAGE: "LOGMESSAGE"
 });
 
@@ -9,3 +10,4 @@ const MessageType = Object.freeze({
 export {
     MessageType
 };
+
