@@ -23,6 +23,11 @@ import {
     getUpload,
     saveUpload
 } from "./db.js";
+// Import Encryption Functions
+import {
+    encryptFilePart,
+    generateEncryptionKey
+} from "./encryption.js";
 // Import Message Type
 import {
     MessageType
@@ -53,6 +58,8 @@ async function uploadParts(file,
     skippedParts,
     uploadedParts) {
 
+    // Mock Encryption Key Generation
+    const encryptionKey = await generateEncryptionKey();
     // Search for each part
     for (let i = 0; i < totalParts; i++) {
 
@@ -74,13 +81,18 @@ async function uploadParts(file,
         var fileEnd = Math.min(fileStart + partSize, file.size);
         var fileChunk = file.slice(fileStart, fileEnd);
 
+        // Encrypt File Chunk
+        const chunkBytes = await fileChunk.arrayBuffer();
+        // Encrypt File Part
+        const encryptedChunk = await encryptFilePart(chunkBytes, encryptionKey);
+
         // Generate Multipart Upload URL
         const multipartUploadUrl = await generateMultipartUploadUrl(file.name, uploadId, partIndex);
         
-        // Upload to R2
+        // Upload to R2 - Replaced with encrypted chunk
         const uploadPartResponse = await fetch(multipartUploadUrl, {
             method: "PUT",
-            body: fileChunk
+            body: encryptedChunk
         });
         // Check Value
         if (!uploadPartResponse.ok) {
