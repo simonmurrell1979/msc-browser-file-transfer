@@ -40,11 +40,11 @@ async function encryptFilePart(key,
         }, 
         key,
         filePart);
-    // Append IV + Key
+    // Append IV + Encrypted File Part
     const retVal = new Uint8Array(iv.byteLength + encryptedFilePart.byteLength);
     // Set IV
     retVal.set(new Uint8Array(iv), 0);
-    // Set Key
+    // Set Encrypted File Part
     retVal.set(new Uint8Array(encryptedFilePart), iv.byteLength);
     // Return
     return retVal;
