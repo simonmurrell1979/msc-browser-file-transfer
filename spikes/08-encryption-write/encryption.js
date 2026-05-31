@@ -7,20 +7,22 @@
 // How To:
 // https://medium.com/@Shamimw/how-to-encrypt-and-decrypt-messages-using-subtle-crypto-and-groovy-118b4cca6884
 
-const TEST_KEY = "1234567890abcdef".repeat(4);
+const TEST_KEY = "1234567890abcdef";
 
 async function getEncryptionKey(encryptionKey) {
 
     // Convert to bytes
-    const keyData = new TextEncoder().encode(encryptionKey || TEST_KEY);
+    const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
     // Import Key
-    return await crypto.subtle.importKey("raw",
+    const key = await crypto.subtle.importKey("raw",
         keyData,
         "AES-GCM",
         true,
         [
             "encrypt"
         ]);
+    // Return
+    return key;
 
 }
 
