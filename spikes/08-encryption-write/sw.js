@@ -84,7 +84,7 @@ async function uploadParts(file,
         // Encrypt File Chunk
         const chunkBytes = await fileChunk.arrayBuffer();
         // Encrypt File Part
-        const encryptedChunk = await encryptFilePart(chunkBytes, encryptionKey);
+        const encryptedChunk = await encryptFilePart(encryptionKey, chunkBytes);
 
         // Generate Multipart Upload URL
         const multipartUploadUrl = await generateMultipartUploadUrl(file.name, uploadId, partIndex);
