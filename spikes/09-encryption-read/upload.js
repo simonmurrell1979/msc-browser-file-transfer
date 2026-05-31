@@ -88,6 +88,7 @@ function handleServiceWorkerMessage(message) {
             // Assign Values
             cmdUpload.textContent = "Upload";
             cmdCancel.style.display = "none";
+            cmdDownload.style.display = "inline-block";
             // Exit
             break;
 
@@ -140,6 +141,9 @@ cmdUpload.addEventListener("click", async () => {
 
     }
 
+    // Assign Value
+    cmdDownload.style.display = "none";
+
 });
 
 cmdCancel.addEventListener("click", async () => {
@@ -166,7 +170,8 @@ cmdCancel.addEventListener("click", async () => {
         // Assign Values
         cmdUpload.textContent = "Upload";
         cmdCancel.style.display = "none";
-        
+        cmdDownload.style.display = "none";
+
     }
     catch (error) {
 
