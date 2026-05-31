@@ -377,22 +377,50 @@ self.addEventListener('message', event => {
 
     }
 
-    // Command Handler
-    switch (data.type) {
+    // Check Value
+    if (data.type === MessageType.NEWUPLOAD ||
+        data.type === MessageType.RESUMEUPLOAD) {
+    
+        // Check Value
+        if (uploadInProgress) {
 
-        case MessageType.NEWUPLOAD:
-
-            // New Upload
-            event.waitUntil(newUpload(data.file));
+            // Log Message
+            logMessage("An upload is already in progress.");
             // Exit
-            break; 
+            return;
 
-        case MessageType.RESUMEUPLOAD:
+        }
+        // Assign Value
+        uploadInProgress = true;
 
-            // Resume Upload
-            event.waitUntil(resumeUpload(data.file, data.uploadId));
-            // Exit
-            break;
+        // Command Handler
+        switch (data.type) {
+
+            case MessageType.NEWUPLOAD:
+
+                // New Upload
+                event.waitUntil(newUpload(data.file).finally(() => {
+
+                    // Disable
+                    uploadInProgress = false;
+
+                }));
+                // Exit
+                break; 
+
+            case MessageType.RESUMEUPLOAD:
+
+                // Resume Upload
+                event.waitUntil(resumeUpload(data.file, data.uploadId).finally(() => {
+
+                    // Disable
+                    uploadInProgress = false;
+                    
+                }));
+                // Exit
+                break;
+
+        }
 
     }
 
