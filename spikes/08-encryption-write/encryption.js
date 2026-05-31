@@ -6,6 +6,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
 // How To:
 // https://medium.com/@Shamimw/how-to-encrypt-and-decrypt-messages-using-subtle-crypto-and-groovy-118b4cca6884
+// https://gist.github.com/rpivo/2904951ee31ce9146d32321f12c941bd
 
 const TEST_KEY = "1234567890abcdef";
 
@@ -32,14 +33,21 @@ async function encryptFilePart(key,
     // Generate IV
     const iv = crypto.getRandomValues(new Uint8Array(12));
     // Encrypt
-    const encryptedFilePart = await crypto.subtle.encrypt({
+    const encryptedFilePart = await crypto.subtle.encrypt(
+        {
             name: "AES-GCM",
             iv: iv
         }, 
         key,
         filePart);
+    // Append IV + Key
+    const retVal = new Uint8Array(keyData.byteLength + key.byteLength);
+    // Set IV
+    retVal.set(new Uint8Array(keyData), 0);
+    // Set Key
+    retVal.set(new Uint8Array(encryptedFilePart), encryptedFilePart.byteLength);
     // Return
-    return encryptedFilePart;
+    return retVal;
 
 }
 
