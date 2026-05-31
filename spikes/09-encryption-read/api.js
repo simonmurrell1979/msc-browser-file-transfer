@@ -32,12 +32,19 @@ async function getDownloadUrl(objectKey) {
 
     // Assign Value
     const downloadUrl = apiBaseUrl + "/GetDownloadUrl?objectKey=" + encodeURIComponent(objectKey);
-    // Get Download URL
-    return await postJSON("/Get", {
-        ObjectKey: objectKey,
-        UploadId: uploadId,
-        PartNumber: partNumber
-    });
+    // Fetch
+    const response = await fetch(downloadUrl);
+    // Extract JSON
+    const json = await response.json();
+    // Check Value
+    if (!json.Success) {
+
+        // Throw Exception
+        throw new Error(json.Message || "Unknown Server Error");
+
+    }
+    // Return
+    return json.ReturnedObject;    
 
 }
 
@@ -105,6 +112,7 @@ export {
     abortMultipartUpload,
     completeMultipartUpload,
     generateMultipartUploadUrl,
+    getDownloadUrl,
     initiateMultipartUpload,
     listMultipartUploadParts
 };
