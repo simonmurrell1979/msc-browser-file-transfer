@@ -38,8 +38,8 @@ async function encryptFilePart(key,
         }, 
         key,
         filePart);
-    //
-    
+    // Return
+    return encryptedFilePart;
 
 }
 
