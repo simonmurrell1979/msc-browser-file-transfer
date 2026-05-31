@@ -68,9 +68,31 @@ async function encryptFilePart(key,
 
 }
 
+async function decryptFilePart(key,
+    filePart) {
+
+    // Extract IV
+    const iv = filePart.slice(0, 12);
+    // Remove IV from File Part
+    const encryptedFilePart = filePart.slice(12);
+    // Decrypt
+    const decryptedFilePart = await crypto.subtle.decrypt(
+        {
+            name: "AES-GCM",
+            iv: iv
+        }, 
+        key,
+        encryptedFilePart);
+    // Return
+    return decryptedFilePart;
+
+}
+
 // Export Function
 export {
+    decryptFilePart,
     encryptFilePart,
+    getDecryptionKey,
     getEncryptionKey
 };
 
