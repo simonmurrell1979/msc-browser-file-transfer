@@ -199,7 +199,7 @@ cmdDownload.addEventListener("click", async () => {
         logMessage("Downloaded file from R2, size: " + downloadedBytes.byteLength + " bytes.");
         
         // Get Decryption Key
-        const decryptionKey = await getDecryptionKey(completedObjectKey);
+        const decryptionKey = await getDecryptionKey();
         // Initialize Decryption File Parts
         const decryptedFileParts = [];
         // Reset File Position
