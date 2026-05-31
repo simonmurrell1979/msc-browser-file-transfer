@@ -27,6 +27,23 @@ async function getEncryptionKey(encryptionKey) {
 
 }
 
+async function getDecryptionKey(encryptionKey) {
+
+    // Convert to bytes
+    const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
+    // Import Key
+    const key = await crypto.subtle.importKey("raw",
+        keyData,
+        "AES-GCM",
+        true,
+        [
+            "decrypt"
+        ]);
+    // Return
+    return key;
+
+}
+
 async function encryptFilePart(key,
     filePart) {
 
