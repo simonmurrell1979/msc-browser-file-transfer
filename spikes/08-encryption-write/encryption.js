@@ -26,8 +26,26 @@ async function getEncryptionKey(encryptionKey) {
 
 }
 
+async function encryptFilePart(key,
+    filePart) {
+
+    // Generate IV
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    // Encrypt
+    const encryptedFilePart = await crypto.subtle.encrypt({
+            name: "AES-GCM",
+            iv: iv
+        }, 
+        key,
+        filePart);
+    //
+    
+
+}
+
 // Export Function
 export {
+    encryptFilePart,
     getEncryptionKey
 };
 
