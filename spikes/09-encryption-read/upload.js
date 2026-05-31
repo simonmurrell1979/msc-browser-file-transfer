@@ -74,6 +74,8 @@ function handleServiceWorkerMessage(message) {
 
             // Log Message
             logMessage("Upload complete for Upload ID: " + message.uploadId.substring(0, 50) + "...");
+            // Assign Completed Object Key
+            completedObjectKey = message.objectKey;
             // Clear Pending Upload
             pendingUpload = null;
             // Assign Values
