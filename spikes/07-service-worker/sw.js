@@ -342,7 +342,7 @@ async function completeUpload(objectKey,
 
         // Complete Upload
         serviceWorkerClient.postMessage({
-            type: MessageType.UPLOADCOMPLETE,
+            type: MessageType.COMPLETEUPLOAD,
             uploadId: uploadId
         });
 
