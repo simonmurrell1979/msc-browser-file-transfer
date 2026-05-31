@@ -29,6 +29,7 @@ import {
 } from "./messagetype.js";
 
 let serviceWorkerClient = null;
+let uploadInProgress = false;
 
 function logMessage(message) {
 
