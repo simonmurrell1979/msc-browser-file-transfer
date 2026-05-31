@@ -1,9 +1,16 @@
 // Import API Functions
+import {
+    getDownloadUrl
+} from "./api.js";
 // Import Database Functions
 import {
     findLatestUpload
 } from "./db.js";
 // Import Encryption Functions
+import {
+    decryptFilePart,
+    getDecryptionKey
+} from "./encryption.js";
 // Import Message Type
 import {
     MessageType
@@ -194,7 +201,14 @@ cmdDownload.addEventListener("click", async () => {
         // Decrypt File
         while (filePosition < downloadedBytes.byteLength) {
 
-            
+            // Extract Encrypted Part
+            const encryptedPart = downloadedBytes.slice(filePosition, filePosition + encryptedPartSize);
+            // Decrypt Part
+            const decryptedPart = await decryptFilePart(decryptionKey, encryptedPart);
+            // Log Message
+            logMessage("Decrypted part of size: " + decryptedPart.byteLength + " bytes.");
+            // Update File Position
+            filePosition += encryptedPartSize;
 
         }
         
