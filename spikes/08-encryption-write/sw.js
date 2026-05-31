@@ -26,7 +26,7 @@ import {
 // Import Encryption Functions
 import {
     encryptFilePart,
-    generateEncryptionKey
+    getEncryptionKey
 } from "./encryption.js";
 // Import Message Type
 import {
@@ -58,8 +58,8 @@ async function uploadParts(file,
     skippedParts,
     uploadedParts) {
 
-    // Mock Encryption Key Generation
-    const encryptionKey = await generateEncryptionKey();
+    // Mock Encryption Key 
+    const encryptionKey = await getEncryptionKey();
     // Search for each part
     for (let i = 0; i < totalParts; i++) {
 
