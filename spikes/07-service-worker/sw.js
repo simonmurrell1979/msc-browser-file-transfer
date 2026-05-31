@@ -294,7 +294,7 @@ async function cancelUpload(objectKey,
     try {
 
         // Abort Multipart Upload
-        await abortMultipartUpload(file.name, uploadId);
+        await abortMultipartUpload(objectKey, uploadId);
         // Log Message
         logMessage("Aborted multipart upload for Upload ID: " + uploadId);
 
