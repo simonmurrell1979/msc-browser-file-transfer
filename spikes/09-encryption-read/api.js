@@ -28,6 +28,19 @@ async function postJSON(url,
 
 }
 
+async function getDownloadUrl(objectKey) {
+
+    // Assign Value
+    const downloadUrl = apiBaseUrl + "/GetDownloadUrl?objectKey=" + encodeURIComponent(objectKey);
+    // Get Download URL
+    return await postJSON("/Get", {
+        ObjectKey: objectKey,
+        UploadId: uploadId,
+        PartNumber: partNumber
+    });
+
+}
+
 async function generateMultipartUploadUrl(objectKey,
     uploadId,
     partNumber) {
