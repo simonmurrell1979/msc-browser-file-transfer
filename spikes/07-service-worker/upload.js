@@ -63,9 +63,20 @@ function handleServiceWorkerMessage(message) {
             // Exit
             break;
 
+        // Complete Upload
+        case MessageType.COMPLETEUPLOAD:
+
+            // Log Message
+            logMessage("Upload complete for Upload ID: " + message.uploadId.substring(0, 50) + "...");
+            // Clear Pending Upload
+            pendingUpload = null;
+            // Assign Values
+            cmdUpload.textContent = "Upload";
+            cmdCancel.style.display = "none";
+            // Exit
+            break;
+
     }
-    // Log Message
-    console.log("Received " + message.type + " message from Service Worker: " + message.message);
 
 }
 
@@ -135,6 +146,12 @@ cmdCancel.addEventListener("click", async () => {
             uploadId: pendingUpload.uploadId
         });
 
+        // Clear Pending Upload
+        pendingUpload = null;
+        // Assign Values
+        cmdUpload.textContent = "Upload";
+        cmdCancel.style.display = "none";
+        
     }
     catch (error) {
 
@@ -142,14 +159,5 @@ cmdCancel.addEventListener("click", async () => {
         logMessage("An error occurred while cancelling upload: " + error.message);
 
     }
-
-    // Log Message
-    logMessage("Deleted upload record from IndexedDB for Upload ID: " + pendingUpload.uploadId);
-
-    // Clear Pending Upload
-    pendingUpload = null;
-    // Assign Values
-    cmdUpload.textContent = "Upload";
-    cmdCancel.style.display = "none";
 
 });
