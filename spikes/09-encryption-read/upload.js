@@ -172,34 +172,26 @@ cmdCancel.addEventListener("click", async () => {
 
 cmdDownload.addEventListener("click", async () => {
 
-    // Query USer
-    if (!confirm("Cancel pending upload?")) {
-
-        // Exit
-        return;
-
-    }
-
     try {
 
-        // Abort Multipart Upload
-        await sendCommand({
-            type: MessageType.CANCELUPLOAD,
-            objectKey: pendingUpload.objectKey,
-            uploadId: pendingUpload.uploadId
-        });
+        // Log Message
+        logMessage("Requesting download URL for completed object key: " + completedObjectKey);
+        // Get Download URL
+        const downloadUrl = await getDownloadUrl(completedObjectKey);
 
-        // Clear Pending Upload
-        pendingUpload = null;
-        // Assign Values
-        cmdUpload.textContent = "Upload";
-        cmdCancel.style.display = "none";
+        // Download File from R2
+        const downloadedFile = await fetch(downloadUrl);
+        // Extract bytes
+        const downloadedBytes = await downloadedFile.arrayBuffer();
+        // Log Message
+        logMessage("Downloaded file from R2, size: " + downloadedBytes.byteLength + " bytes.");
+        
         
     }
     catch (error) {
 
         // Log Message
-        logMessage("An error occurred while cancelling upload: " + error.message);
+        logMessage("An error occurred while requesting download URL: " + error.message);
 
     }
 
