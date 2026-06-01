@@ -25,7 +25,7 @@ To prevent cross-origin download failures, the R2 bucket's CORS configuration ne
 
 ## Key Findings
 
-- **Round trip verified.** - The file that was recovered is complete and functions as expected. Files are encrypted before uploading, stored as ciphertext on R2, and decrypted upon download, restoring the original file.
+- **Round trip verified.** - The file that was recovered is complete and functions as expected. Files are encrypted before uploading, stored as ciphertext on R2, and decrypted upon download, restoring the original file. Verification of round-tripped single-part and multi-part files proves the part-by-part reassembly's ability to work across segment boundaries.
 - **Reassembly walks the object part by part.** - - Each part of the object is put back together sequentially. The page processes data in segments of `partSize + 28` bytes, decrypting them individually. `slice` handles the final short segment automatically, eliminating the need for special handling of the last part.
 - **Decryption is page-side and server-blind.** -. The server signs the GET request without processing the bytes or the key. Zero-knowledge is maintained on the read side, mirroring its function on the write side.
 - **The key must be handed to the decrypt side.** - The key must be transferred to the decryption party. Both encryption and decryption function identically due to a shared, pre-programmed test key. There is no mechanism in the pipeline for the key to go from sender to recipient. A genuine key-management layer is essential for this specific reason, not merely a supplementary feature.
