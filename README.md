@@ -21,7 +21,7 @@ A browser-based file transfer pipeline integrating chunked resumable upload with
 ## Repository structure
 
 - `/spikes` - spiked based prototypes, index shown below
-- `/src` - source code for client and server application (REST API / Angular application), index to come
+- `/src` - source code for client and server application (REST API / Angular application)
 
 ## Spikes
 
