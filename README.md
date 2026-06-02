@@ -40,7 +40,7 @@ Each isolated prototype is a runnable snapshot that includes its own README. Eac
 
  **Encryption** 
 - [Spike 08: Encryption Write Path](spikes/08-encryption-write/readme.md) - The Service Worker will encrypt each part using AES-GCM prior to uploading. 
-- **Spike 09: Encryption Read Path** (spikes/09-encryption-read/readme.md): Focuses on downloading and decrypting data, with verification for both single and multi-part transfers.
+- [Spike 09: Encryption Read Path](spikes/09-encryption-read/readme.md): Focuses on downloading and decrypting data, with verification for both single and multi-part transfers.
 
 ## Status
 
