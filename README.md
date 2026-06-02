@@ -1,10 +1,12 @@
 # Resilient and Confidential Browser-Based File Transfer
 
-MSc Computing final project - File Transfer Application - Birkbeck, University of London.
+MSc Computing final project (File Transfer Application) - Birkbeck, University of London.
 
-**Author:** Simon Murrell
-**Supervisor:** Martyn Harris
-**Academic year:** April to September 2026
+## Project Details
+
+- **Author:** Simon Murrell
+- **Supervisor:** Martyn Harris
+- **Academic year:** April to September 2026
 
 ## Overview
 
