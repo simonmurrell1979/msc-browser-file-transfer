@@ -4,7 +4,7 @@ import { Component, signal } from '@angular/core';
     selector: 'app-send',
     imports: [],
     templateUrl: './send.component.html',
-    styleUrl: './send.component.scss',
+    styleUrl: './send.component.css',
 })
 export class SendComponent {
 
