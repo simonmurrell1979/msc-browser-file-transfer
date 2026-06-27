@@ -1,4 +1,3 @@
-
 using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Helpers;
 using FileTransfer.Common.Storage;
