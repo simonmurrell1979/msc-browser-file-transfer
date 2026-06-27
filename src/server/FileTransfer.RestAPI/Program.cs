@@ -73,12 +73,15 @@ namespace FileTransfer.RestAPI
 
                 // Use CORS Policy - Remember to add for production environment
 
+
+                // Use HTTPS Redirection
+                app.UseHttpsRedirection();
+
             }
 
             // Use Bath Path /api/
             app.UsePathBase("/api/");
-            // Use HTTPS Redirection and Authorization
-            //app.UseHttpsRedirection();
+            // Use Authorization
             app.UseAuthorization();
             // Map Controllers
             app.MapControllers();
