@@ -10,7 +10,7 @@
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
-                    "style": "scss",
+                    "style": "css",
                     "type": "component"
                 },
                 "@schematics/angular:service": {
