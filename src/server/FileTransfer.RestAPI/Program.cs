@@ -78,7 +78,7 @@ namespace FileTransfer.RestAPI
             // Use Bath Path /api/
             app.UsePathBase("/api/");
             // Use HTTPS Redirection and Authorization
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseAuthorization();
             // Map Controllers
             app.MapControllers();
