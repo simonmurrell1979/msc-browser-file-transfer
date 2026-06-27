@@ -1,44 +1,12 @@
-import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ConnectionService } from './services/connection.service';
-import { Header}
+import { HeaderComponent } from './layout/header/header.component';
+import { FooterComponent } from './layout/footer/footer.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent],
   templateUrl: './app.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.scss',
 })
-export class App {
-
-  // Protected Variables
-  protected readonly title = signal('file-transfer-client');
-  protected readonly connectionResult = signal<string>("");
-  // Private Variables
-  private readonly _connectionService = inject(ConnectionService);
-
-  protected TestConnection(): void {
-
-    // Subscribe to the connection service
-    this._connectionService.TestConnection().subscribe({
-
-      // Next
-      next: (response) => {
-
-        // Set the connection result
-        this.connectionResult.set(response.Success ? "Connection Successful" : `Connection Failed: ${response.ErrorMessage}`);
-
-      },
-      error: (error) => {
-
-        // Set the connection result
-        this.connectionResult.set(`Error: ${error.message}`);
-        
-      }
-
-    });
-
-  }
-
-}
+export class App {}
