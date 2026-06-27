@@ -1,4 +1,17 @@
-import { Service } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
+import { StorageService } from "./storage.service";
 
-@Service()
-export class UploadService {}
+@Injectable({ providedIn: "root" })
+export class UploadService {
+
+    // Private variables
+    private readonly _storageService = inject(StorageService);
+
+    public async uploadFile(file: File): Promise<void> {
+
+        
+
+    }
+
+}
+
