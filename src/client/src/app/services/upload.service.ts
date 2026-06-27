@@ -9,7 +9,20 @@ export class UploadService {
 
     public async uploadFile(file: File): Promise<void> {
 
-        
+        // Get Upload Url
+        var uploadUrl = await this._storageService.getUploadUrl(file.name);
+        // Fetch the upload url and send the file
+        var response = await fetch(uploadUrl, {
+            method: "PUT",
+            body: file
+        });
+        // Check Response
+        if (!response.ok) {
+
+            // Throw Error
+            throw new Error(`Failed to upload file: ${response.statusText}`);
+
+        }
 
     }
 
