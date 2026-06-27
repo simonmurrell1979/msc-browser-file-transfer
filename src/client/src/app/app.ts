@@ -1,6 +1,7 @@
 import { Component, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ConnectionService } from './services/connection.service';
+import { Header}
 
 @Component({
   selector: 'app-root',
