@@ -24,3 +24,6 @@ Client services reflect the server division (how they stand currently):
 
 - **`StorageService`:** transport. Each `StorageController` action should have its own method.
 - **`UploadService`:** Manages the overall process. Is responsible for the upload workflow. Where resilience logic resides.
+
+---
+
