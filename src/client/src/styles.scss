@@ -1,1 +1,47 @@
-/* You can add global styles to this file, and also import other style files */
+@font-face {
+    font-family: "Aeonik";
+    src: url("/fonts/aeonik/Aeonik-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Aeonik-Bold";
+    src: url("/fonts/aeonik/Aeonik-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Aeonik-Light";
+    src: url("/fonts/aeonik/Aeonik-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Aeonik-Medium";
+    src: url("/fonts/aeonik/Aeonik-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Aeonik-SemiBold";
+    src: url("/fonts/aeonik/Aeonik-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Aeonik-Thin";
+    src: url("/fonts/aeonik/Aeonik-Thin.woff2") format("woff2");
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
