@@ -19,3 +19,8 @@ Three separated layers:
 - **Angular 22 SPA:** client, file selection, encryption, and orchestrating chunked uploads.
 - **ASP.NET Core REST API:** acts as a session coordinator and R2 transport signer, with its code in `RestAPI -> Services -> Common`.
 - **Cloudflare R2:** Object storage that matches S3 standards, storing only ciphertext.
+
+Client services reflect the server division (how they stand currently):
+
+- **`StorageService`:** transport. Each `StorageController` action should have its own method.
+- **`UploadService`:** Manages the overall process. Is responsible for the upload workflow. Where resilience logic resides.
