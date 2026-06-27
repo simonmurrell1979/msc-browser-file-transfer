@@ -17,6 +17,27 @@ export class App {
   // Private Variables
   private readonly _connectionService = inject(ConnectionService);
 
+  protected TestConnection(): void {
 
+    // Subscribe to the connection service
+    this._connectionService.TestConnection().subscribe({
+
+      // Next
+      next: (response) => {
+
+        // Set the connection result
+        this.connectionResult.set(response.Success ? "Connection Successful" : `Connection Failed: ${response.ErrorMessage}`);
+
+      },
+      error: (error) => {
+
+        // Set the connection result
+        this.connectionResult.set(`Error: ${error.message}`);
+        
+      }
+
+    });
+
+  }
 
 }
