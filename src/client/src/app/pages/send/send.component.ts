@@ -1,10 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal } from "@angular/core";
 
 @Component({
-    selector: 'app-send',
+    selector: "app-send",
     imports: [],
-    templateUrl: './send.component.html',
-    styleUrl: './send.component.css',
+    templateUrl: "./send.component.html",
+    styleUrl: "./send.component.css",
 })
 export class SendComponent {
 
