@@ -1,4 +1,5 @@
-import { Component, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
+import { UploadService } from "../../services/upload.service";
 
 @Component({
     selector: "app-send",
@@ -8,6 +9,8 @@ import { Component, signal } from "@angular/core";
 })
 export class SendComponent {
 
+    // Private Variables
+    private readonly _uploadService = inject(UploadService);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
 
@@ -24,6 +27,35 @@ export class SendComponent {
         }
         // Set selected file
         this.selectedFile.set(input.files[0]);
+
+    }
+
+    protected async onSendFile(): Promise<void> {
+
+        // Get selected file
+        const file = this.selectedFile();
+        // Check Value
+        if (file == null) {
+
+            // Exit
+            return;
+
+        }
+
+        try {
+
+            // Upload file to server
+            await this._uploadService.uploadFile(file);
+            // Log Success
+            console.log("File sent successfully!");
+
+        }
+        catch (error) {
+
+            // Log Error
+            console.error("Error sending file:", error);
+
+        }
 
     }
 
