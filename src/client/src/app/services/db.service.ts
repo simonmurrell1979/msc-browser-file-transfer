@@ -3,15 +3,21 @@
 //
 //*************************************************/
 import { Injectable } from "@angular/core";
-import { openDB } from "idb";
+import { openDB, IDBPDatabase } from "idb";
 
 @Injectable({ providedIn: "root" })
 export class DbService {
 
-    function openDatabase() {
+    // Private Variables
+    private readonly _databaseName = "FileTransfer";
+    private readonly _databaseVersion = 1;
+    private readonly _storeName = "uploads";
+    private _databasePromise: Promise<IDBPDatabase<any>> | null = null;
+
+    private openDatabase(): Promise<IDBPDatabase<any>> {
 
         // Check Value
-        if (!databasePromise) {
+        if (!this._databasePromise) {
 
             // Initialize Database
             databasePromise = new Promise((resolve, reject) => {
