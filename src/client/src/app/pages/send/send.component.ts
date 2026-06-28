@@ -69,19 +69,21 @@ export class SendComponent {
             // Load Value
             const pendingUpload = this.pendingUpload();
             // Check Value
-    if (pendingUpload) {
+            if (pendingUpload) {
 
-        // Resume Upload
-        await resumeUpload(file,
-            pendingUpload);
+                // Resume Upload
+                await this._uploadService.resumeUpload(file,
+                    pendingUpload);
 
-    }
-    else {
+            }
+            else {
 
-        // New Upload
-        await newUpload(file);
+                // New Upload
+                await this._uploadService.newUpload(file);
 
-    }
+            }
+            // Clear Pending Upload
+            this.pendingUpload.set(null);
 
         }
         catch (error) {
