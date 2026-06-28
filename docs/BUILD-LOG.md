@@ -106,3 +106,9 @@ The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and
 
 ---
 
+## Locked decisions (report-bound)
+
+### Methodology framing
+
+The HTML and JavaScript pages from the spike phase are throwaway artefacts; their source is kept only as evidence. The spike .NET REST API was treated differently. It was already built during the spike phase in the layered `RestAPI -> Services -> Common` structure, and was carried forward unchanged as the baseline for the Phase 2 kernel. The intended framing for the report is that this API was a stable baseline serving a series of disposable probes, rather than a system built up incrementally across the spikes. In other words it is salvage rather than continuity, which keeps the boundary between the spike phase and the build phase clean.
+
