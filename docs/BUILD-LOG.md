@@ -29,22 +29,22 @@ Client services reflect the server division (how they stand currently):
 
 ## Progress timeline
 
-| # | Slice                                         | Spike origin                      | Status                                |
-|---|---                                            |---                                |---                                    |
-| 0 | Kernel pipe (SPA <-> API <-> R2)              | N/A                               | Complete (26 June)                    |
-| 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27 June)                    |
-| 2 | Multipart upload                              | Spike 03                          | In progress                           |
-| 3 | Real-time upload progress visibility          | N/A                               | Planned (deliverable)                 |
-| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Planned                               |
-| 5 | ListParts reconciliation                      | Spike 05                          | Planned                               |
-| 6 | Service Worker plumbing                       | Spike 06                          | Planned                               |
-| 7 | Service Worker upload loop                    | Spike 07                          | Planned                               |
-| 8 | Chunked encryption write path                 | Spike 08                          | Planned                               |
-| 9 | Chunked decryption read path                  | Spike 09                          | Planned                               |
-| 10 | Share URL with key in fragment               | N/A                               | Planned                               |
-| 11 | Download / receive screen                    | N/A                               | Planned                               |
-| 12 | End-to-end integrity check                   | N/A                               | Planned (deliverable)                 |
-| 13 | IndexedDBChunkSource                         | N/A                               | Nice-to-have (else Future Work)       |
+| # | Slice                                         | Spike origin                      | Status                                        |
+|---|---                                            |---                                |---                                            |
+| 0 | Kernel pipe (SPA <-> API <-> R2)              | N/A                               | Complete (26 June)                            |
+| 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27 June)                            |
+| 2 | Multipart upload                              | Spike 03                          | In progress                                   |
+| 3 | Real-time upload progress visibility          | N/A                               | Planned (deliverable)                         |
+| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Planned                                       |
+| 5 | ListParts reconciliation                      | Spike 05                          | Planned                                       |
+| 6 | Service Worker plumbing                       | Spike 06                          | Planned                                       |
+| 7 | Service Worker upload loop                    | Spike 07                          | Planned                                       |
+| 8 | Chunked encryption write path                 | Spike 08                          | Planned                                       |
+| 9 | Chunked decryption read path                  | Spike 09                          | Planned                                       |
+| 10 | Share URL with key in fragment               | N/A                               | Planned                                       |
+| 11 | Download / receive screen                    | N/A                               | Planned                                       |
+| 12 | End-to-end integrity check                   | N/A                               | Planned (deliverable)                         |
+| 13 | IndexedDBChunkSource                         | N/A                               | Nice-to-have (else Future Work)               |
 
 IndexedDBChunkSource enables the Service Worker to access previously stored chunks. The Service Worker upload loop (07) and the encryption paths (08 and 09) must be completed before this can be built. As a result, it is positioned after Spike 09. The default is the standard FileChunkSource. The IndexedDB version is optional and will be skipped if there is not enough time. It is also limited to Chromium based browsers.
 
