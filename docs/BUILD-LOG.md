@@ -98,10 +98,18 @@ The `selectedFile` signal is updated when a file is chosen. Bootstrap 5 and the 
 
 **Open decision recorded.** `findLatestUpload` was changed to be parameterless and it assumes one upload in the store at a time. If the send interface later holds several uploads at once, "newest record" is no longer a safe proxy for "the file the user re-selected", and an overloaded method will be needed. The data already lives on every record, so this is a cheap addition when required.
 
+**Object key collision (open, fix deferred).** The R2 object key is currently the raw file name. Testing confirmed that uploading the same file name twice overwrites the first object on R2 rather than creating two. For a send tool this is wrong. The planned fix is a client-minted crypto.`randomUUID()` prefix on the object key, giving {`guid`}/{`fileName`}, which keeps the name human-readable in the bucket while guaranteeing uniqueness. The uploadId stays the session correlation key; the GUID is the object key prefix, a separate identifier for a separate job. Deferred until the upload loop has settled, since the encryption and Service Worker slices modify the same loop.
+
+**UploadService orchestration. Working end to end.** The spike `upload.js` was ported into `UploadService` as three methods. These were `uploadParts`, `newUpload`, and `resumeUpload`. All DOM and button-state lines were stripped out, as that belongs to the component. The `postJSON` calls became typed `StorageService` methods. Status reporting goes through a single logMessage method, currently wrapping console.log, which is the seam where the progress signal attaches later.
+
+Both paths were proven on real multi-part files. A new upload of a 129MB file ran as 25 parts, initiated, uploaded, completed, and the IndexedDB record was cleaned up. A resume was then proven: the same upload was cancelled after part 4 in the UI, and on a fresh page load the pending record was found, server parts were reconciled through ListParts, the completed parts were skipped, and the remaining parts uploaded to completion.
+
+A precise finding came out of the resume test. The UI was cancelled after part 4, but reconciliation reported 5 parts already uploaded, because the server had accepted a 5th part the client had not yet recorded. ListParts returned server truth and the resume skipped 5, not 4. This is direct evidence for the "server is master, IndexedDB listens" principle, and a concrete point for the report.
+
 **Findings:**
 
 - **Async model:**  Async model: `HttpClient` observables are converted to promises when crossing the transport boundary, using `firstValueFrom`.Observables do not go beyond `StorageService`. AbortController will be employed for canceling resume operations mid-flight.
-- **ETag asymmetry (from Spike 05):** ETags from PUT responses are enclosed in quotes, unlike those from ListParts. It is worth mentioning in the report the difference at the integration point. Quotes are removed on capture using `.replaceAll('"', '')`.
+- **ETag asymmetry (from Spike 05):** ETags from PUT responses are enclosed in quotes, unlike those from ListParts. It is worth mentioning in the report the difference at the integration point. Quotes are removed on capture using `.replaceAll("\"", "")`.
 
 ---
 
