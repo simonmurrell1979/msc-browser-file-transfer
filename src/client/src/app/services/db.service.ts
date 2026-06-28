@@ -54,7 +54,16 @@ export class DbService {
         // Open Database
         const database = await this.openDatabase();
         // Put
-        database.put(this._storeName, record);
+        await database.put(this._storeName, record);
+
+    }
+
+    public async deleteUpload(uploadId: any): Promise<void> {
+
+        // Open Database
+        const database = await this.openDatabase();
+        // Delete
+        await database.delete(this._storeName, uploadId);
 
     }
 
