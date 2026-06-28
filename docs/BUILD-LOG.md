@@ -51,3 +51,42 @@ IndexedDBChunkSource enables the Service Worker to access previously stored chun
 Each row with (deliverable) indicates one of the four measurable project deliverables. Row 3 shows real-time progress visibility, while row 12 is for the end-to-end integrity check. The final two tasks involve pausing and resuming functionality during network interruptions (as noted in row 4), and confirming the successful transfer of data through an integrity check.
 
 ---
+
+## Session entries
+
+### 26 Jun 2026: Kernel pipe proven
+
+The entire pipe was tested from one end to the other. The Angular 22 SPA sends a request, through a cross-origin call, to the .NET REST API. An R2 connectivity check then returns it as a typed `ApiResponse` shown in the user interface. Because this was an actual round-trip and not a test, every layer of wiring has been verified, and each subsequent slice travels the same path.
+
+Angular 22.0.3 (CLI 22.0.4), TypeScript 6.0.3, and Node 22.22.3 comprised the stack, along with the Vitest test runner, an ASP.NET Core backend, and Cloudflare R2 for storage.
+
+Several client architecture principles were locked in:
+
+- The `HttpClient` should not be called by a component. It always goes through a typed service.
+- When injecting dependencies, always use `inject()`; do not construct services with `new`.
+- Each service is designed for a single, specialized function, rather than a large, all-encompassing `ApiService`. The services are organized in a flat `src/app/services/` directory.
+- The shared response contract lives in `models/` and mirrors the server`s types (PascalCase):
+
+```typescript
+export interface ApiResponse {
+    Success: boolean;
+    ErrorMessage?: string;
+}
+
+export interface ApiResponseWithData<T> extends ApiResponse {
+    ReturnedObject?: T;
+}
+```
+
+The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing results in paths like `/api/Storage/TestConnection`. The CORS policy permits `localhost:4200` and `UseHttpsRedirection` was eliminated to enable local HTTP testing.
+
+### 27 Jun 2026: Slices 1 and 2 (single PUT and multipart)
+
+**SPA shell and send screen.** The application now has its frame in place. The `pages/send` route is loaded lazily as a standalone component; the empty path redirects to `send`. The `app.html` frame consists of a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. The folder structure is finalized: `pages/` for screens that are routed, `layout/` for the surrounding UI, and `services/` will be at the top level. The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and the self-hosted Aeonik font already implemented.
+
+**Slice 1, single-file presigned PUT (Spike 02). Green.** This was proven with a real file landing in R2.
+
+- `StorageService.getUploadUrl(objectKey)` generates a signed PUT URL via a typed GET request.
+- `UploadService.uploadFile(file)` gets that URL and then performs a raw `fetch` PUT straight to R2.
+- The division was intentional. The presign call uses the typed `HttpClient` for uniformity with the client, while the R2 upload utilizes a direct `fetch` to avoid interference from `HttpClient` interceptors or JSON processing, as it`s a cross-origin binary upload.
+
