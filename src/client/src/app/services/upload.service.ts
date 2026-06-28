@@ -9,6 +9,7 @@ export class UploadService {
     // Private variables
     private readonly _storageService = inject(StorageService);
     private readonly _dbService = inject(DbService);
+    private readonly _partSize = 5 * 1024 * 1024;                   // 5MB
 
     private logMessage(message: string) {
 
@@ -65,9 +66,7 @@ export class UploadService {
             const fileChunk = file.slice(fileStart, fileEnd);
     
             // Generate Multipart Upload URL
-            const multipartUploadUrl = await this._storageService.generateMultipartUploadUrl(file.name,
-                uploadId,
-                partIndex);
+            const multipartUploadUrl = await this._storageService.generateMultipartUploadUrl(file.name, uploadId, partIndex);
             
             // Upload to R2
             const uploadPartResponse = await fetch(multipartUploadUrl, {
@@ -103,112 +102,92 @@ export class UploadService {
     
     }
 
-    async function newUpload(file) {
+    public async newUpload(file: File): Promise<void> {
 
         try {
 
             // Log Message
-            logMessage("Uploading file: " + file.name);
+            this.logMessage("Uploading file: " + file.name);
 
             // Initialize Multipart Upload
-            const uploadId = await postJSON("/InitiateMultipartUpload", {
-                ObjectKey: file.name,
-                ContentType: file.type || "application/octet-stream"
-            });
+            const uploadId = await this._storageService.initiateMultipartUpload(file.name, file.type || "application/octet-stream");
             // Check Value
             if (!uploadId) {
             
                 // Log Message
-                logMessage("Failed to initiate multipart upload.");
+                this.logMessage("Failed to initiate multipart upload.");
                 // Exit
                 return;
 
             }
 
-            // Assign Value
-            const partSize = 5 * 1024 * 1024; // 5MB
             // Calculate Number of Parts
-            var totalParts = Math.ceil(file.size / partSize);
+            const totalParts = Math.ceil(file.size / this._partSize);
 
             // Create Record
-            await createUploadRecord(uploadId, 
-                file,
-                partSize, 
-                totalParts);
+            await this._dbService.createUploadRecord(uploadId, file, this._partSize, totalParts);
             // Log Message
-            logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
+            this.logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
 
             // Initialize Parts
-            const uploadedParts = [];
+            const uploadedParts: UploadPart[] = [];
 
             try {
 
                 // Upload Parts
-                await uploadParts(file,
-                    uploadId,
-                    partSize,
-                    totalParts,
-                    new Set(),
-                    uploadedParts);
+                await this.uploadParts(file, uploadId, this._partSize, totalParts, new Set(), uploadedParts);
 
                 // Check Value
                 if (uploadedParts.length !== totalParts) {
 
                     // Log Message
-                    logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                    this.logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
                     // Throw Exception
                     throw new Error("Not all parts were uploaded successfully.");
 
                 }
                 // Complete Multipart Upload
-                await postJSON("/CompleteMultipartUpload", {
-                    ObjectKey: file.name,
-                    UploadId: uploadId,
-                    Parts: uploadedParts
-                });
+                await this._storageService.completeMultipartUpload(file.name, uploadId, uploadedParts);
 
                 // Log Message
-                logMessage("All parts uploaded successfully. Completed multipart upload...");
+                this.logMessage("All parts uploaded successfully. Completed multipart upload...");
 
                 // Delete Record
-                await deleteUpload(uploadId);
+                await this._dbService.deleteUpload(uploadId);
                 // Log Message
-                logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+                this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
 
             }
-            catch (error) {
+            catch (error: any) {
 
                 // Log Message
-                logMessage("An error occurred during multipart upload: " + error.message);            
+                this.logMessage("An error occurred during multipart upload: " + error.message);            
 
                 try {
 
                     // Abort Multipart Upload
-                    await postJSON("/AbortMultipartUpload", {
-                        ObjectKey: file.name,
-                        UploadId: uploadId
-                    });
+                    await this._storageService.abortMultipartUpload(file.name, uploadId);
 
                     // Delete Record
-                    await deleteUpload(uploadId);
+                    await this._dbService.deleteUpload(uploadId);
                     // Log Message
-                    logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+                    this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
 
                 }
-                catch (abortError) {
+                catch (abortError: any) {
 
                     // Log Message
-                    logMessage("Failed to abort multipart upload: " + abortError.message);
+                    this.logMessage("Failed to abort multipart upload: " + abortError.message);
 
                 }
 
             }
 
         }
-        catch (error) {
+        catch (error: any) {
 
             // Log Message
-            logMessage("An error occurred while uploading file: " + error.message);
+            this.logMessage("An error occurred while uploading file: " + error.message);
 
         }
 
