@@ -1,11 +1,21 @@
 import { inject, Injectable } from "@angular/core";
 import { StorageService } from "./storage.service";
+import { UploadPart } from "../models/uploadpart";
+import { DbService } from "./db.service";
 
 @Injectable({ providedIn: "root" })
 export class UploadService {
 
     // Private variables
     private readonly _storageService = inject(StorageService);
+    private readonly _dbService = inject(DbService);
+
+    private logMessage(message: string) {
+
+        // Log Message
+        console.log(message);
+
+    }
 
     public async uploadFile(file: File): Promise<void> {
 
@@ -26,12 +36,12 @@ export class UploadService {
 
     }
     
-    async function uploadParts(file,
-        uploadId,
-        partSize,
-        totalParts,
-        skippedParts,
-        uploadedParts) {
+    private async uploadParts(file: File,
+        uploadId: string,
+        partSize: number,
+        totalParts: number,
+        skippedParts: Set<number>,
+        uploadedParts: UploadPart[]) {
     
         // Search for each part
         for (let i = 0; i < totalParts; i++) {
@@ -43,7 +53,7 @@ export class UploadService {
             if (skippedParts.has(partIndex)) {
     
                 // Log Message
-                logMessage("Skipping part " + partIndex + " as it was already uploaded.");
+                this.logMessage("Skipping part " + partIndex + " as it was already uploaded.");
                 // Continue
                 continue;
     
@@ -55,11 +65,9 @@ export class UploadService {
             var fileChunk = file.slice(fileStart, fileEnd);
     
             // Generate Multipart Upload URL
-            const multipartUploadUrl = await postJSON("/GenerateMultipartUploadUrl", {
-                ObjectKey: file.name,
-                UploadId: uploadId,
-                PartNumber: partIndex
-            });
+            const multipartUploadUrl = await this._storageService.generateMultipartUploadUrl(file.name,
+                uploadId,
+                partIndex);
             
             // Upload to R2
             const uploadPartResponse = await fetch(multipartUploadUrl, {
@@ -70,16 +78,16 @@ export class UploadService {
             if (!uploadPartResponse.ok) {
     
                 // Log Message
-                logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
+                this.logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
                 // Throw Exception
                 throw new Error("Failed to upload part " + partIndex);
     
             }
     
             // Assign Value
-            const eTag = uploadPartResponse.headers.get("ETag").replaceAll('"', "");
+            const eTag = uploadPartResponse.headers.get("ETag")?.replaceAll('"', "") ?? "";
             // Log Message
-            logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
+            this.logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
             // Add to Uploaded Parts Array
             uploadedParts.push({
                 PartNumber: partIndex,
@@ -87,7 +95,7 @@ export class UploadService {
             });
     
             // Update Record
-            await addUploadedPart(uploadId,
+            await this._dbService.addUploadedPart(uploadId,
                 partIndex,
                 eTag);
     
