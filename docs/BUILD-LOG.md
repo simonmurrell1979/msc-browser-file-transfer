@@ -105,3 +105,4 @@ The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and
 - **ETag asymmetry (from Spike 05):** ETags from PUT responses are enclosed in quotes, unlike those from ListParts. It is worth mentioning in the report the difference at the integration point. Quotes are removed on capture using `.replaceAll('"', '')`.
 
 ---
+
