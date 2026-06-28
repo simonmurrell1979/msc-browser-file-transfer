@@ -82,7 +82,16 @@ The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]`
 
 ### 27 Jun 2026: Slices 1 and 2 (single PUT and multipart)
 
-**SPA shell and send screen.** The application now has its frame in place. The `pages/send` route is loaded lazily as a standalone component; the empty path redirects to `send`. The `app.html` frame consists of a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. The folder structure is finalized: `pages/` for screens that are routed, `layout/` for the surrounding UI, and `services/` will be at the top level. The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and the self-hosted Aeonik font already implemented.
+**SPA shell and send screen.** The application now has its frame in place. The `pages/send` route is loaded lazily as a standalone component. The empty router path redirects to `send`. The `app.html` frame consists of a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. 
+
+The folder structure is finalized: 
+
+- `pages/` for screens that are routed.
+- `layout/` for the surrounding UI.
+- `models/` for the storing of all models replicated from the .NET REST API.
+- `services/` will be at the top level to store all the services. 
+- 
+- The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and the self-hosted Aeonik font already implemented.
 
 **Slice 1, single-file presigned PUT (Spike 02). Green.** This was proven with a real file landing in R2.
 
@@ -90,3 +99,9 @@ The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]`
 - `UploadService.uploadFile(file)` gets that URL and then performs a raw `fetch` PUT straight to R2.
 - The division was intentional. The presign call uses the typed `HttpClient` for uniformity with the client, while the R2 upload utilizes a direct `fetch` to avoid interference from `HttpClient` interceptors or JSON processing, as it`s a cross-origin binary upload.
 
+**Findings:**
+
+- **Async model:**  Async model: `HttpClient` observables are converted to promises when crossing the transport boundary, using `firstValueFrom`.Observables do not go beyond `StorageService`. AbortController will be employed for canceling resume operations mid-flight.
+- **ETag asymmetry (from Spike 05):** ETags from PUT responses are enclosed in quotes, unlike those from ListParts. It is worth mentioning in the report the difference at the integration point. Quotes are removed on capture using `.replaceAll('"', '')`.
+
+---
