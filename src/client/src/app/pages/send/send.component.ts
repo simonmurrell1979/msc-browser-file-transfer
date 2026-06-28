@@ -1,5 +1,7 @@
 import { Component, inject, signal } from "@angular/core";
 import { UploadService } from "../../services/upload.service";
+import { UploadRecord } from "../../models/uploadrecord";
+import { DbService } from "../../services/db.service";
 
 @Component({
     selector: "app-send",
@@ -11,8 +13,10 @@ export class SendComponent {
 
     // Private Variables
     private readonly _uploadService = inject(UploadService);
+    private readonly _dbService = inject(DbService);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
+    protected readonly pendingUpload = signal<UploadRecord | null>(null);
 
     protected onFileSelected(event: Event): void {
 
