@@ -24,7 +24,7 @@ export class StorageService {
     public async initiateMultipartUpload(objectKey: string, contentType: string): Promise<string> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/InitiateMultipartUpload?object`;
+        const requestUrl = `${environment.apiBaseUrl}/Storage/InitiateMultipartUpload`;
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
