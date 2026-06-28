@@ -29,8 +29,8 @@ Client services reflect the server division (how they stand currently):
 
 ## Progress timeline
 
-| # | Slice                                         | Spike origin                      | Status                |
-|---|---|---|---|
+| # | Slice                                         | Spike origin                      | Status                                |
+|---|---                                            |---                                |---                                    |
 | 0 | Kernel pipe (SPA <-> API <-> R2)              | N/A                               | Complete (26 June)                    |
 | 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27 June)                    |
 | 2 | Multipart upload                              | Spike 03                          | In progress                           |
@@ -45,3 +45,9 @@ Client services reflect the server division (how they stand currently):
 | 11 | Download / receive screen                    | N/A                               | Planned                               |
 | 12 | End-to-end integrity check                   | N/A                               | Planned (deliverable)                 |
 | 13 | IndexedDBChunkSource                         | N/A                               | Nice-to-have (else Future Work)       |
+
+IndexedDBChunkSource enables the Service Worker to access previously stored chunks. The Service Worker upload loop (07) and the encryption paths (08 and 09) must be completed before this can be built. As a result, it is positioned after Spike 09. The established FileChunkSource is the default. The IndexedDB version is optional and deferred if time is short, given its limited browser support (Chromium only).
+
+Each row with (deliverable) indicates one of the four measurable project deliverables. Row 3 shows real-time progress visibility, while row 12 is for the end-to-end integrity check. The final two tasks involve pausing and resuming functionality during network interruptions (as noted in row 4), and confirming the successful transfer of data through an integrity check.
+
+---
