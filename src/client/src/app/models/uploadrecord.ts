@@ -1,21 +1,17 @@
-export interface UploadRecord {
-}
+import { UploadPart } from "./uploadpart";
 
-/*
- // Build Record
-        const newRecord = {
-            uploadId: uploadId,
-            objectKey: file.name,
-            contentType: file.type || "application/octet-stream",
-            fileIdentifier: {
-                name: file.name,
-                size: file.size,
-                lastModified: file.lastModified,
-                hash: null
-            },
-            partSize: partSize,
-            totalParts: totalParts,
-            createDate: Date.now(),
-            uploadedParts: []
-        }
-            */
+export interface UploadRecord {
+    uploadId: string;
+    objectKey: string;
+    contentType: string;
+    fileIdentifier: {
+        name: string;
+        size: number;
+        lastModified: number;
+        hash: string | null;
+    };
+    partSize: number;
+    totalParts: number;
+    createDate: number;
+    uploadedParts: UploadPart[];
+}
