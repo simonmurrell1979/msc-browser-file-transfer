@@ -85,4 +85,32 @@ export class DbService {
 
     }
 
+    public async createUploadRecord(uploadId: string,
+        file: File,
+        partSize: number,
+        totalParts: number): Promise<any> {
+
+        // Build Record
+        const newRecord = {
+            uploadId: uploadId,
+            objectKey: file.name,
+            contentType: file.type || "application/octet-stream",
+            fileIdentifier: {
+                name: file.name,
+                size: file.size,
+                lastModified: file.lastModified,
+                hash: null
+            },
+            partSize: partSize,
+            totalParts: totalParts,
+            createDate: Date.now(),
+            uploadedParts: []
+        }
+        // Save Record
+        await this.saveUpload(newRecord);
+        // Return
+        return newRecord;
+
+    }
+
 }
