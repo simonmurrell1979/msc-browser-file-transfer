@@ -64,7 +64,7 @@ Several client architecture principles were locked in:
 
 - The `HttpClient` should not be called by a component. It always goes through a typed service.
 - When injecting dependencies, always use `inject()`; do not construct services with `new`.
-- Each service is designed for a single, specialized function, rather than a large, all-encompassing `ApiService`. The services are organized in a flat `src/app/services/` directory.
+- Each service is designed for a single, specialised function, rather than a large, all-encompassing `ApiService`. The services are organized in a flat `src/app/services/` directory.
 - The shared response contract lives in `models/` and mirrors the server`s types (PascalCase):
 
 ```typescript
@@ -82,22 +82,22 @@ The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]`
 
 ### 27 Jun 2026: Slices 1 and 2
 
-**SPA shell and send screen.** The application now has its frame in place. The `pages/send` route is loaded lazily as a separate component. The empty router path redirects to `send`. The `app.html` frame consists of a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. 
+**SPA shell and send screen.** The application now has its skeleton in place. The `pages/send` route is loaded lazily as a separate component. The empty router path redirects to `send`. The `app.html` frame contains a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. 
 
-The folder structure is finalized: 
+The folder structure is finalised: 
 
 - `pages/` for screens that are routed.
 - `layout/` for the surrounding UI.
 - `models/` for the storing of all models replicated from the .NET REST API.
 - `services/` will be at the top level to store all the services. 
 
-The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and the self-hosted Aeonik font already implemented.
+The `selectedFile` signal is updated when a file is chosen. Bootstrap 5 and the self-hosted Aeonik font already implemented.
 
 **Slice 1, single-file presigned PUT (Spike 02). Green.** This was proven with a real file landing in R2.
 
-- `StorageService.getUploadUrl(objectKey)` generates a signed PUT URL via a typed GET request.
-- `UploadService.uploadFile(file)` gets that URL and then performs a raw `fetch` PUT straight to R2.
-- The division was intentional. The presign call uses the typed `HttpClient` for uniformity with the client, while the R2 upload utilizes a direct `fetch` to avoid interference from `HttpClient` interceptors or JSON processing, as it`s a cross-origin binary upload.
+- `StorageService.getUploadUrl(objectKey)` generates a signed PUT URL through a typed GET request.
+- `UploadService.uploadFile(file)` gets that URL and then performs a raw `fetch` PUT directly to R2.
+- The division was deliberate. The presign call uses the typed `HttpClient` for consistency with the client, while the R2 upload uses a `fetch` to avoid interference from `HttpClient` interceptors or JSON handling as it`s a cross-origin binary upload.
 
 **Findings:**
 
