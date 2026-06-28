@@ -12,9 +12,14 @@ export class DbService {
     private readonly _databaseName = "FileTransfer";
     private readonly _databaseVersion = 1;
     private readonly _storeName = "uploads";
+    private readonly _keyPath = "uploadId";
     private _databasePromise: Promise<IDBPDatabase<any>> | null = null;
 
     private openDatabase(): Promise<IDBPDatabase<any>> {
+
+        // Assign Values
+        const storeName = this._storeName;
+        const keyPath = this._keyPath;
 
         // Check Value
         if (this._databasePromise) {
@@ -28,10 +33,10 @@ export class DbService {
             upgrade(database) {
 
                 // Check Object Store exists
-                if (!database.objectStoreNames.contains("uploads")) {
+                if (!database.objectStoreNames.contains(storeName)) {
 
                     // Create Object Store
-                    database.createObjectStore("uploads", { keyPath: "uploadId" });
+                    database.createObjectStore(storeName, { keyPath: keyPath });
 
                 }
 
