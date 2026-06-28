@@ -113,4 +113,31 @@ export class DbService {
 
     }
 
+    public async addUploadedPart(uploadId: string, 
+        partNumber: number, 
+        eTag: string): Promise<any> {
+
+        // Get Record
+        const record = await this.getUpload(uploadId);
+        // Check Value
+        if (!record) {
+
+            // Throw Exception
+            throw new Error("Upload record not found for uploadId: " + uploadId);
+
+        }
+
+        // Add Uploaded Part
+        record.uploadedParts.push({
+            PartNumber: partNumber,
+            ETag: eTag,
+            uploadedAt: Date.now()
+        });
+        // Save Record
+        await this.saveUpload(record);
+        // Return
+        return record;
+
+    }
+
 }
