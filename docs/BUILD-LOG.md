@@ -33,9 +33,9 @@ Client services reflect the server division (how they stand currently):
 |---|---                                            |---                                |---                                            |
 | 0 | Kernel pipe (SPA <-> API <-> R2)              | N/A                               | Complete (26 June)                            |
 | 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27 June)                            |
-| 2 | Multipart upload                              | Spike 03                          | In progress                                   |
+| 2 | Multipart upload                              | Spike 03                          | In progress (transport layer built)           |
 | 3 | Real-time upload progress visibility          | N/A                               | Planned (deliverable)                         |
-| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Planned                                       |
+| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Storage layer is built. Resume to be done     |
 | 5 | ListParts reconciliation                      | Spike 05                          | Planned                                       |
 | 6 | Service Worker plumbing                       | Spike 06                          | Planned                                       |
 | 7 | Service Worker upload loop                    | Spike 07                          | Planned                                       |
