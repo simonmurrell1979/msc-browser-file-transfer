@@ -103,5 +103,116 @@ export class UploadService {
     
     }
 
+    async function newUpload(file) {
+
+        try {
+
+            // Log Message
+            logMessage("Uploading file: " + file.name);
+
+            // Initialize Multipart Upload
+            const uploadId = await postJSON("/InitiateMultipartUpload", {
+                ObjectKey: file.name,
+                ContentType: file.type || "application/octet-stream"
+            });
+            // Check Value
+            if (!uploadId) {
+            
+                // Log Message
+                logMessage("Failed to initiate multipart upload.");
+                // Exit
+                return;
+
+            }
+
+            // Assign Value
+            const partSize = 5 * 1024 * 1024; // 5MB
+            // Calculate Number of Parts
+            var totalParts = Math.ceil(file.size / partSize);
+
+            // Create Record
+            await createUploadRecord(uploadId, 
+                file,
+                partSize, 
+                totalParts);
+            // Log Message
+            logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
+
+            // Initialize Parts
+            const uploadedParts = [];
+
+            try {
+
+                // Upload Parts
+                await uploadParts(file,
+                    uploadId,
+                    partSize,
+                    totalParts,
+                    new Set(),
+                    uploadedParts);
+
+                // Check Value
+                if (uploadedParts.length !== totalParts) {
+
+                    // Log Message
+                    logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                    // Throw Exception
+                    throw new Error("Not all parts were uploaded successfully.");
+
+                }
+                // Complete Multipart Upload
+                await postJSON("/CompleteMultipartUpload", {
+                    ObjectKey: file.name,
+                    UploadId: uploadId,
+                    Parts: uploadedParts
+                });
+
+                // Log Message
+                logMessage("All parts uploaded successfully. Completed multipart upload...");
+
+                // Delete Record
+                await deleteUpload(uploadId);
+                // Log Message
+                logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+            }
+            catch (error) {
+
+                // Log Message
+                logMessage("An error occurred during multipart upload: " + error.message);            
+
+                try {
+
+                    // Abort Multipart Upload
+                    await postJSON("/AbortMultipartUpload", {
+                        ObjectKey: file.name,
+                        UploadId: uploadId
+                    });
+
+                    // Delete Record
+                    await deleteUpload(uploadId);
+                    // Log Message
+                    logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+                }
+                catch (abortError) {
+
+                    // Log Message
+                    logMessage("Failed to abort multipart upload: " + abortError.message);
+
+                }
+
+            }
+
+        }
+        catch (error) {
+
+            // Log Message
+            logMessage("An error occurred while uploading file: " + error.message);
+
+        }
+
+    }
+
 }
 
