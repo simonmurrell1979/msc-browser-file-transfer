@@ -1,6 +1,6 @@
 //*************************************************/
 // https://www.npmjs.com/package/idb
-//
+// https://github.com/jakearchibald/idb
 //*************************************************/
 import { Injectable } from "@angular/core";
 import { openDB, IDBPDatabase } from "idb";
@@ -17,48 +17,29 @@ export class DbService {
     private openDatabase(): Promise<IDBPDatabase<any>> {
 
         // Check Value
-        if (!this._databasePromise) {
+        if (this._databasePromise) {
 
-            // Initialize Database
-            databasePromise = new Promise((resolve, reject) => {
+            // Return
+            return this._databasePromise;
 
-                // Open Database
-                const request = indexedDB.open(databaseName, databaseVersion);   
-                // Handle Upgrade
-                request.onupgradeneeded = (event) => {
+        }
+        // Open Database
+        this._databasePromise = openDB(this._databaseName, this._databaseVersion, {
+            upgrade(database) {
 
-                    // Assign Database
-                    const database = event.target.result;
-                    // Check if store exists
-                    if (!database.objectStoreNames.contains(storeName)) {
+                // Check Object Store exists
+                if (!database.objectStoreNames.contains("uploads")) {
 
-                        // Create Store
-                        database.createObjectStore(storeName, { keyPath: "uploadId" });
-
-                    }
-
-                };    
-
-                // Handle Success
-                request.onsuccess = (event) => {
-
-                    // Resolve
-                    resolve(event.target.result);
-                    
-                };
-                // Handle Error
-                request.onerror = (event) => {
-
-                    // Reject
-                    reject(event.target.error);
+                    // Create Object Store
+                    database.createObjectStore("uploads", { keyPath: "uploadId" });
 
                 }
 
-            });
+            }
 
-        }
+        });
         // Return
-        return databasePromise;
+        return this._databasePromise;
 
     }
 
