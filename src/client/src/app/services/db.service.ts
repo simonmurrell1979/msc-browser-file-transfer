@@ -76,4 +76,13 @@ export class DbService {
 
     }
 
+    public async getUploads(): Promise<any> {
+
+        // Open Database
+        const database = await this.openDatabase();
+        // Get
+        return await database.getAll(this._storeName);
+
+    }
+
 }
