@@ -48,7 +48,7 @@ Client services reflect the server division (how they stand currently):
 
 IndexedDBChunkSource enables the Service Worker to access previously stored chunks. The Service Worker upload loop (07) and the encryption paths (08 and 09) must be completed before this can be built. As a result, it is positioned after Spike 09. The default is the standard FileChunkSource. The IndexedDB version is optional and will be skipped if there is not enough time. It is also limited to Chromium based browsers.
 
-Each row with (deliverable) indicates one of the four measurable project deliverables. Row 3 shows real-time progress visibility, while row 12 is for the end-to-end integrity check. The final two tasks involve pausing and resuming functionality during network interruptions (as noted in row 4), and confirming the successful transfer of data through an integrity check.
+Each row with (deliverable) indicates one of the four measurable project deliverables. Row 3 shows real-time progress visibility. Row 12 is for the end-to-end integrity check. The final two tasks involve pausing and resuming functionality during network interruptions.
 
 ---
 
@@ -65,18 +65,7 @@ Several client architecture principles were locked in:
 - The `HttpClient` should not be called by a component. It always goes through a typed service.
 - When injecting dependencies, always use `inject()`; do not construct services with `new`.
 - Each service is designed for a single, specialised function, rather than a large, all-encompassing `ApiService`. The services are organised in a flat `src/app/services/` directory.
-- The shared response contract lives in `models/` and relects the server`s types (PascalCase):
-
-```typescript
-export interface ApiResponse {
-    Success: boolean;
-    ErrorMessage?: string;
-}
-
-export interface ApiResponseWithData<T> extends ApiResponse {
-    ReturnedObject?: T;
-}
-```
+- The shared response contract lives in `models/` and relects the server`s types (PascalCase).
 
 The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing gives paths like `/api/Storage/TestConnection`. The CORS policy allows `localhost:4200` and `UseHttpsRedirection` was removed to allow for local HTTP testing.
 
