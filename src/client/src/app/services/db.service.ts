@@ -49,28 +49,13 @@ export class DbService {
 
     }
 
-export async function saveUpload(record) {
+    public async saveUpload(record: any): Promise<any> {
 
-    // Open Database
-    const database = await openDatabase();
+        // Open Database
+        const database = await this.openDatabase();
+        // Put
+        database.put(this._storeName, record);
 
-    // Initialize Promise
-    return new Promise((resolve, reject) => {
-
-        // Open Transaction
-        const transaction = database.transaction(storeName, "readwrite");
-        // Get Object Store
-        const objectStore = transaction.objectStore(storeName);
-        // Put Record
-        const request = objectStore.put(record);
-
-        // Handle Success
-        request.onsuccess = () => resolve(record);
-        // Handle Error
-        request.onerror = (event) => reject(event.target.error);
-
-    });
-
-}
+    }
 
 }
