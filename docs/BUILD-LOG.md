@@ -46,7 +46,7 @@ Client services reflect the server division (how they stand currently):
 | 12 | End-to-end integrity check                   | N/A                               | Planned (deliverable)                 |
 | 13 | IndexedDBChunkSource                         | N/A                               | Nice-to-have (else Future Work)       |
 
-IndexedDBChunkSource enables the Service Worker to access previously stored chunks. The Service Worker upload loop (07) and the encryption paths (08 and 09) must be completed before this can be built. As a result, it is positioned after Spike 09. The established FileChunkSource is the default. The IndexedDB version is optional and deferred if time is short, given its limited browser support (Chromium only).
+IndexedDBChunkSource enables the Service Worker to access previously stored chunks. The Service Worker upload loop (07) and the encryption paths (08 and 09) must be completed before this can be built. As a result, it is positioned after Spike 09. The default is the standard FileChunkSource. The IndexedDB version is optional and will be skipped if there is not enough time. It is also limited to Chromium based browsers.
 
 Each row with (deliverable) indicates one of the four measurable project deliverables. Row 3 shows real-time progress visibility, while row 12 is for the end-to-end integrity check. The final two tasks involve pausing and resuming functionality during network interruptions (as noted in row 4), and confirming the successful transfer of data through an integrity check.
 
@@ -56,7 +56,7 @@ Each row with (deliverable) indicates one of the four measurable project deliver
 
 ### 26 Jun 2026: Kernel pipe proven
 
-The entire pipe was tested from one end to the other. The Angular 22 SPA sends a request, through a cross-origin call, to the .NET REST API. An R2 connectivity check then returns it as a typed `ApiResponse` shown in the user interface. Because this was an actual round-trip and not a test, every layer of wiring has been verified, and each subsequent slice travels the same path.
+The entire pipe was tested from one end to the other. The Angular 22 SPA makes a cross-origin call to the .NET REST API. The R2 connectivity check then returns it as a typed `ApiResponse` displayed in the UI. Since this was an actual round-trip and not a test, every layer of wiring has been verified, and each subsequent slice follows the same path.
 
 Angular 22.0.3 (CLI 22.0.4), TypeScript 6.0.3, and Node 22.22.3 comprised the stack, along with the Vitest test runner, an ASP.NET Core backend, and Cloudflare R2 for storage.
 
@@ -78,11 +78,11 @@ export interface ApiResponseWithData<T> extends ApiResponse {
 }
 ```
 
-The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing results in paths like `/api/Storage/TestConnection`. The CORS policy permits `localhost:4200` and `UseHttpsRedirection` was eliminated to enable local HTTP testing.
+The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing gives paths like `/api/Storage/TestConnection`. The CORS policy permits `localhost:4200` and `UseHttpsRedirection` was removed to allow for local HTTP testing.
 
-### 27 Jun 2026: Slices 1 and 2 (single PUT and multipart)
+### 27 Jun 2026: Slices 1 and 2
 
-**SPA shell and send screen.** The application now has its frame in place. The `pages/send` route is loaded lazily as a standalone component. The empty router path redirects to `send`. The `app.html` frame consists of a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. 
+**SPA shell and send screen.** The application now has its frame in place. The `pages/send` route is loaded lazily as a separate component. The empty router path redirects to `send`. The `app.html` frame consists of a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. 
 
 The folder structure is finalized: 
 
