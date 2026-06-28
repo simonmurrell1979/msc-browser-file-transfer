@@ -3,6 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "../../environments/environment.development";
 import { ApiResponse, ApiResponseWithData } from "../models/apiresponse";
 import { firstValueFrom } from "rxjs";
+import { UploadPart } from "../models/uploadpart";
 
 @Injectable({ providedIn: "root" })
 export class StorageService {
@@ -61,7 +62,7 @@ export class StorageService {
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
-            uploadId: uploadId
+            uploadId: uploadId,
             parts: parts
         };
         // Make HTTP request
