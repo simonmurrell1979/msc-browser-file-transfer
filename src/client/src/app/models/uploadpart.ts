@@ -1,4 +1,4 @@
 export interface UploadPart {
-    eTag: string;
-    partNumber: number;
+    ETag: string;
+    PartNumber: number;
 }
