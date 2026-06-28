@@ -17,10 +17,6 @@ export class DbService {
 
     private openDatabase(): Promise<IDBPDatabase<any>> {
 
-        // Assign Values
-        const storeName = this._storeName;
-        const keyPath = this._keyPath;
-
         // Check Value
         if (this._databasePromise) {
 
@@ -28,6 +24,11 @@ export class DbService {
             return this._databasePromise;
 
         }
+
+        // Assign Values
+        const storeName = this._storeName;
+        const keyPath = this._keyPath;       
+
         // Open Database
         this._databasePromise = openDB(this._databaseName, this._databaseVersion, {
             upgrade(database) {
