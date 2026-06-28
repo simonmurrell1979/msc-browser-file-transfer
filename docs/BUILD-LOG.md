@@ -31,12 +31,12 @@ Client services reflect the server division (how they stand currently):
 
 | # | Slice                                         | Spike origin                      | Status                                        |
 |---|---                                            |---                                |---                                            |
-| 0 | Kernel pipe (SPA <-> API <-> R2)              | N/A                               | Complete (26 June)                            |
-| 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27 June)                            |
-| 2 | Multipart upload                              | Spike 03                          | In progress (transport layer built)           |
+| 0 | Kernel pipe (SPA <-> API <-> R2)              | N/A                               | Complete (26th June)                          |
+| 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27th June)                          |
+| 2 | Multipart upload                              | Spike 03                          | Complete (28th June)                          |
 | 3 | Real-time upload progress visibility          | N/A                               | Planned (deliverable)                         |
-| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Storage layer is built. Resume to be done     |
-| 5 | ListParts reconciliation                      | Spike 05                          | Planned                                       |
+| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Complete (28th June)                          |
+| 5 | ListParts reconciliation                      | Spike 05                          | Complete (28th June)                          |
 | 6 | Service Worker plumbing                       | Spike 06                          | Planned                                       |
 | 7 | Service Worker upload loop                    | Spike 07                          | Planned                                       |
 | 8 | Chunked encryption write path                 | Spike 08                          | Planned                                       |
@@ -65,11 +65,11 @@ Several client architecture principles were locked in:
 - The `HttpClient` should not be called by a component. It always goes through a typed service.
 - When injecting dependencies, always use `inject()`; do not construct services with `new`.
 - Each service is designed for a single, specialised function, rather than a large, all-encompassing `ApiService`. The services are organised in a flat `src/app/services/` directory.
-- The shared response contract lives in `models/` and relects the server`s types (PascalCase).
+- The shared response contract lives in `models/` and reflects the server's types (PascalCase).
 
 The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing gives paths like `/api/Storage/TestConnection`. The CORS policy allows `localhost:4200` and `UseHttpsRedirection` was removed to allow for local HTTP testing.
 
-### 27 Jun 2026: Slices 1 and 2
+### 27 Jun 2026: Slice 1
 
 **SPA shell and send screen.** The application now has its skeleton in place. The `pages/send` route is loaded lazily as a separate component. The empty router path redirects to `send`. The `app.html` frame contains a header, a `router-outlet`, and a footer. The header and footer are located within the `layout/` directory. 
 
@@ -86,7 +86,7 @@ The `selectedFile` signal is updated when a file is chosen. Bootstrap 5 and the 
 
 - `StorageService.getUploadUrl(objectKey)` generates a signed PUT URL through a typed GET request.
 - `UploadService.uploadFile(file)` gets that URL and then performs a raw `fetch` PUT directly to R2.
-- The division was deliberate. The presign call uses the typed `HttpClient` for consistency with the client, while the R2 upload uses a `fetch` to avoid interference from `HttpClient` interceptors or JSON handling as it`s a cross-origin binary upload.
+- The division was deliberate. The presign call uses the typed `HttpClient` for consistency with the client, while the R2 upload uses a `fetch` to avoid interference from `HttpClient` interceptors or JSON handling as it's a cross-origin binary upload.
 
 ### 28 Jun 2026: Slice 2 transport and storage
 
