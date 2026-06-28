@@ -140,4 +140,22 @@ export class DbService {
 
     }
 
+    public async findLatestUpload(): Promise<any> {
+
+        // Get All Uploads
+        const uploads = await this.getUploads();
+        // Check Value
+        if (!uploads || uploads.length === 0) {
+
+            // Return
+            return null;
+
+        }
+        // Sort
+        uploads.sort((a: any, b: any) => b.createDate - a.createDate);
+        // Return
+        return uploads[0];
+
+    }
+
 }
