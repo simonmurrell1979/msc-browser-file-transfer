@@ -116,3 +116,15 @@ The design also shifts cost to the edges. The sender's browser does the encrypti
 ### Abuse control (report-only, to be built)
 
 Malicious content cannot be solved within a zero-knowledge design, because the server cannot scan what it cannot decrypt. This is acknowledged as a limitation rather than something the project attempts to fix. Volume abuse, by contrast, can be made harder. The chosen approach is a one-time password per send together with a CAPTCHA, both of which work without accounts and rely only on metadata, so zero-knowledge is preserved. WeTransfer already uses a one-time password per send, which sets a mainstream precedent. IP-based rate limiting was rejected, because it punishes innocent users behind shared addresses while abusers simply rotate IPs. The one-time password would be delivered through a transactional email service such as Resend, which is named as a concrete choice but not built. The honest bound on all of this is that it raises the cost of abuse rather than preventing it outright.
+
+### Deployment
+
+The application is deployed as two separate Railway services, one for the API and one for the SPA, rather than serving the SPA as static files from the API. This mirrors the separation in the codebase and keeps the clear split between the control plane (the API, which coordinates) and the data plane (the SPA as client, with R2 as external storage). The trade-off is that the two origins need CORS configured between them, which is trivial but real. The academic instance runs on an unadvertised Railway subdomain, but this obscurity is only a deployment convenience and is not treated as a security control. Restricting access by allow-listing a domain was considered and rejected, because it would reintroduce the notion of identity that the accountless design deliberately avoids.
+
+### Lifecycle (accountless)
+
+Cleanup and expiry are keyed to the uploadId rather than a sender's email, in keeping with the accountless design. Two lifecycle mechanisms handle this, both configured on R2 rather than written in code: incomplete multipart uploads are aborted after a set number of days to clear orphaned parts, and completed objects expire after a set number of days.
+
+### Deferred polish: Unsplash backgrounds (similar to WeTransfer)
+
+This is presentation only and must not jump ahead of the functional slices. When it is built, the requests will be proxied through the .NET API so that the access key stays on the server and is never embedded in the client. It is scheduled for the final polish pass, ahead of the demo.
