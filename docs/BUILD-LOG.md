@@ -27,3 +27,21 @@ Client services reflect the server division (how they stand currently):
 
 ---
 
+## Progress timeline
+
+| # | Slice                                         | Spike origin                      | Status                |
+|---|---|---|---|
+| 0 | Kernel pipe (SPA <-> API <-> R2)              | n/a                               | Complete (26 June)                    |
+| 1 | Single-file presigned PUT                     | Spike 02                          | Complete (27 June)                    |
+| 2 | Multipart upload                              | Spike 03                          | In progress                           |
+| 3 | Real-time upload progress visibility          | n/a                               | Planned (deliverable)                 |
+| 4 | Resume / IndexedDB session persistence        | Spike 04                          | Planned                               |
+| 5 | ListParts reconciliation                      | Spike 05                          | Planned                               |
+| 6 | Service Worker plumbing                       | Spike 06                          | Planned                               |
+| 7 | Service Worker upload loop                    | Spike 07                          | Planned                               |
+| 8 | Chunked encryption write path                 | Spike 08                          | Planned                               |
+| 9 | Chunked decryption read path                  | Spike 09                          | Planned                               |
+| 10 | Share URL with key in fragment               | n/a                               | Planned                               |
+| 11 | Download / receive screen                    | n/a                               | Planned                               |
+| 12 | End-to-end integrity check                   | n/a                               | Planned (deliverable)                 |
+| 13 | IndexedDBChunkSource                         | after Spike 09                    | Nice-to-have (else Future Work)       |
