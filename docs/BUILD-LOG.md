@@ -90,8 +90,8 @@ The folder structure is finalized:
 - `layout/` for the surrounding UI.
 - `models/` for the storing of all models replicated from the .NET REST API.
 - `services/` will be at the top level to store all the services. 
-- 
-- The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and the self-hosted Aeonik font already implemented.
+
+The `selectedFile` signal is updated when a file is chosen, with Bootstrap 5 and the self-hosted Aeonik font already implemented.
 
 **Slice 1, single-file presigned PUT (Spike 02). Green.** This was proven with a real file landing in R2.
 
