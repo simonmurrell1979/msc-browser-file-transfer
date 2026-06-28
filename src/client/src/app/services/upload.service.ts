@@ -47,7 +47,7 @@ export class UploadService {
         for (let i = 0; i < totalParts; i++) {
     
             // Assign Value
-            var partIndex = i + 1;
+            const partIndex = i + 1;
     
             // Check Value
             if (skippedParts.has(partIndex)) {
@@ -60,9 +60,9 @@ export class UploadService {
             }
     
             // Assign Values
-            var fileStart = i * partSize;
-            var fileEnd = Math.min(fileStart + partSize, file.size);
-            var fileChunk = file.slice(fileStart, fileEnd);
+            const fileStart = i * partSize;
+            const fileEnd = Math.min(fileStart + partSize, file.size);
+            const fileChunk = file.slice(fileStart, fileEnd);
     
             // Generate Multipart Upload URL
             const multipartUploadUrl = await this._storageService.generateMultipartUploadUrl(file.name,
