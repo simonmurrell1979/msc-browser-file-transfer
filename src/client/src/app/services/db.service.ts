@@ -4,6 +4,7 @@
 //*************************************************/
 import { Injectable } from "@angular/core";
 import { openDB, IDBPDatabase } from "idb";
+import { UploadRecord } from "../models/uploadrecord";
 
 @Injectable({ providedIn: "root" })
 export class DbService {
@@ -49,7 +50,7 @@ export class DbService {
 
     }
 
-    public async saveUpload(record: any): Promise<any> {
+    public async saveUpload(record: UploadRecord): Promise<void> {
 
         // Open Database
         const database = await this.openDatabase();
@@ -67,7 +68,7 @@ export class DbService {
 
     }
 
-    public async getUpload(uploadId: any): Promise<any> {
+    public async getUpload(uploadId: any): Promise<UploadRecord | undefined> {
 
         // Open Database
         const database = await this.openDatabase();
@@ -76,7 +77,7 @@ export class DbService {
 
     }
 
-    public async getUploads(): Promise<any> {
+    public async getUploads(): Promise<UploadRecord[]> {
 
         // Open Database
         const database = await this.openDatabase();
@@ -88,10 +89,10 @@ export class DbService {
     public async createUploadRecord(uploadId: string,
         file: File,
         partSize: number,
-        totalParts: number): Promise<any> {
+        totalParts: number): Promise<UploadRecord> {
 
         // Build Record
-        const newRecord = {
+        const newRecord: UploadRecord = {
             uploadId: uploadId,
             objectKey: file.name,
             contentType: file.type || "application/octet-stream",
@@ -115,7 +116,7 @@ export class DbService {
 
     public async addUploadedPart(uploadId: string, 
         partNumber: number, 
-        eTag: string): Promise<any> {
+        eTag: string): Promise<UploadRecord> {
 
         // Get Record
         const record = await this.getUpload(uploadId);
@@ -131,7 +132,7 @@ export class DbService {
         record.uploadedParts.push({
             PartNumber: partNumber,
             ETag: eTag,
-            uploadedAt: Date.now()
+            UploadedAt: Date.now()
         });
         // Save Record
         await this.saveUpload(record);
@@ -140,7 +141,7 @@ export class DbService {
 
     }
 
-    public async findLatestUpload(): Promise<any> {
+    public async findLatestUpload(): Promise<UploadRecord | null> {
 
         // Get All Uploads
         const uploads = await this.getUploads();
@@ -152,7 +153,7 @@ export class DbService {
 
         }
         // Sort
-        uploads.sort((a: any, b: any) => b.createDate - a.createDate);
+        uploads.sort((a: UploadRecord, b: UploadRecord) => b.createDate - a.createDate);
         // Return
         return uploads[0];
 
