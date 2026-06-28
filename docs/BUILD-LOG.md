@@ -101,3 +101,18 @@ The `selectedFile` signal is updated when a file is chosen. Bootstrap 5 and the 
 
 The HTML and JavaScript pages from the spike phase are throwaway artefacts; their source is kept only as evidence. The spike .NET REST API was treated differently. It was already built during the spike phase in the layered `RestAPI -> Services -> Common` structure, and was carried forward unchanged as the baseline for the Phase 2 kernel. The intended framing for the report is that this API was a stable baseline serving a series of disposable probes, rather than a system built up incrementally across the spikes. In other words it is salvage rather than continuity, which keeps the boundary between the spike phase and the build phase clean.
 
+### Zero-knowledge custody model
+
+The sender's browser holds the encryption key. The key lives in the URL fragment (`download/{id}#{key}`) and never reaches the server, so a WeTransfer-style "log in and view your sends" is impossible by design. If the sender clears their browser storage, they lose the key: the ciphertext stays on R2 but can no longer be opened through the app, which is the intended behaviour. The recipient is not affected, because their link already carries the key. The trade-off is simple to state: this design moves trust from the server to the client, and the price is that the server can never recover a lost key. The value that ties a transfer together is the `uploadId`, not the sender's identity.
+
+### Cryptography
+
+The key derivation function is PBKDF2. It was chosen because it is built into the Web Crypto API (SubtleCrypto), which keeps the design to platform primitives only. The parameters follow NIST SP 800-132, with a high iteration count in line with OWASP guidance. Argon2id was considered but deferred to Future Work, since it would require an external WASM or JavaScript library and so break the platform-primitives rule.
+
+The cipher is AES-GCM applied directly to a password-derived key, rather than envelope encryption with a separate data key and key-encrypting key. This is justified by the single-sender, link-based model, which has no multiple recipients, key rotation, or hardware security module to account for. Encryption is done per chunk, and each chunk has its own random 12-byte initialisation vector prepended to the ciphertext. The IV is not secret; only the key is, and the key travels solely in the URL fragment.
+
+The design also shifts cost to the edges. The sender's browser does the encryption, the ciphertext sits on R2 with no egress charge, and the recipient's browser does the decryption. The server only moves bytes; it is pure transport.
+
+### Abuse control (report-only, to be built)
+
+Malicious content cannot be solved within a zero-knowledge design, because the server cannot scan what it cannot decrypt. This is acknowledged as a limitation rather than something the project attempts to fix. Volume abuse, by contrast, can be made harder. The chosen approach is a one-time password per send together with a CAPTCHA, both of which work without accounts and rely only on metadata, so zero-knowledge is preserved. WeTransfer already uses a one-time password per send, which sets a mainstream precedent. IP-based rate limiting was rejected, because it punishes innocent users behind shared addresses while abusers simply rotate IPs. The one-time password would be delivered through a transactional email service such as Resend, which is named as a concrete choice but not built. The honest bound on all of this is that it raises the cost of abuse rather than preventing it outright.
