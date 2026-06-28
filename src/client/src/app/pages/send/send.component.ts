@@ -18,6 +18,24 @@ export class SendComponent {
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
 
+    public async ngOnInit(): Promise<void> {
+
+        // Find Latest Pending Upload
+        const latestUpload = await this._dbService.findLatestUpload();
+        // Check Value
+        if (latestUpload == null) {
+
+            // Exit
+            return;
+
+        }
+        // Set Pending Upload
+        this.pendingUpload.set(latestUpload);
+        // Log Message
+        console.log("Latest pending upload found:", latestUpload);
+
+    }
+
     protected onFileSelected(event: Event): void {
 
         // Set input
@@ -48,10 +66,22 @@ export class SendComponent {
 
         try {
 
-            // Upload file to server
-            await this._uploadService.uploadFile(file);
-            // Log Success
-            console.log("File sent successfully!");
+            // Load Value
+            const pendingUpload = this.pendingUpload();
+            // Check Value
+    if (pendingUpload) {
+
+        // Resume Upload
+        await resumeUpload(file,
+            pendingUpload);
+
+    }
+    else {
+
+        // New Upload
+        await newUpload(file);
+
+    }
 
         }
         catch (error) {
