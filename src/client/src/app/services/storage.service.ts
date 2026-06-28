@@ -21,6 +21,22 @@ export class StorageService {
 
     }
 
+    public async initiateMultipartUpload(objectKey: string, contentType: string): Promise<string> {
+
+        // Build URL
+        const requestUrl = `${environment.apiBaseUrl}/Storage/InitiateMultipartUpload?object`;
+        // Build Request Body
+        const requestBody = {
+            objectKey: objectKey,
+            contentType: contentType
+        };
+        // Make HTTP request
+        const response = await firstValueFrom(this._httpClient.post<ApiResponseWithData<string>>(requestUrl, requestBody));
+        // Check Value
+        return this.checkResponseWithData<string>(response);
+
+    }
+
     private checkResponse(response: ApiResponse): boolean {
 
         // Check Response
