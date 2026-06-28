@@ -67,4 +67,13 @@ export class DbService {
 
     }
 
+    public async getUpload(uploadId: any): Promise<any> {
+
+        // Open Database
+        const database = await this.openDatabase();
+        // Get
+        return await database.get(this._storeName, uploadId);
+
+    }
+
 }
