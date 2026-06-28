@@ -56,16 +56,16 @@ Each row with (deliverable) indicates one of the four measurable project deliver
 
 ### 26 Jun 2026: Kernel pipe proven
 
-The entire pipe was tested from one end to the other. The Angular 22 SPA makes a cross-origin call to the .NET REST API. The R2 connectivity check then returns it as a typed `ApiResponse` displayed in the UI. Since this was an actual round-trip and not a test, every layer of wiring has been verified, and each subsequent slice follows the same path.
+The whole pipe was tested from end to end. The Angular 22 SPA makes a cross-origin call to the .NET REST API. The R2 connectivity check then returns it as a typed `ApiResponse` displayed in the UI. Being a real round trip this cannot be a test so all layers of wiring have been checked and each following slice is the same.
 
-Angular 22.0.3 (CLI 22.0.4), TypeScript 6.0.3, and Node 22.22.3 comprised the stack, along with the Vitest test runner, an ASP.NET Core backend, and Cloudflare R2 for storage.
+Angular 22.0.3 (CLI 22.0.4), TypeScript 6.0.3, and Node 22.22.3 makes up the stack. There is a Vitest test runner, an ASP.NET Core backend, and Cloudflare R2 for storage.
 
 Several client architecture principles were locked in:
 
 - The `HttpClient` should not be called by a component. It always goes through a typed service.
 - When injecting dependencies, always use `inject()`; do not construct services with `new`.
-- Each service is designed for a single, specialised function, rather than a large, all-encompassing `ApiService`. The services are organized in a flat `src/app/services/` directory.
-- The shared response contract lives in `models/` and mirrors the server`s types (PascalCase):
+- Each service is designed for a single, specialised function, rather than a large, all-encompassing `ApiService`. The services are organised in a flat `src/app/services/` directory.
+- The shared response contract lives in `models/` and relects the server`s types (PascalCase):
 
 ```typescript
 export interface ApiResponse {
@@ -78,7 +78,7 @@ export interface ApiResponseWithData<T> extends ApiResponse {
 }
 ```
 
-The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing gives paths like `/api/Storage/TestConnection`. The CORS policy permits `localhost:4200` and `UseHttpsRedirection` was removed to allow for local HTTP testing.
+The combination of `UsePathBase("/api/")` and `[Route("[controller]/[action]")]` in routing gives paths like `/api/Storage/TestConnection`. The CORS policy allows `localhost:4200` and `UseHttpsRedirection` was removed to allow for local HTTP testing.
 
 ### 27 Jun 2026: Slices 1 and 2
 
