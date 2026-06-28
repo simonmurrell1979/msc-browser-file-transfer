@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "../../environments/environment.development";
-import { ApiResponseWithData } from "../models/apiresponse";
+import { ApiResponse, ApiResponseWithData } from "../models/apiresponse";
 import { firstValueFrom } from "rxjs";
 
 @Injectable({ providedIn: "root" })
@@ -17,11 +17,26 @@ export class StorageService {
         // Make HTTP request
         const response = await firstValueFrom(this._httpClient.get<ApiResponseWithData<string>>(requestUrl));
         // Check Value
-        return this.checkResponse<string>(response);
+        return this.checkResponseWithData<string>(response);
 
     }
 
-    private checkResponse<T>(response: ApiResponseWithData<T>): T {
+    private checkResponse(response: ApiResponse): boolean {
+
+        // Check Response
+        if (!response ||
+            !response.Success) {
+            
+            // Throw Exception
+            throw new Error(response.ErrorMessage || "An error occurred while processing the request.");
+
+        }
+        // Return
+        return response.Success;
+
+    }
+
+    private checkResponseWithData<T>(response: ApiResponseWithData<T>): T {
 
         // Check Response
         if (!response ||
