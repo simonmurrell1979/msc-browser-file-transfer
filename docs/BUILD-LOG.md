@@ -88,6 +88,16 @@ The `selectedFile` signal is updated when a file is chosen. Bootstrap 5 and the 
 - `UploadService.uploadFile(file)` gets that URL and then performs a raw `fetch` PUT directly to R2.
 - The division was deliberate. The presign call uses the typed `HttpClient` for consistency with the client, while the R2 upload uses a `fetch` to avoid interference from `HttpClient` interceptors or JSON handling as it`s a cross-origin binary upload.
 
+### 28 Jun 2026: Slice 2 transport and storage
+
+**StorageService multipart methods.** The five multipart actions on the Storage controller now each have a matching method on StorageService: InitiateMultipartUpload, GenerateMultipartUploadUrl, CompleteMultipartUpload, AbortMultipartUpload and ListMultipartUploadParts. Each is a typed POST that builds a request body, awaits the response through firstValueFrom, and passes it through the response guard. The two that return no data (Complete and Abort) use the no-data guard against a plain ApiResponse. This completes the transport layer for the multipart slice.
+
+**DbService using idb library.** The spike db.js was ported into a new DbService, the client-side IndexedDB boundary for upload session state. It exposes the same surface as the spike: openDatabase (a cached-promise single connection), saveUpload, deleteUpload, getUpload, getUploads, createUploadRecord, addUploadedPart and findLatestUpload. The boundary discipline from the spike is preserved: this service is pure storage with no API knowledge.
+
+**Additional Models.** The upload record shape is now captured as TypeScript interfaces in models/: UploadRecord, FileIdentifier, and UploadPart (which mirrors the C# UploadPart and carries an optional local-only UploadedAt). DbService was updated to use these types in place of the earlier any usage.
+
+**Open decision recorded.** findLatestUpload was changed to be parameterless and it assumes one upload in the store at a time. If the send interface later holds several uploads at once, "newest record" is no longer a safe proxy for "the file the user re-selected", and an overloaded method will be needed. The data already lives on every record, so this is a cheap addition when required.
+
 **Findings:**
 
 - **Async model:**  Async model: `HttpClient` observables are converted to promises when crossing the transport boundary, using `firstValueFrom`.Observables do not go beyond `StorageService`. AbortController will be employed for canceling resume operations mid-flight.
