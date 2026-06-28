@@ -2,6 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { StorageService } from "./storage.service";
 import { UploadPart } from "../models/uploadpart";
 import { DbService } from "./db.service";
+import { UploadRecord } from "../models/uploadrecord";
 
 @Injectable({ providedIn: "root" })
 export class UploadService {
@@ -191,6 +192,110 @@ export class UploadService {
 
         }
 
+    }
+
+    public async resumeUpload(file: File,
+        existingRecord: UploadRecord): Promise<void> {
+    
+        try {
+    
+            // Check Value
+            if (file.name !== existingRecord.fileIdentifier.name ||
+                file.size !== existingRecord.fileIdentifier.size ||
+                file.lastModified !== existingRecord.fileIdentifier.lastModified) {
+    
+                // Log Message
+                this.logMessage("Selected file does not match pending upload. Aborting upload!");
+                // Exit
+                return;
+    
+            }
+    
+            // Log Message
+            this.logMessage("Resuming upload for file: " + existingRecord.objectKey);
+    
+            // Assign Values
+            const uploadId = existingRecord.uploadId;
+            const partSize = existingRecord.partSize;
+            const totalParts = existingRecord.totalParts;
+    
+            // Load Server Parts
+            const serverParts = await this._storageService.listMultipartUploadParts(existingRecord.objectKey, existingRecord.uploadId);
+            // Update Existing Record
+            existingRecord.uploadedParts = serverParts;
+            // Save Record
+            await this._dbService.saveUpload(existingRecord);
+    
+            // Initialize Skipped Parts
+            const skippedParts = new Set(existingRecord.uploadedParts.map(part => part.PartNumber));
+            // Initialize Uploaded Parts
+            const uploadedParts = existingRecord.uploadedParts.map(part => ({
+                PartNumber: part.PartNumber,
+                ETag: part.ETag
+            }));
+    
+            // Log Message
+            this.logMessage(skippedParts.size + " out of " + totalParts + " parts already uploaded. Resuming upload...");
+    
+            try {
+    
+                // Upload Parts
+                await this.uploadParts(file, uploadId, partSize, totalParts, skippedParts, uploadedParts);
+    
+                // Check Value
+                if (uploadedParts.length !== totalParts) {
+    
+                    // Log Message
+                    this.logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                    // Throw Exception
+                    throw new Error("Not all parts were uploaded successfully.");
+    
+                }
+                // Complete Multipart Upload
+                await this._storageService.completeMultipartUpload(file.name, uploadId, uploadedParts);
+                // Log Message
+                this.logMessage("All parts uploaded successfully. Completed multipart upload...");
+    
+                // Delete Record
+                await this._dbService.deleteUpload(uploadId);
+                // Log Message
+                this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+    
+            }
+            catch (error: any) {
+    
+                // Log Message
+                this.logMessage("An error occurred during multipart upload: " + error.message);            
+    
+
+                try {
+    
+                    // Abort Multipart Upload
+                    await this._storageService.abortMultipartUpload(file.name, uploadId);
+    
+                    // Delete Record
+                    await this._dbService.deleteUpload(uploadId);
+                    // Log Message
+                    this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+    
+                }
+                catch (abortError: any) {
+    
+                    // Log Message
+                    this.logMessage("Failed to abort multipart upload: " + abortError.message);
+    
+                }
+    
+            }
+    
+        }
+        catch (error: any) {
+    
+            // Log Message
+            this.logMessage("An error occurred while uploading file: " + error.message);
+    
+        }
+    
     }
 
 }
