@@ -37,6 +37,25 @@ export class StorageService {
 
     }
 
+    public async generateMultipartUploadUrl(objectKey: string, uploadId: string, partNumber: number): Promise<string> {
+
+        // Build URL
+        const requestUrl = `${environment.apiBaseUrl}/Storage/GenerateMultipartUploadUrl`;
+        // Build Request Body
+        const requestBody = {
+            objectKey: objectKey,
+            uploadId: uploadId,
+            partNumber: partNumber
+        };
+        // Make HTTP request
+        const response = await firstValueFrom(this._httpClient.post<ApiResponseWithData<string>>(requestUrl, requestBody));
+        // Check Value
+        return this.checkResponseWithData<string>(response);
+
+    }
+
+    
+
     private checkResponse(response: ApiResponse): boolean {
 
         // Check Response
