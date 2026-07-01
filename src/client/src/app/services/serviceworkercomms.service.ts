@@ -1,4 +1,8 @@
-import { Service } from "@angular/core";
+import { Injectable } from "@angular/core";
 
-@Service()
-export class ServiceWorkerCommsService {}
+@Injectable({ providedIn: "root" })
+export class ServiceWorkerCommsService {
+
+    
+
+}
