@@ -79,6 +79,7 @@ The folder structure is finalised:
 - `layout/` for the surrounding UI.
 - `models/` for the storing of all models replicated from the .NET REST API.
 - `services/` will be at the top level to store all the services. 
+- `workers/` will be at the top level to store the service worker. 
 
 The `selectedFile` signal is updated when a file is chosen. Bootstrap 5 and the self-hosted Aeonik font already implemented.
 
@@ -110,6 +111,23 @@ A precise finding came out of the resume test. The UI was cancelled after part 4
 
 - **Async model:**  Async model: `HttpClient` observables are converted to promises when crossing the transport boundary, using `firstValueFrom`.Observables do not go beyond `StorageService`. AbortController will be employed for canceling resume operations mid-flight.
 - **ETag asymmetry (from Spike 05):** ETags from PUT responses are enclosed in quotes, unlike those from ListParts. It is worth mentioning in the report the difference at the integration point. Quotes are removed on capture using `.replaceAll("\"", "")`.
+
+### 30 Jun 2026: Slice 6 Service Worker plumbing
+
+**Goal.** Get a hand-written Service Worker registered, active, and talking to the page. No upload loop yet. Get the baseline service worker working.
+
+**Worker written in TypeScript.** The spike used `sw.js` from Spike 06. In the build it is `service-worker.ts` under `src/app/workers/`, so the whole project stays TypeScript. The browser still gets JavaScript, but that file is build output and is never hand-edited. Ported elements from Spike 06 to get a baseline communication layer going in the new Angular project.
+
+**Separate compile for the worker.** The worker runs in its own context with different globals (`self`, `clients`) that need the `webworker` type library, not the `dom` one the app uses. So esbuild was added and a `build:worker` script compiles `service-worker.ts` to `public/service-worker.js`.
+
+**Compile runs with the build.** `prestart` and `prebuild` scripts run the worker compile first, so `npm start` and `npm run build` always emit a fresh worker. Note: a bare `ng serve` skips this. Use `npm start`.
+
+**Angular build kept off the worker.** The app tsconfig was pulling the worker in and failing on the `webworker` types. Updated the `tsconfig.app.json` file to exclude the `service-worker.ts` file.
+
+**MessageType model** Added the `messagetype.ts` file to include the message types used in the last spike. I defined this now so that it doesn't need to be modified again.
+
+**Service Worker Comms Service** Added new `serviceworkercomms.service.ts` file. It was rebuilt from scratch and from elements found in Spike 06.
+It was registered using the `providerAppInitializer` in the `app.config.ts`.
 
 ---
 
