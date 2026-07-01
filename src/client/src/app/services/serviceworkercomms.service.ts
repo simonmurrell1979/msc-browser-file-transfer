@@ -12,4 +12,29 @@ export class ServiceWorkerCommsService {
 
     }
 
+    async sendTest(): Promise<void> {
+
+        // Check Value
+        if (navigator.serviceWorker.controller == null) {
+
+            // Log Message
+            console.log("Service Worker is not active.");
+            // Exit
+            return;
+
+        }
+        // Listen for Message
+        navigator.serviceWorker.addEventListener("message", (event) => {
+
+            // Log Message
+            console.log(`Received message from Service Worker: ${event.data.message}`);
+
+        });
+        // Send Message
+        navigator.serviceWorker.controller.postMessage({
+            type: "TEST"
+        });
+
+    }
+
 }
