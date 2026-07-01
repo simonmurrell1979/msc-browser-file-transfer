@@ -37,7 +37,7 @@ Client services reflect the server division (how they stand currently):
 | 3 | Real-time upload progress visibility          | N/A                               | Planned (deliverable)                         |
 | 4 | Resume / IndexedDB session persistence        | Spike 04                          | Complete (28th June)                          |
 | 5 | ListParts reconciliation                      | Spike 05                          | Complete (28th June)                          |
-| 6 | Service Worker plumbing                       | Spike 06                          | Planned                                       |
+| 6 | Service Worker plumbing                       | Spike 06                          | Complete (30th June)                          |
 | 7 | Service Worker upload loop                    | Spike 07                          | Planned                                       |
 | 8 | Chunked encryption write path                 | Spike 08                          | Planned                                       |
 | 9 | Chunked decryption read path                  | Spike 09                          | Planned                                       |
