@@ -5,6 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:worker": "esbuild src/app/workers/service-worker.ts --bundle --outfile=src/public/service-worker.js --platform=browser --formmat=esm",
         "watch": "ng build --watch --configuration development",
         "test": "ng test"
     },
