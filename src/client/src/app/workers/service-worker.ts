@@ -1,1 +1,3 @@
-console.log("Service Worker: Console log test!");
+import { MessageType } from "../models/messagetype";
+
+declare const self: ServiceWorkerGlobalScope;
