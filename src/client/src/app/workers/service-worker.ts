@@ -55,3 +55,76 @@ function logMesage(message: string) {
     });
     
 }
+
+// Add Message Event
+self.addEventListener('message', event => {
+
+    // Assign Value
+    serviceWorkerClient = event.source;
+
+    // Assign Value
+    const data = event.data;
+    // Check Value
+    if (!data || !data.type) {
+
+        // Log Message
+        logMessage("Received invalid message in Service Worker.");
+        // Exit
+        return;
+
+    }
+
+    // Check Value
+    if (data.type === MessageType.NEWUPLOAD ||
+        data.type === MessageType.RESUMEUPLOAD) {
+    
+        // Check Value
+        if (uploadInProgress) {
+
+            // Log Message
+            logMessage("An upload is already in progress.");
+            // Exit
+            return;
+
+        }
+        // Assign Value
+        uploadInProgress = true;
+
+        // Command Handler
+        switch (data.type) {
+
+            case MessageType.NEWUPLOAD:
+
+                // New Upload
+                event.waitUntil(newUpload(data.file).finally(() => {
+
+                    // Disable
+                    uploadInProgress = false;
+
+                }));
+                // Exit
+                break; 
+
+            case MessageType.RESUMEUPLOAD:
+
+                // Resume Upload
+                event.waitUntil(resumeUpload(data.file, data.uploadId).finally(() => {
+
+                    // Disable
+                    uploadInProgress = false;
+                    
+                }));
+                // Exit
+                break;
+
+        }
+
+    }
+    else if (data.type === MessageType.CANCELUPLOAD) {
+
+        // Cancel Upload
+        event.waitUntil(cancelUpload(data.objectKey, data.uploadId));
+
+    }
+
+});
