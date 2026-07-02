@@ -2,6 +2,8 @@ import { Component, inject, signal } from "@angular/core";
 import { UploadService } from "../../services/upload.service";
 import { UploadRecord } from "../../models/uploadrecord";
 import { DbService } from "../../services/db.service";
+import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.service";
+import { MessageType } from "../../models/messagetype";
 
 @Component({
     selector: "app-send",
@@ -14,6 +16,7 @@ export class SendComponent {
     // Private Variables
     private readonly _uploadService = inject(UploadService);
     private readonly _dbService = inject(DbService);
+    private readonly _serviceWorkerCommsService = inject(ServiceWorkerCommsService);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
@@ -72,14 +75,20 @@ export class SendComponent {
             if (pendingUpload) {
 
                 // Resume Upload
-                await this._uploadService.resumeUpload(file,
-                    pendingUpload);
+                await this._serviceWorkerCommsService.sendCommand({ 
+                    type: MessageType.RESUMEUPLOAD, 
+                    file: file,
+                    uploadId: pendingUpload.uploadId
+                });
 
             }
             else {
 
-                // New Upload
-                await this._uploadService.newUpload(file);
+                // Resume Upload
+                await this._serviceWorkerCommsService.sendCommand({ 
+                    type: MessageType.NEWUPLOAD, 
+                    file: file
+                });
 
             }
             // Clear Pending Upload

@@ -24,7 +24,7 @@ export class ServiceWorkerCommsService  {
             this._messageHandler = onMessageHandler;
 
             // Register Service Worker
-            await navigator.serviceWorker.register("sw.js", 
+            await navigator.serviceWorker.register("service-worker.js", 
                 {
                     type: "module"
                 }

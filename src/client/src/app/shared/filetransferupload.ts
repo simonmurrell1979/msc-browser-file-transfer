@@ -178,10 +178,21 @@ export class FileTransferUpload {
     }
 
     public async resumeUpload(file: File,
-        existingRecord: UploadRecord): Promise<void> {
+        uploadId: string): Promise<void> {
     
         try {
     
+            // Get Existing Record
+            const existingRecord = await this._db.getUpload(uploadId);
+            // Check Value
+            if (existingRecord == null) {
+
+                // Log Message
+                this.logMessage("No existing upload record found. Aborting upload!");
+                // Exit
+                return;
+
+            }
             // Check Value
             if (file.name !== existingRecord.fileIdentifier.name ||
                 file.size !== existingRecord.fileIdentifier.size ||
@@ -198,7 +209,6 @@ export class FileTransferUpload {
             this.logMessage("Resuming upload for file: " + existingRecord.objectKey);
     
             // Assign Values
-            const uploadId = existingRecord.uploadId;
             const partSize = existingRecord.partSize;
             const totalParts = existingRecord.totalParts;
     

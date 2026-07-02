@@ -66,7 +66,7 @@ export class FileTransferDb {
 
     }
 
-    public async getUpload(uploadId: any): Promise<UploadRecord | undefined> {
+    public async getUpload(uploadId: string): Promise<UploadRecord | undefined> {
 
         // Open Database
         const database = await this.openDatabase();
