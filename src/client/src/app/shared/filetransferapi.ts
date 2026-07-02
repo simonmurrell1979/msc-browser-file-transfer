@@ -31,9 +31,9 @@ export class FileTransferApi {
     public async getUploadUrl(objectKey: string): Promise<string> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/GetUploadUrl?objectKey=${encodeURIComponent(objectKey)}`;
+        const requestUrl = `GetUploadUrl?objectKey=${encodeURIComponent(objectKey)}`;
         // Make HTTP request
-        const response = await firstValueFrom(this._httpClient.get<ApiResponseWithData<string>>(requestUrl));
+        const response = await this.getJson<ApiResponseWithData<string>>(requestUrl);
         // Check Value
         return this.checkResponseWithData<string>(response);
 
