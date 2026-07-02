@@ -40,8 +40,13 @@ export class FileTransferDb {
 
                 }
 
-            }
+            },
+            terminated: () => {
 
+                // Reset Database Promise
+                this._databasePromise = null;
+
+            }
         });
         // Return
         return this._databasePromise;

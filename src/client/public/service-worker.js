@@ -340,6 +340,9 @@ var FileTransferDb = class {
         if (!database.objectStoreNames.contains(storeName)) {
           database.createObjectStore(storeName, { keyPath });
         }
+      },
+      terminated: () => {
+        this._databasePromise = null;
       }
     });
     return this._databasePromise;
