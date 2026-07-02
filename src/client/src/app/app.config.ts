@@ -11,7 +11,7 @@ export const appConfig: ApplicationConfig = {
         provideBrowserGlobalErrorListeners(), 
         provideRouter(routes), 
         provideHttpClient(),
-        provideAppInitializer(() => inject(ServiceWorkerCommsService).initializeServiceWorker(() => {}))
+        provideAppInitializer(() => inject(ServiceWorkerCommsService).initializeServiceWorker((message: any) => console.log("From Service Worker: ", message)))
     ],
     
 };
