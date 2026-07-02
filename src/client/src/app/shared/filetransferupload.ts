@@ -8,20 +8,15 @@ export class FileTransferUpload {
     // Private variables
     private readonly _api: FileTransferApi;
     private readonly _db: FileTransferDb;
+    private readonly _logMessage: (message: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
 
-    constructor(api: FileTransferApi, db: FileTransferDb) {
+    constructor(api: FileTransferApi, db: FileTransferDb, logMessage: (message: string) => void) {
 
         // Initialize Classes
         this._api = api;
         this._db = db;
-
-    }
-
-    private logMessage(message: string) {
-
-        // Log Message
-        console.log(message);
+        this._logMessage = logMessage;
 
     }
 
@@ -61,7 +56,7 @@ export class FileTransferUpload {
             if (skippedParts.has(partIndex)) {
     
                 // Log Message
-                this.logMessage("Skipping part " + partIndex + " as it was already uploaded.");
+                this._logMessage("Skipping part " + partIndex + " as it was already uploaded.");
                 // Continue
                 continue;
     
@@ -84,7 +79,7 @@ export class FileTransferUpload {
             if (!uploadPartResponse.ok) {
     
                 // Log Message
-                this.logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
+                this._logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
                 // Throw Exception
                 throw new Error("Failed to upload part " + partIndex);
     
@@ -93,7 +88,7 @@ export class FileTransferUpload {
             // Assign Value
             const eTag = uploadPartResponse.headers.get("ETag")?.replaceAll('"', "") ?? "";
             // Log Message
-            this.logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
+            this._logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
             // Add to Uploaded Parts Array
             uploadedParts.push({
                 PartNumber: partIndex,
@@ -114,7 +109,7 @@ export class FileTransferUpload {
         try {
 
             // Log Message
-            this.logMessage("Uploading file: " + file.name);
+            this._logMessage("Uploading file: " + file.name);
 
             // Initialize Multipart Upload
             const uploadId = await this._api.initiateMultipartUpload(file.name, file.type || "application/octet-stream");
@@ -122,7 +117,7 @@ export class FileTransferUpload {
             if (!uploadId) {
             
                 // Log Message
-                this.logMessage("Failed to initiate multipart upload.");
+                this._logMessage("Failed to initiate multipart upload.");
                 // Exit
                 return;
 
@@ -134,7 +129,7 @@ export class FileTransferUpload {
             // Create Record
             await this._db.createUploadRecord(uploadId, file, this._partSize, totalParts);
             // Log Message
-            this.logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
+            this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
 
             // Initialize Parts
             const uploadedParts: UploadPart[] = [];
@@ -148,7 +143,7 @@ export class FileTransferUpload {
                 if (uploadedParts.length !== totalParts) {
 
                     // Log Message
-                    this.logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                    this._logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
                     // Throw Exception
                     throw new Error("Not all parts were uploaded successfully.");
 
@@ -160,7 +155,7 @@ export class FileTransferUpload {
             catch (error: any) {
 
                 // Log Message
-                this.logMessage("An error occurred during multipart upload: " + error.message);            
+                this._logMessage("An error occurred during multipart upload: " + error.message);            
 
                 // Cancel Multipart Upload
                 await this.cancelUpload(file.name, uploadId);
@@ -171,7 +166,7 @@ export class FileTransferUpload {
         catch (error: any) {
 
             // Log Message
-            this.logMessage("An error occurred while uploading file: " + error.message);
+            this._logMessage("An error occurred while uploading file: " + error.message);
 
         }
 
@@ -188,7 +183,7 @@ export class FileTransferUpload {
             if (existingRecord == null) {
 
                 // Log Message
-                this.logMessage("No existing upload record found. Aborting upload!");
+                this._logMessage("No existing upload record found. Aborting upload!");
                 // Exit
                 return;
 
@@ -199,14 +194,14 @@ export class FileTransferUpload {
                 file.lastModified !== existingRecord.fileIdentifier.lastModified) {
     
                 // Log Message
-                this.logMessage("Selected file does not match pending upload. Aborting upload!");
+                this._logMessage("Selected file does not match pending upload. Aborting upload!");
                 // Exit
                 return;
     
             }
     
             // Log Message
-            this.logMessage("Resuming upload for file: " + existingRecord.objectKey);
+            this._logMessage("Resuming upload for file: " + existingRecord.objectKey);
     
             // Assign Values
             const partSize = existingRecord.partSize;
@@ -228,7 +223,7 @@ export class FileTransferUpload {
             }));
     
             // Log Message
-            this.logMessage(skippedParts.size + " out of " + totalParts + " parts already uploaded. Resuming upload...");
+            this._logMessage(skippedParts.size + " out of " + totalParts + " parts already uploaded. Resuming upload...");
     
             try {
     
@@ -239,7 +234,7 @@ export class FileTransferUpload {
                 if (uploadedParts.length !== totalParts) {
     
                     // Log Message
-                    this.logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
+                    this._logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
                     // Throw Exception
                     throw new Error("Not all parts were uploaded successfully.");
     
@@ -252,7 +247,7 @@ export class FileTransferUpload {
             catch (error: any) {
     
                 // Log Message
-                this.logMessage("An error occurred during multipart upload: " + error.message);            
+                this._logMessage("An error occurred during multipart upload: " + error.message);            
     
                 // Cancel Multipart Upload
                 await this.cancelUpload(existingRecord.objectKey, uploadId);
@@ -263,7 +258,7 @@ export class FileTransferUpload {
         catch (error: any) {
     
             // Log Message
-            this.logMessage("An error occurred while uploading file: " + error.message);
+            this._logMessage("An error occurred while uploading file: " + error.message);
     
         }
     
@@ -277,13 +272,13 @@ export class FileTransferUpload {
             // Abort Multipart Upload
             await this._api.abortMultipartUpload(objectKey, uploadId);
             // Log Message
-            this.logMessage("Aborted multipart upload for Upload ID: " + uploadId);
+            this._logMessage("Aborted multipart upload for Upload ID: " + uploadId);
     
         }
         catch (error: any) {
     
             // Log Message
-            this.logMessage("Failed while canceling multipart upload: " + error.message);
+            this._logMessage("Failed while canceling multipart upload: " + error.message);
     
         }
     
@@ -292,13 +287,13 @@ export class FileTransferUpload {
             // Delete Record
             await this._db.deleteUpload(uploadId);
             // Log Message
-            this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+            this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
     
         }
         catch (error: any) {
     
             // Log Message
-            this.logMessage("Failed while deleting record: " + error.message);
+            this._logMessage("Failed while deleting record: " + error.message);
     
         }
     
@@ -311,12 +306,12 @@ export class FileTransferUpload {
         // Complete Multipart Upload
         await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
         // Log Message
-        this.logMessage("All parts uploaded successfully. Completed multipart upload...");
+        this._logMessage("All parts uploaded successfully. Completed multipart upload...");
     
         // Delete Record
         await this._db.deleteUpload(uploadId);
         // Log Message
-        this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+        this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
     
     }
 
