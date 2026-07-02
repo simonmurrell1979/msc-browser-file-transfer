@@ -1,4 +1,10 @@
+import { FileTransferApi } from "../shared/filetransferapi";
+import { FileTransferDb } from "../shared/filetransferdb";
 import { MessageType } from "../models/messagetype";
+
+// Initialize FileTransferApi/FileTransferDb
+const fileTransferApi = new FileTransferApi();
+const fileTransferDb = new FileTransferDb();
 
 declare const self: ServiceWorkerGlobalScope;
 
