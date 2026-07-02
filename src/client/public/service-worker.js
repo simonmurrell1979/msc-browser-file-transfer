@@ -476,19 +476,10 @@ var FileTransferUpload = class {
           this.logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
           throw new Error("Not all parts were uploaded successfully.");
         }
-        await this._api.completeMultipartUpload(file.name, uploadId, uploadedParts);
-        this.logMessage("All parts uploaded successfully. Completed multipart upload...");
-        await this._db.deleteUpload(uploadId);
-        this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+        await this.completeUpload(file.name, uploadId, uploadedParts);
       } catch (error) {
         this.logMessage("An error occurred during multipart upload: " + error.message);
-        try {
-          await this._api.abortMultipartUpload(file.name, uploadId);
-          await this._db.deleteUpload(uploadId);
-          this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-        } catch (abortError) {
-          this.logMessage("Failed to abort multipart upload: " + abortError.message);
-        }
+        await this.cancelUpload(file.name, uploadId);
       }
     } catch (error) {
       this.logMessage("An error occurred while uploading file: " + error.message);
@@ -519,23 +510,34 @@ var FileTransferUpload = class {
           this.logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
           throw new Error("Not all parts were uploaded successfully.");
         }
-        await this._api.completeMultipartUpload(file.name, uploadId, uploadedParts);
-        this.logMessage("All parts uploaded successfully. Completed multipart upload...");
-        await this._db.deleteUpload(uploadId);
-        this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+        await this.completeUpload(file.name, uploadId, uploadedParts);
       } catch (error) {
         this.logMessage("An error occurred during multipart upload: " + error.message);
-        try {
-          await this._api.abortMultipartUpload(file.name, uploadId);
-          await this._db.deleteUpload(uploadId);
-          this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-        } catch (abortError) {
-          this.logMessage("Failed to abort multipart upload: " + abortError.message);
-        }
+        await this.cancelUpload(existingRecord.objectKey, uploadId);
       }
     } catch (error) {
       this.logMessage("An error occurred while uploading file: " + error.message);
     }
+  }
+  async cancelUpload(objectKey, uploadId) {
+    try {
+      await this._api.abortMultipartUpload(objectKey, uploadId);
+      this.logMessage("Aborted multipart upload for Upload ID: " + uploadId);
+    } catch (error) {
+      this.logMessage("Failed while canceling multipart upload: " + error.message);
+    }
+    try {
+      await this._db.deleteUpload(uploadId);
+      this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+    } catch (error) {
+      this.logMessage("Failed while deleting record: " + error.message);
+    }
+  }
+  async completeUpload(objectKey, uploadId, uploadedParts) {
+    await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
+    this.logMessage("All parts uploaded successfully. Completed multipart upload...");
+    await this._db.deleteUpload(uploadId);
+    this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
   }
 };
 
@@ -544,17 +546,8 @@ var fileTransferApi = new FileTransferApi();
 var fileTransferDb = new FileTransferDb();
 var fileTransferUpload = new FileTransferUpload(fileTransferApi, fileTransferDb);
 var serviceWorkerClient = null;
-self.addEventListener("install", (event) => {
-  self.skipWaiting();
-});
-self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
-});
-self.addEventListener("message", (event) => {
-  serviceWorkerClient = event.source;
-  logMesage("Message has been received. Pinging back to client.");
-});
-function logMesage(message) {
+var uploadInProgress = false;
+function logMessage(message) {
   if (serviceWorkerClient == null) {
     return;
   }
@@ -563,3 +556,37 @@ function logMesage(message) {
     message
   });
 }
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(self.clients.claim());
+});
+self.addEventListener("message", (event) => {
+  serviceWorkerClient = event.source;
+  const data = event.data;
+  if (!data || !data.type) {
+    logMessage("Received invalid message in Service Worker.");
+    return;
+  }
+  if (data.type === "NEWUPLOAD" /* NEWUPLOAD */ || data.type === "RESUMEUPLOAD" /* RESUMEUPLOAD */) {
+    if (uploadInProgress) {
+      logMessage("An upload is already in progress.");
+      return;
+    }
+    uploadInProgress = true;
+    switch (data.type) {
+      case "NEWUPLOAD" /* NEWUPLOAD */:
+        event.waitUntil(fileTransferUpload.newUpload(data.file).finally(() => {
+          uploadInProgress = false;
+        }));
+        break;
+      case "RESUMEUPLOAD" /* RESUMEUPLOAD */:
+        event.waitUntil(fileTransferUpload.resumeUpload(data.file, data.uploadId).finally(() => {
+          uploadInProgress = false;
+        }));
+        break;
+    }
+  } else if (data.type === "CANCELUPLOAD" /* CANCELUPLOAD */) {
+  }
+});

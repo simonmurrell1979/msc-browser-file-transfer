@@ -307,17 +307,6 @@ export class FileTransferUpload {
         await this._db.deleteUpload(uploadId);
         // Log Message
         this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-
-        // Check Value
-        if (serviceWorkerClient) {
-    
-            // Complete Upload
-            serviceWorkerClient.postMessage({
-                type: MessageType.COMPLETEUPLOAD,
-                uploadId: uploadId
-            });
-    
-        }
     
     }
 

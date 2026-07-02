@@ -114,7 +114,7 @@ self.addEventListener("message", (event: any) => {
     else if (data.type === MessageType.CANCELUPLOAD) {
 
         // Cancel Upload
-        //event.waitUntil(cancelUpload(data.objectKey, data.uploadId));
+        event.waitUntil(fileTransferUpload.cancelUpload(data.objectKey, data.uploadId));
 
     }
 
