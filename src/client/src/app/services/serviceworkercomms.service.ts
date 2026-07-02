@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
 @Injectable({ providedIn: "root" })
-export class ServiceWorkerCommsService {
+export class ServiceWorkerCommsService  {
 
     async registerWorker(): Promise<void> {
 
