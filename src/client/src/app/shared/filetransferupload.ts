@@ -1,5 +1,4 @@
 import { UploadPart } from "../models/uploadpart";
-import { UploadRecord } from "../models/uploadrecord";
 import { FileTransferApi } from "./filetransferapi";
 import { FileTransferDb } from "./filetransferdb";
 
@@ -16,7 +15,7 @@ export class FileTransferUpload {
         // Initialize Classes
         this._api = api;
         this._db = db;
-        this._logMessage = logMessage;
+        this._logMessage = logMessage ?? console.log;
 
     }
 
