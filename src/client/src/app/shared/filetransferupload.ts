@@ -154,15 +154,7 @@ export class FileTransferUpload {
 
                 }
                 // Complete Multipart Upload
-                await this._api.completeMultipartUpload(file.name, uploadId, uploadedParts);
-
-                // Log Message
-                this.logMessage("All parts uploaded successfully. Completed multipart upload...");
-
-                // Delete Record
-                await this._db.deleteUpload(uploadId);
-                // Log Message
-                this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+                await this.completeUpload(file.name, uploadId, uploadedParts);
 
             }
             catch (error: any) {
@@ -170,23 +162,8 @@ export class FileTransferUpload {
                 // Log Message
                 this.logMessage("An error occurred during multipart upload: " + error.message);            
 
-                try {
-
-                    // Abort Multipart Upload
-                    await this._api.abortMultipartUpload(file.name, uploadId);
-
-                    // Delete Record
-                    await this._db.deleteUpload(uploadId);
-                    // Log Message
-                    this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-
-                }
-                catch (abortError: any) {
-
-                    // Log Message
-                    this.logMessage("Failed to abort multipart upload: " + abortError.message);
-
-                }
+                // Cancel Multipart Upload
+                await this.cancelUpload(file.name, uploadId);
 
             }
 
@@ -257,15 +234,9 @@ export class FileTransferUpload {
                     throw new Error("Not all parts were uploaded successfully.");
     
                 }
+                
                 // Complete Multipart Upload
-                await this._api.completeMultipartUpload(file.name, uploadId, uploadedParts);
-                // Log Message
-                this.logMessage("All parts uploaded successfully. Completed multipart upload...");
-    
-                // Delete Record
-                await this._db.deleteUpload(uploadId);
-                // Log Message
-                this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+                await this.completeUpload(file.name, uploadId, uploadedParts);
     
             }
             catch (error: any) {
@@ -273,24 +244,8 @@ export class FileTransferUpload {
                 // Log Message
                 this.logMessage("An error occurred during multipart upload: " + error.message);            
     
-
-                try {
-    
-                    // Abort Multipart Upload
-                    await this._api.abortMultipartUpload(file.name, uploadId);
-    
-                    // Delete Record
-                    await this._db.deleteUpload(uploadId);
-                    // Log Message
-                    this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-    
-                }
-                catch (abortError: any) {
-    
-                    // Log Message
-                    this.logMessage("Failed to abort multipart upload: " + abortError.message);
-    
-                }
+                // Cancel Multipart Upload
+                await this.cancelUpload(existingRecord.objectKey, uploadId);
     
             }
     
@@ -299,6 +254,68 @@ export class FileTransferUpload {
     
             // Log Message
             this.logMessage("An error occurred while uploading file: " + error.message);
+    
+        }
+    
+    }
+
+    public async cancelUpload(objectKey: string,
+        uploadId: string) {
+    
+        try {
+    
+            // Abort Multipart Upload
+            await this._api.abortMultipartUpload(objectKey, uploadId);
+            // Log Message
+            this.logMessage("Aborted multipart upload for Upload ID: " + uploadId);
+    
+        }
+        catch (error: any) {
+    
+            // Log Message
+            this.logMessage("Failed while canceling multipart upload: " + error.message);
+    
+        }
+    
+        try {
+    
+            // Delete Record
+            await this._db.deleteUpload(uploadId);
+            // Log Message
+            this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+    
+        }
+        catch (error: any) {
+    
+            // Log Message
+            this.logMessage("Failed while deleting record: " + error.message);
+    
+        }
+    
+    }
+    
+    public async completeUpload(objectKey: string,
+        uploadId: string,
+        uploadedParts: UploadPart[]) {
+    
+        // Complete Multipart Upload
+        await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
+        // Log Message
+        this.logMessage("All parts uploaded successfully. Completed multipart upload...");
+    
+        // Delete Record
+        await this._db.deleteUpload(uploadId);
+        // Log Message
+        this.logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+
+        // Check Value
+        if (serviceWorkerClient) {
+    
+            // Complete Upload
+            serviceWorkerClient.postMessage({
+                type: MessageType.COMPLETEUPLOAD,
+                uploadId: uploadId
+            });
     
         }
     
