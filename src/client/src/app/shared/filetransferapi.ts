@@ -42,14 +42,14 @@ export class FileTransferApi {
     public async initiateMultipartUpload(objectKey: string, contentType: string): Promise<string> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/InitiateMultipartUpload`;
+        const requestUrl = "InitiateMultipartUpload";
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
             contentType: contentType
         };
         // Make HTTP request
-        const response = await firstValueFrom(this._httpClient.post<ApiResponseWithData<string>>(requestUrl, requestBody));
+        const response = await this.postJson<ApiResponseWithData<string>>(requestUrl, requestBody);
         // Check Value
         return this.checkResponseWithData<string>(response);
 
