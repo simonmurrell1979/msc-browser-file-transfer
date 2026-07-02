@@ -4,6 +4,15 @@ import { UploadPart } from "../models/uploadpart";
 
 export class FileTransferApi {
 
+    private async getJson<T>(url: string): Promise<T> {
+
+        // Send Request
+        const response = await fetch(`${environment.apiBaseUrl}/Storage/${url}`);
+        // Return
+        return await response.json() as T;
+
+    }
+
     private async postJson<T>(url: string, body: any): Promise<T> {
 
         // Send Request
