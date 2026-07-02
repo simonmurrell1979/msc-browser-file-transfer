@@ -11,35 +11,10 @@ const fileTransferUpload = new FileTransferUpload(fileTransferApi, fileTransferD
 declare const self: ServiceWorkerGlobalScope;
 
 let serviceWorkerClient: Client | null = null;
-
-// Install Event
-self.addEventListener("install", (event) => {
-
-    // Activate immediately 
-    self.skipWaiting();
-
-});
-
-// Activate Event
-self.addEventListener("activate", (event) => {
-
-    // Claim clients
-    event.waitUntil(self.clients.claim());
-
-});
-
-// Add Message Event
-self.addEventListener("message", (event) => {
-
-    // Assign Value
-    serviceWorkerClient = event.source as Client;
-    // Ping back
-    logMesage("Message has been received. Pinging back to client.");
-
-});
+let uploadInProgress = false;
 
 // Log Message
-function logMesage(message: string) {
+function logMessage(message: string) {
 
     // Check Value
     if (serviceWorkerClient == null) {
@@ -56,8 +31,24 @@ function logMesage(message: string) {
     
 }
 
+// Install Event
+self.addEventListener("install", (event: any) => {
+
+    // Activate immediately 
+    self.skipWaiting();
+
+});
+
+// Activate Event
+self.addEventListener("activate", (event: any) => {
+
+    // Claim clients
+    event.waitUntil(self.clients.claim());
+
+});
+
 // Add Message Event
-self.addEventListener('message', event => {
+self.addEventListener("message", (event: any) => {
 
     // Assign Value
     serviceWorkerClient = event.source;
@@ -96,7 +87,7 @@ self.addEventListener('message', event => {
             case MessageType.NEWUPLOAD:
 
                 // New Upload
-                event.waitUntil(newUpload(data.file).finally(() => {
+                event.waitUntil(fileTransferUpload.newUpload(data.file).finally(() => {
 
                     // Disable
                     uploadInProgress = false;
@@ -108,7 +99,7 @@ self.addEventListener('message', event => {
             case MessageType.RESUMEUPLOAD:
 
                 // Resume Upload
-                event.waitUntil(resumeUpload(data.file, data.uploadId).finally(() => {
+                event.waitUntil(fileTransferUpload.resumeUpload(data.file, data.uploadId).finally(() => {
 
                     // Disable
                     uploadInProgress = false;
@@ -123,7 +114,7 @@ self.addEventListener('message', event => {
     else if (data.type === MessageType.CANCELUPLOAD) {
 
         // Cancel Upload
-        event.waitUntil(cancelUpload(data.objectKey, data.uploadId));
+        //event.waitUntil(cancelUpload(data.objectKey, data.uploadId));
 
     }
 
