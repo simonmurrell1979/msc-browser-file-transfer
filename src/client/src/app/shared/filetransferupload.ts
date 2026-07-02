@@ -1,4 +1,5 @@
 import { UploadPart } from "../models/uploadpart";
+import { UploadRecord } from "../models/uploadrecord";
 import { FileTransferApi } from "./filetransferapi";
 import { FileTransferDb } from "./filetransferdb";
 
