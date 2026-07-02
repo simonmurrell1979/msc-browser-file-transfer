@@ -485,14 +485,18 @@ var FileTransferUpload = class {
       this.logMessage("An error occurred while uploading file: " + error.message);
     }
   }
-  async resumeUpload(file, existingRecord) {
+  async resumeUpload(file, uploadId) {
     try {
+      const existingRecord = await this._db.getUpload(uploadId);
+      if (existingRecord == null) {
+        this.logMessage("No existing upload record found. Aborting upload!");
+        return;
+      }
       if (file.name !== existingRecord.fileIdentifier.name || file.size !== existingRecord.fileIdentifier.size || file.lastModified !== existingRecord.fileIdentifier.lastModified) {
         this.logMessage("Selected file does not match pending upload. Aborting upload!");
         return;
       }
       this.logMessage("Resuming upload for file: " + existingRecord.objectKey);
-      const uploadId = existingRecord.uploadId;
       const partSize = existingRecord.partSize;
       const totalParts = existingRecord.totalParts;
       const serverParts = await this._api.listMultipartUploadParts(existingRecord.objectKey, existingRecord.uploadId);
