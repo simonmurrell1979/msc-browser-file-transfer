@@ -58,7 +58,7 @@ export class FileTransferApi {
     public async generateMultipartUploadUrl(objectKey: string, uploadId: string, partNumber: number): Promise<string> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/GenerateMultipartUploadUrl`;
+        const requestUrl = "GenerateMultipartUploadUrl";
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
@@ -66,7 +66,7 @@ export class FileTransferApi {
             partNumber: partNumber
         };
         // Make HTTP request
-        const response = await firstValueFrom(this._httpClient.post<ApiResponseWithData<string>>(requestUrl, requestBody));
+        const response = await this.postJson<ApiResponseWithData<string>>(requestUrl, requestBody);
         // Check Value
         return this.checkResponseWithData<string>(response);
 
@@ -75,7 +75,7 @@ export class FileTransferApi {
     public async completeMultipartUpload(objectKey: string, uploadId: string, parts: UploadPart[]): Promise<boolean> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/CompleteMultipartUpload`;
+        const requestUrl = "CompleteMultipartUpload";
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
@@ -83,7 +83,7 @@ export class FileTransferApi {
             parts: parts
         };
         // Make HTTP request
-        const response = await firstValueFrom(this._httpClient.post<ApiResponse>(requestUrl, requestBody));
+        const response = await this.postJson<ApiResponse>(requestUrl, requestBody);
         // Check Value
         return this.checkResponse(response);
 
@@ -92,14 +92,14 @@ export class FileTransferApi {
     public async abortMultipartUpload(objectKey: string, uploadId: string): Promise<boolean> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/AbortMultipartUpload`;
+        const requestUrl = "AbortMultipartUpload";
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
             uploadId: uploadId
         };
         // Make HTTP request
-        const response = await firstValueFrom(this._httpClient.post<ApiResponse>(requestUrl, requestBody));
+        const response = await this.postJson<ApiResponse>(requestUrl, requestBody);
         // Check Value
         return this.checkResponse(response);
 
@@ -108,14 +108,14 @@ export class FileTransferApi {
     public async listMultipartUploadParts(objectKey: string, uploadId: string): Promise<UploadPart[]> {
 
         // Build URL
-        const requestUrl = `${environment.apiBaseUrl}/Storage/ListMultipartUploadParts`;
+        const requestUrl = "ListMultipartUploadParts";
         // Build Request Body
         const requestBody = {
             objectKey: objectKey,
             uploadId: uploadId
         };
         // Make HTTP request
-        const response = await firstValueFrom(this._httpClient.post<ApiResponseWithData<UploadPart[]>>(requestUrl, requestBody));
+        const response = await this.postJson<ApiResponseWithData<UploadPart[]>>(requestUrl, requestBody);
         // Check Value
         return this.checkResponseWithData<UploadPart[]>(response);
 
