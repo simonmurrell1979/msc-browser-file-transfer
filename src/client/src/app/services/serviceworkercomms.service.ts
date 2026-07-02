@@ -32,7 +32,7 @@ export class ServiceWorkerCommsService  {
             // Wait for Service Worker to be ready
             await navigator.serviceWorker.ready;
             // Add Message Listener
-            addServiceWorkerMessageListener();
+            this.addServiceWorkerMessageListener();
             // Log Message
             console.log("Service Worker registered and ready.");
 
@@ -46,16 +46,16 @@ export class ServiceWorkerCommsService  {
 
     }
 
-    function addServiceWorkerMessageListener() {
+    private addServiceWorkerMessageListener() {
 
         // Add Listener for Messages from Service Worker
         navigator.serviceWorker.addEventListener("message", event => {
 
             // Check Value
-            if (messageHandler) {
+            if (this._messageHandler) {
 
                 // Call Message Handler
-                messageHandler(event.data);
+                this._messageHandler(event.data);
 
             }
 
@@ -63,7 +63,7 @@ export class ServiceWorkerCommsService  {
 
     }
 
-    async function sendCommand(message) {
+    public sendCommand(message: any) {
 
         // Check Value
         if (!navigator.serviceWorker.controller) {
