@@ -588,5 +588,6 @@ self.addEventListener("message", (event) => {
         break;
     }
   } else if (data.type === "CANCELUPLOAD" /* CANCELUPLOAD */) {
+    event.waitUntil(fileTransferUpload.cancelUpload(data.objectKey, data.uploadId));
   }
 });
