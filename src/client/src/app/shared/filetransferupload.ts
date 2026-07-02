@@ -10,7 +10,7 @@ export class FileTransferUpload {
     private readonly _logMessage: (message: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
 
-    constructor(api: FileTransferApi, db: FileTransferDb, logMessage: (message: string) => void) {
+    constructor(api: FileTransferApi, db: FileTransferDb, logMessage?: (message: string) => void) {
 
         // Initialize Classes
         this._api = api;
