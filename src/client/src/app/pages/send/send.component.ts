@@ -108,6 +108,27 @@ export class SendComponent {
 
     }
 
+    protected onCancelUpload(): void {
+
+        // Assign Value
+        const pendingUpload = this.pendingUpload();
+        // Check Value
+        if (pendingUpload == null) {
+
+            // Exit
+            return;
+
+        }
+
+        // Send Cancel Command
+        this._serviceWorkerCommsService.sendCommand({ 
+            type: MessageType.CANCELUPLOAD, 
+            objectKey: pendingUpload.objectKey,
+            uploadId: pendingUpload.uploadId
+        });
+
+    }
+
     private handleServiceWorkerMessages(message: any): void {
 
         // Check Message Type
