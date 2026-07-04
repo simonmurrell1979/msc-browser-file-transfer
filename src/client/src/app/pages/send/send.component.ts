@@ -23,6 +23,8 @@ export class SendComponent {
 
     public async ngOnInit(): Promise<void> {
 
+        // Set Message Handler
+        this._serviceWorkerCommsService.setMessageHandler(async (message: any) => this.handleServiceWorkerMessages(message));
         // Find Latest Pending Upload
         const latestUpload = await this._dbService.findLatestUpload();
         // Check Value
@@ -102,6 +104,9 @@ export class SendComponent {
 
         }
 
+    }
+
+    private handleServiceWorkerMessages(message: any): void {
     }
 
 }

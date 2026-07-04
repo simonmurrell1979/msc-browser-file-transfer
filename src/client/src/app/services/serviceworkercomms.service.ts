@@ -46,6 +46,13 @@ export class ServiceWorkerCommsService  {
 
     }
 
+    public setMessageHandler(onMessageHandler: (message: any) => void) {
+        
+        // Assign Message Handler
+        this._messageHandler = onMessageHandler;
+
+    }
+
     private addServiceWorkerMessageListener() {
 
         // Add Listener for Messages from Service Worker

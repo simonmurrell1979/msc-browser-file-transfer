@@ -9,8 +9,8 @@ const fileTransferDb = new FileTransferDb();
 const fileTransferUpload = new FileTransferUpload(fileTransferApi, 
     fileTransferDb, 
     logMessage,
-    (uploadId: string) => sendEvent(MessageType.COMPLETEUPLOAD, { uploadId: uploadId }),
-    (uploadId: string) => sendEvent(MessageType.CANCELLEDUPLOAD, { uploadId: uploadId }));
+    (uploadId: string) => sendEvent(MessageType.COMPLETEUPLOAD, uploadId),
+    (uploadId: string) => sendEvent(MessageType.CANCELLEDUPLOAD, uploadId));
 
 declare const self: ServiceWorkerGlobalScope;
 
