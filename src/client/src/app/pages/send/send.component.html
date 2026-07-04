@@ -16,7 +16,7 @@
                             Drag and drop files here or click to select files
                         </p>
 
-                        <input type="file" class="form-control" (change)="onFileSelected($event)" />
+                        <input type="file" #fileInput class="form-control" (change)="onFileSelected($event)" />
 
                         @if (selectedFile()) {
 

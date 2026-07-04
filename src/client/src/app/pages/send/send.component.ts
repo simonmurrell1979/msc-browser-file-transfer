@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, ElementRef, inject, signal, viewChild } from "@angular/core";
 import { UploadService } from "../../services/upload.service";
 import { UploadRecord } from "../../models/uploadrecord";
 import { DbService } from "../../services/db.service";
@@ -17,6 +17,7 @@ export class SendComponent {
     private readonly _uploadService = inject(UploadService);
     private readonly _dbService = inject(DbService);
     private readonly _serviceWorkerCommsService = inject(ServiceWorkerCommsService);
+    private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>("fileInput");
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
@@ -134,6 +135,15 @@ export class SendComponent {
                 this.pendingUpload.set(null);
                 // Clear Selected File
                 this.selectedFile.set(null);
+                // Initialize Class
+                const fileInputElement = this._fileInput();
+                // Clear File Input
+                if (fileInputElement) {
+
+                    // Clear File Input Value
+                    fileInputElement.nativeElement.value = "";
+
+                }
                 // Exit
                 break;
 
