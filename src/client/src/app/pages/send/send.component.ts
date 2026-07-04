@@ -132,6 +132,8 @@ export class SendComponent {
                 this.statusMessages.update(messages => [...messages, `Upload completed or cancelled: ${JSON.stringify(message)}`]);
                 // Clear Pending Upload
                 this.pendingUpload.set(null);
+                // Clear Selected File
+                this.selectedFile.set(null);
                 // Exit
                 break;
 
