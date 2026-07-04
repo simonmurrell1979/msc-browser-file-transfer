@@ -107,6 +107,37 @@ export class SendComponent {
     }
 
     private handleServiceWorkerMessages(message: any): void {
+
+        // Check Message Type
+        switch (message.type) {
+
+            // Log Message
+            case MessageType.LOGMESSAGE:
+
+                // Log Message
+                console.log("From Service Worker: ", message)
+                // Exit
+                break;
+
+            // Complete / Cancelled Upload
+            case MessageType.COMPLETEUPLOAD:
+            case MessageType.CANCELLEDUPLOAD:
+
+                // Clear Pending Upload
+                this.pendingUpload.set(null);
+                // Exit
+                break;
+
+            // Unknown Message Type
+            default:
+
+                // Log Message
+                console.warn("Unknown message type received from Service Worker: ", message);
+                // Exit
+                break;
+
+        }
+
     }
 
 }
