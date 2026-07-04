@@ -9,21 +9,21 @@ export class FileTransferUpload {
     private readonly _db: FileTransferDb;
     private readonly _logMessage: (message: string) => void;
     private readonly _onComplete: (uploadId: string) => void;
-    private readonly _onCancel: (uploadId: string) => void;
+    private readonly _onCancelled: (uploadId: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
 
     constructor(api: FileTransferApi, 
         db: FileTransferDb, 
         logMessage?: (message: string) => void, 
         onComplete?: (uploadId: string) => void, 
-        onCancel?: (uploadId: string) => void) {
+        onCancelled?: (uploadId: string) => void) {
 
         // Initialize Classes
         this._api = api;
         this._db = db;
         this._logMessage = logMessage ?? console.log;
         this._onComplete = onComplete ?? (() => {});
-        this._onCancel = onCancel ?? (() => {});
+        this._onCancelled = onCancelled ?? (() => {});
 
     }
 
@@ -304,8 +304,8 @@ export class FileTransferUpload {
     
         }
 
-        // Call onCancel callback
-        this._onCancel(uploadId);
+        // Call _onCancelled callback
+        this._onCancelled(uploadId);
     
     }
     

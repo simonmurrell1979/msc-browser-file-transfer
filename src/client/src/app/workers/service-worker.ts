@@ -6,12 +6,34 @@ import { MessageType } from "../models/messagetype";
 // Initialize FileTransferApi/FileTransferDb
 const fileTransferApi = new FileTransferApi();
 const fileTransferDb = new FileTransferDb();
-const fileTransferUpload = new FileTransferUpload(fileTransferApi, fileTransferDb, logMessage);
+const fileTransferUpload = new FileTransferUpload(fileTransferApi, 
+    fileTransferDb, 
+    logMessage,
+    (uploadId: string) => sendEvent(MessageType.COMPLETEUPLOAD, { uploadId: uploadId }),
+    (uploadId: string) => sendEvent(MessageType.CANCELLEDUPLOAD, { uploadId: uploadId }));
 
 declare const self: ServiceWorkerGlobalScope;
 
 let serviceWorkerClient: Client | null = null;
 let uploadInProgress = false;
+
+// Send Event
+function sendEvent(type: MessageType, uploadId: string) {
+
+    // Check Value
+    if (serviceWorkerClient == null) {
+
+        // Exit
+        return; 
+
+    }
+    // Post Message
+    serviceWorkerClient.postMessage({
+        type: type,
+        uploadId: uploadId
+    });
+
+}
 
 // Log Message
 function logMessage(message: string) {
