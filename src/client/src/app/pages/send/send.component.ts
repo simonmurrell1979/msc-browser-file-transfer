@@ -1,5 +1,4 @@
 import { Component, ElementRef, inject, signal, viewChild } from "@angular/core";
-import { UploadService } from "../../services/upload.service";
 import { UploadRecord } from "../../models/uploadrecord";
 import { DbService } from "../../services/db.service";
 import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.service";
@@ -14,14 +13,13 @@ import { MessageType } from "../../models/messagetype";
 export class SendComponent {
 
     // Private Variables
-    private readonly _uploadService = inject(UploadService);
     private readonly _dbService = inject(DbService);
     private readonly _serviceWorkerCommsService = inject(ServiceWorkerCommsService);
     private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>("fileInput");
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
-    protected readonly statusMessages = signal<string[]>([]);
+    protected readonly statusMessage = signal<string | null>(null);
 
     public async ngOnInit(): Promise<void> {
 
@@ -137,8 +135,8 @@ export class SendComponent {
             // Log Message
             case MessageType.LOGMESSAGE:
 
-                // Update Status Messages
-                this.statusMessages.update(messages => [...messages, message.message]);
+                // Update Status Message
+                this.statusMessage.set(message.message);
                 // Exit
                 break;
 
@@ -147,7 +145,7 @@ export class SendComponent {
             case MessageType.CANCELLEDUPLOAD:
 
                 // Update Status Messages
-                this.statusMessages.update(messages => [...messages, "Upload completed or cancelled"]);
+                this.statusMessage.set("Upload completed or cancelled");
                 // Clear Pending Upload
                 this.pendingUpload.set(null);
                 // Clear Selected File

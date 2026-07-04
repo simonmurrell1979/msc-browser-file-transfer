@@ -36,17 +36,9 @@
 
                     }
 
-                    @if (statusMessages().length > 0) {
-
-                        <div class="border rounded p-3 mt-3">
-
-                            @for (message of statusMessages(); track $index) {
-                                <p class="mb-1 small text-muted">{{ message }}</p>
-                            }
-
-                        </div>
-
-                    }
+                    <div class="border rounded p-3 mt-3">
+                        <p class="mb-1 small text-muted">{{ statusMessage() }}</p>
+                    </div>
 
                 </div>
 
