@@ -5,7 +5,7 @@ import { provideRouter } from "@angular/router";
 import { routes } from "./app.routes";
 import { ServiceWorkerCommsService } from "./services/serviceworkercomms.service";
 
-export const appConfig: ApplicationConfig = {2
+export const appConfig: ApplicationConfig = {
     
     providers: [
         provideBrowserGlobalErrorListeners(), 
