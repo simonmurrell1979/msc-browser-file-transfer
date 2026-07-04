@@ -30,6 +30,18 @@
 
                     <button type="button" class="btn btn-primary w-100" (click)="onSendFile()">Send</button>
 
+                    @if (statusMessages().length > 0) {
+
+                        <div class="border rounded p-3 mt-3">
+
+                            @for (message of statusMessages(); track $index) {
+                                <p class="mb-1 small text-muted">{{ message }}</p>
+                            }
+
+                        </div>
+
+                    }
+
                 </div>
 
             </div>

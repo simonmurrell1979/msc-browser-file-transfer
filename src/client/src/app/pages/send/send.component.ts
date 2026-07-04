@@ -116,10 +116,8 @@ export class SendComponent {
             // Log Message
             case MessageType.LOGMESSAGE:
 
-                // Log Message
-                console.log("From Service Worker: ", message)
                 // Update Status Messages
-                this.statusMessages.update(messages => [...messages, `From Service Worker: ${JSON.stringify(message)}`]);
+                this.statusMessages.update(messages => [...messages, message.message]);
                 // Exit
                 break;
 
@@ -127,10 +125,8 @@ export class SendComponent {
             case MessageType.COMPLETEUPLOAD:
             case MessageType.CANCELLEDUPLOAD:
 
-                // Log Message
-                console.log("Upload completed or cancelled: ", message);
                 // Update Status Messages
-                this.statusMessages.update(messages => [...messages, `Upload completed or cancelled: ${JSON.stringify(message)}`]);
+                this.statusMessages.update(messages => [...messages, "Upload completed or cancelled"]);
                 // Clear Pending Upload
                 this.pendingUpload.set(null);
                 // Clear Selected File
