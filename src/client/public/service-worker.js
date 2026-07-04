@@ -411,12 +411,18 @@ var FileTransferUpload = class {
   _api;
   _db;
   _logMessage;
+  _onComplete;
+  _onCancelled;
   _partSize = 5 * 1024 * 1024;
   // 5MB
-  constructor(api, db, logMessage2) {
+  constructor(api, db, logMessage2, onComplete, onCancelled) {
     this._api = api;
     this._db = db;
     this._logMessage = logMessage2 ?? console.log;
+    this._onComplete = onComplete ?? (() => {
+    });
+    this._onCancelled = onCancelled ?? (() => {
+    });
   }
   async uploadFile(file) {
     const uploadUrl = await this._api.getUploadUrl(file.name);
@@ -538,21 +544,38 @@ var FileTransferUpload = class {
     } catch (error) {
       this._logMessage("Failed while deleting record: " + error.message);
     }
+    this._onCancelled(uploadId);
   }
   async completeUpload(objectKey, uploadId, uploadedParts) {
     await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
     this._logMessage("All parts uploaded successfully. Completed multipart upload...");
     await this._db.deleteUpload(uploadId);
     this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
+    this._onComplete(uploadId);
   }
 };
 
 // src/app/workers/service-worker.ts
 var fileTransferApi = new FileTransferApi();
 var fileTransferDb = new FileTransferDb();
-var fileTransferUpload = new FileTransferUpload(fileTransferApi, fileTransferDb, logMessage);
+var fileTransferUpload = new FileTransferUpload(
+  fileTransferApi,
+  fileTransferDb,
+  logMessage,
+  (uploadId) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, { uploadId }),
+  (uploadId) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, { uploadId })
+);
 var serviceWorkerClient = null;
 var uploadInProgress = false;
+function sendEvent(type, uploadId) {
+  if (serviceWorkerClient == null) {
+    return;
+  }
+  serviceWorkerClient.postMessage({
+    type,
+    uploadId
+  });
+}
 function logMessage(message) {
   if (serviceWorkerClient == null) {
     return;
