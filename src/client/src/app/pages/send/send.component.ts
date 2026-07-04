@@ -20,6 +20,7 @@ export class SendComponent {
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
+    protected readonly statusMessages = signal<string[]>([]);
 
     public async ngOnInit(): Promise<void> {
 
@@ -116,6 +117,8 @@ export class SendComponent {
 
                 // Log Message
                 console.log("From Service Worker: ", message)
+                // Update Status Messages
+                this.statusMessages.update(messages => [...messages, `From Service Worker: ${JSON.stringify(message)}`]);
                 // Exit
                 break;
 
@@ -123,6 +126,10 @@ export class SendComponent {
             case MessageType.COMPLETEUPLOAD:
             case MessageType.CANCELLEDUPLOAD:
 
+                // Log Message
+                console.log("Upload completed or cancelled: ", message);
+                // Update Status Messages
+                this.statusMessages.update(messages => [...messages, `Upload completed or cancelled: ${JSON.stringify(message)}`]);
                 // Clear Pending Upload
                 this.pendingUpload.set(null);
                 // Exit
