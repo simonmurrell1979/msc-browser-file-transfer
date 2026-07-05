@@ -36,8 +36,8 @@ export class FileTransferEncryption {
 
     }
 
-    async function encryptFilePart(key,
-        filePart) {
+    async encryptFilePart(key: CryptoKey,
+        filePart: ArrayBuffer): Promise<Uint8Array> {
 
         // Generate IV
         const iv = crypto.getRandomValues(new Uint8Array(12));
