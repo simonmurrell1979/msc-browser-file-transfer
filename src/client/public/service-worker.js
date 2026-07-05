@@ -413,7 +413,7 @@ var FileTransferDb = class {
 // src/app/shared/filetransferencryption.ts
 var TEST_KEY = "1234567890abcdef";
 var FileTransferEncryption = class {
-  async getEncryptionKey(encryptionKey) {
+  async getEncryptionKey(encryptionKey = null) {
     const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
     const key = await crypto.subtle.importKey(
       "raw",
@@ -426,7 +426,7 @@ var FileTransferEncryption = class {
     );
     return key;
   }
-  async getDecryptionKey(encryptionKey) {
+  async getDecryptionKey(encryptionKey = null) {
     const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
     const key = await crypto.subtle.importKey(
       "raw",
@@ -480,6 +480,8 @@ var FileTransferUpload = class {
   _onCancelled;
   _partSize = 5 * 1024 * 1024;
   // 5MB
+  // Public Variables
+  partSize = this._partSize;
   constructor(api, db, logMessage2, onComplete, onCancelled) {
     this._api = api;
     this._db = db;
