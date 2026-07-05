@@ -16,3 +16,6 @@ appsettings.Development.json
 
 # VS Code
 .vscode/
+
+# Ignore Build Log
+docs/BUILD-LOG.md
