@@ -476,17 +476,20 @@ var FileTransferUpload = class {
   _db;
   _encryption;
   _logMessage;
+  _onProgress;
   _onComplete;
   _onCancelled;
   _partSize = 5 * 1024 * 1024;
   // 5MB
   // Public Variables
   partSize = this._partSize;
-  constructor(api, db, logMessage2, onComplete, onCancelled) {
+  constructor(api, db, logMessage2, onProgress, onComplete, onCancelled) {
     this._api = api;
     this._db = db;
     this._encryption = new FileTransferEncryption();
     this._logMessage = logMessage2 ?? console.log;
+    this._onProgress = onProgress ?? (() => {
+    });
     this._onComplete = onComplete ?? (() => {
     });
     this._onCancelled = onCancelled ?? (() => {
@@ -535,6 +538,11 @@ var FileTransferUpload = class {
         partIndex,
         eTag
       );
+      this._onProgress(
+        uploadId,
+        partIndex,
+        totalParts
+      );
     }
   }
   async newUpload(file) {
@@ -549,6 +557,11 @@ var FileTransferUpload = class {
       const totalParts = Math.ceil(file.size / this._partSize);
       await this._db.createUploadRecord(uploadId, objectKey, file, this._partSize, totalParts);
       this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
+      this._onProgress(
+        uploadId,
+        0,
+        totalParts
+      );
       const uploadedParts = [];
       try {
         await this.uploadParts(file, objectKey, uploadId, this._partSize, totalParts, /* @__PURE__ */ new Set(), uploadedParts);
@@ -637,6 +650,7 @@ var fileTransferUpload = new FileTransferUpload(
   fileTransferApi,
   fileTransferDb,
   logMessage,
+  (uploadId, partNumber, totalParts) => sendProgressEvent("PROGRESSUPLOAD" /* PROGRESSUPLOAD */, uploadId, partNumber, totalParts),
   (uploadId, objectKey) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey),
   (uploadId, objectKey) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
@@ -650,6 +664,17 @@ function sendEvent(type, uploadId, objectKey) {
     type,
     uploadId,
     objectKey
+  });
+}
+function sendProgressEvent(type, uploadId, partNumber, totalParts) {
+  if (serviceWorkerClient == null) {
+    return;
+  }
+  serviceWorkerClient.postMessage({
+    type,
+    uploadId,
+    partNumber,
+    totalParts
   });
 }
 function logMessage(message) {

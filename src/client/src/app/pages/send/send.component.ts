@@ -226,6 +226,14 @@ export class SendComponent {
                 // Exit
                 break;
 
+            // Progress Upload
+            case MessageType.PROGRESSUPLOAD:
+
+                // Update Status Messages
+                this.statusMessage.set(`Uploading part ${message.partNumber} of ${message.totalParts}`);
+                // Exit
+                break;
+
             // Complete Upload
             case MessageType.COMPLETEUPLOAD:
 

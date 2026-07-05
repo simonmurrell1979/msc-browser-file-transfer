@@ -9,6 +9,7 @@ const fileTransferDb = new FileTransferDb();
 const fileTransferUpload = new FileTransferUpload(fileTransferApi, 
     fileTransferDb, 
     logMessage,
+    (uploadId: string, partNumber: number, totalParts: number) => sendProgressEvent(MessageType.PROGRESSUPLOAD, uploadId, partNumber, totalParts),
     (uploadId: string, objectKey: string) => sendEvent(MessageType.COMPLETEUPLOAD, uploadId, objectKey),
     (uploadId: string, objectKey: string) => sendEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey));
 
@@ -32,6 +33,25 @@ function sendEvent(type: MessageType, uploadId: string, objectKey: string) {
         type: type,
         uploadId: uploadId,
         objectKey: objectKey
+    });
+
+}
+
+function sendProgressEvent(type: MessageType, uploadId: string, partNumber: number, totalParts: number) {
+
+    // Check Value
+    if (serviceWorkerClient == null) {
+
+        // Exit
+        return; 
+
+    }
+    // Post Message
+    serviceWorkerClient.postMessage({
+        type: type,
+        uploadId: uploadId,
+        partNumber: partNumber,
+        totalParts: totalParts
     });
 
 }

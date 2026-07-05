@@ -10,6 +10,7 @@ export class FileTransferUpload {
     private readonly _db: FileTransferDb;
     private readonly _encryption: FileTransferEncryption;
     private readonly _logMessage: (message: string) => void;
+    private readonly _onProgress: (uploadId: string, partNumber: number, totalParts: number) => void;
     private readonly _onComplete: (uploadId: string, objectKey: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
@@ -19,6 +20,7 @@ export class FileTransferUpload {
     constructor(api: FileTransferApi, 
         db: FileTransferDb, 
         logMessage?: (message: string) => void, 
+        onProgress?: (uploadId: string, partNumber: number, totalParts: number) => void,
         onComplete?: (uploadId: string, objectKey: string) => void, 
         onCancelled?: (uploadId: string, objectKey: string) => void) {
 
@@ -27,6 +29,7 @@ export class FileTransferUpload {
         this._db = db;
         this._encryption = new FileTransferEncryption();
         this._logMessage = logMessage ?? console.log;
+        this._onProgress = onProgress ?? (() => {});
         this._onComplete = onComplete ?? (() => {});
         this._onCancelled = onCancelled ?? (() => {});
 
@@ -109,7 +112,7 @@ export class FileTransferUpload {
             // Assign Value
             const eTag = uploadPartResponse.headers.get("ETag")?.replaceAll('"', "") ?? "";
             // Log Message
-            this._logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
+            //this._logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
             // Add to Uploaded Parts Array
             uploadedParts.push({
                 PartNumber: partIndex,
@@ -120,6 +123,10 @@ export class FileTransferUpload {
             await this._db.addUploadedPart(uploadId,
                 partIndex,
                 eTag);
+            // Report Progress
+            this._onProgress(uploadId, 
+                partIndex, 
+                totalParts);
     
         }
     
@@ -153,6 +160,10 @@ export class FileTransferUpload {
             await this._db.createUploadRecord(uploadId, objectKey, file, this._partSize, totalParts);
             // Log Message
             this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
+            // Report Progress
+            this._onProgress(uploadId, 
+                0, 
+                totalParts);
 
             // Initialize Parts
             const uploadedParts: UploadPart[] = [];
