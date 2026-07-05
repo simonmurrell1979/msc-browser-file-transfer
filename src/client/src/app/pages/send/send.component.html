@@ -36,6 +36,12 @@
 
                     }
 
+                    @if (completedObjectKey()) {
+
+                        <button type="button" class="btn btn-secondary w-100 mt-2" (click)="onDownloadFile()">Download</button>
+
+                    }
+
                     <div class="border rounded p-3 mt-3">
                         <p class="mb-1 small text-muted">{{ statusMessage() }}</p>
                     </div>
