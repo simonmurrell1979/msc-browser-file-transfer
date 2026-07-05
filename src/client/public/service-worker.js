@@ -25,6 +25,11 @@ var FileTransferApi = class {
     const response = await this.getJson(requestUrl);
     return this.checkResponseWithData(response);
   }
+  async getDownloadUrl(objectKey) {
+    const requestUrl = `GetDownloadUrl?objectKey=${encodeURIComponent(objectKey)}`;
+    const response = await this.getJson(requestUrl);
+    return this.checkResponseWithData(response);
+  }
   async initiateMultipartUpload(objectKey, contentType) {
     const requestUrl = "InitiateMultipartUpload";
     const requestBody = {
@@ -608,14 +613,20 @@ var FileTransferUpload = class {
     } catch (error) {
       this._logMessage("Failed while deleting record: " + error.message);
     }
-    this._onCancelled(uploadId);
+    this._onCancelled(
+      uploadId,
+      objectKey
+    );
   }
   async completeUpload(objectKey, uploadId, uploadedParts) {
     await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
     this._logMessage("All parts uploaded successfully. Completed multipart upload...");
     await this._db.deleteUpload(uploadId);
     this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-    this._onComplete(uploadId);
+    this._onComplete(
+      uploadId,
+      objectKey
+    );
   }
 };
 
