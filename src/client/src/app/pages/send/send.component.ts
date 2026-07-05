@@ -5,6 +5,7 @@ import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.ser
 import { MessageType } from "../../models/messagetype";
 import { StorageService } from "../../services/storage.service";
 import { EncryptionService } from "../../services/encryption.service";
+import { FileTransferUpload } from "../../shared/filetransferupload";
 
 @Component({
     selector: "app-send",
@@ -20,6 +21,7 @@ export class SendComponent {
     private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>("fileInput");
     private readonly _storageService = inject(StorageService);
     private readonly _encryptionService = inject(EncryptionService);
+    private readonly _uploadService = inject(FileTransferUpload);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
@@ -132,7 +134,7 @@ export class SendComponent {
 
     }
 
-    protected onDownloadFile(): void {
+    protected async onDownloadFile(): Promise<void> {
 
         // Assign Value
         const objectKey = this.completedObjectKey();
@@ -146,24 +148,21 @@ export class SendComponent {
 
         try {
 
-            // Log Message
-            logMessage("Requesting download URL for completed object key: " + completedObjectKey);
             // Get Download URL
-            const downloadUrl = await getDownloadUrl(completedObjectKey);
-
+            const downloadUrl = await this._storageService.getDownloadUrl(objectKey);
             // Download File from R2
             const downloadedFile = await fetch(downloadUrl);
             // Extract bytes
             const downloadedBytes = await downloadedFile.arrayBuffer();
-            // Log Message
-            logMessage("Downloaded file from R2, size: " + downloadedBytes.byteLength + " bytes.");
             
             // Get Decryption Key
-            const decryptionKey = await getDecryptionKey();
+            const decryptionKey = await this._encryptionService.getDecryptionKey();
             // Initialize Decryption File Parts
             const decryptedFileParts = [];
             // Reset File Position
             let filePosition = 0;
+            // Set Encrypted Part Size
+            const encryptedPartSize = this._uploadService.partSize;
 
             // Decrypt File
             while (filePosition < downloadedBytes.byteLength) {
@@ -171,9 +170,7 @@ export class SendComponent {
                 // Extract Encrypted Part
                 const encryptedPart = downloadedBytes.slice(filePosition, filePosition + encryptedPartSize);
                 // Decrypt Part
-                const decryptedPart = await decryptFilePart(decryptionKey, encryptedPart);
-                // Log Message
-                logMessage("Decrypted part of size: " + decryptedPart.byteLength + " bytes.");
+                const decryptedPart = await this._encryptionService.decryptFilePart(decryptionKey, encryptedPart);
                 // Append Decrypted Part
                 decryptedFileParts.push(decryptedPart);
                 // Update File Position
@@ -186,15 +183,15 @@ export class SendComponent {
             // Create Download Link
             const downloadLink = document.createElement("a");
             downloadLink.href = URL.createObjectURL(decryptedFile);
-            downloadLink.download = completedObjectKey;
+            downloadLink.download = objectKey;
             // Click Download Link
             downloadLink.click();
 
         }
-        catch (error) {
+        catch (error: any) {
 
-            // Log Message
-            logMessage("An error occurred while requesting download URL: " + error.message);
+            // Log Error
+            console.error("Error sending file:", error);
 
         }
 

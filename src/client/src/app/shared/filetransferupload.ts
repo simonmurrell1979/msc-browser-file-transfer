@@ -13,6 +13,8 @@ export class FileTransferUpload {
     private readonly _onComplete: (uploadId: string, objectKey: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
+    // Public Variables
+    public readonly partSize = this._partSize;
 
     constructor(api: FileTransferApi, 
         db: FileTransferDb, 
