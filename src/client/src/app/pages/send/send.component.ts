@@ -100,8 +100,6 @@ export class SendComponent {
                 });
 
             }
-            // Clear Pending Upload
-            this.pendingUpload.set(null);
 
         }
         catch (error) {
