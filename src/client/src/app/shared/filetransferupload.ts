@@ -10,15 +10,15 @@ export class FileTransferUpload {
     private readonly _db: FileTransferDb;
     private readonly _encryption: FileTransferEncryption;
     private readonly _logMessage: (message: string) => void;
-    private readonly _onComplete: (uploadId: string) => void;
-    private readonly _onCancelled: (uploadId: string) => void;
+    private readonly _onComplete: (uploadId: string, objectKey: string) => void;
+    private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
 
     constructor(api: FileTransferApi, 
         db: FileTransferDb, 
         logMessage?: (message: string) => void, 
-        onComplete?: (uploadId: string) => void, 
-        onCancelled?: (uploadId: string) => void) {
+        onComplete?: (uploadId: string, objectKey: string) => void, 
+        onCancelled?: (uploadId: string, objectKey: string) => void) {
 
         // Initialize Classes
         this._api = api;
@@ -316,7 +316,8 @@ export class FileTransferUpload {
         }
 
         // Call _onCancelled callback
-        this._onCancelled(uploadId);
+        this._onCancelled(uploadId, 
+            objectKey);
     
     }
     
@@ -335,7 +336,8 @@ export class FileTransferUpload {
         this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
 
         // Call onComplete callback
-        this._onComplete(uploadId);
+        this._onComplete(uploadId, 
+            objectKey);
     
     }
 
