@@ -1,5 +1,6 @@
 import { UploadPart } from "../models/uploadpart";
 import { FileTransferApi } from "./filetransferapi";
+import { FileTransferEncryption } from "./filetransferencryption";
 import { FileTransferDb } from "./filetransferdb";
 
 export class FileTransferUpload {
