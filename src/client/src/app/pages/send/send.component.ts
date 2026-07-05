@@ -135,7 +135,68 @@ export class SendComponent {
     protected onDownloadFile(): void {
 
         // Assign Value
-        this.completedObjectKey.set(null);
+        const objectKey = this.completedObjectKey();
+        // Check Value
+        if (objectKey == null) {
+
+            // Exit
+            return;
+
+        }
+
+        try {
+
+            // Log Message
+            logMessage("Requesting download URL for completed object key: " + completedObjectKey);
+            // Get Download URL
+            const downloadUrl = await getDownloadUrl(completedObjectKey);
+
+            // Download File from R2
+            const downloadedFile = await fetch(downloadUrl);
+            // Extract bytes
+            const downloadedBytes = await downloadedFile.arrayBuffer();
+            // Log Message
+            logMessage("Downloaded file from R2, size: " + downloadedBytes.byteLength + " bytes.");
+            
+            // Get Decryption Key
+            const decryptionKey = await getDecryptionKey();
+            // Initialize Decryption File Parts
+            const decryptedFileParts = [];
+            // Reset File Position
+            let filePosition = 0;
+
+            // Decrypt File
+            while (filePosition < downloadedBytes.byteLength) {
+
+                // Extract Encrypted Part
+                const encryptedPart = downloadedBytes.slice(filePosition, filePosition + encryptedPartSize);
+                // Decrypt Part
+                const decryptedPart = await decryptFilePart(decryptionKey, encryptedPart);
+                // Log Message
+                logMessage("Decrypted part of size: " + decryptedPart.byteLength + " bytes.");
+                // Append Decrypted Part
+                decryptedFileParts.push(decryptedPart);
+                // Update File Position
+                filePosition += encryptedPartSize;
+
+            }
+
+            // Combine Decrypted Parts
+            const decryptedFile = new Blob(decryptedFileParts);
+            // Create Download Link
+            const downloadLink = document.createElement("a");
+            downloadLink.href = URL.createObjectURL(decryptedFile);
+            downloadLink.download = completedObjectKey;
+            // Click Download Link
+            downloadLink.click();
+
+        }
+        catch (error) {
+
+            // Log Message
+            logMessage("An error occurred while requesting download URL: " + error.message);
+
+        }
 
     }
 
