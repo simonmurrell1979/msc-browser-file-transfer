@@ -3,6 +3,8 @@ import { UploadRecord } from "../../models/uploadrecord";
 import { DbService } from "../../services/db.service";
 import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.service";
 import { MessageType } from "../../models/messagetype";
+import { StorageService } from "../../services/storage.service";
+import { EncryptionService } from "../../services/encryption.service";
 
 @Component({
     selector: "app-send",
@@ -16,6 +18,8 @@ export class SendComponent {
     private readonly _dbService = inject(DbService);
     private readonly _serviceWorkerCommsService = inject(ServiceWorkerCommsService);
     private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>("fileInput");
+    private readonly _storageService = inject(StorageService);
+    private readonly _encryptionService = inject(EncryptionService);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
@@ -125,6 +129,13 @@ export class SendComponent {
             objectKey: pendingUpload.objectKey,
             uploadId: pendingUpload.uploadId
         });
+
+    }
+
+    protected onDownloadFile(): void {
+
+        // Assign Value
+        this.completedObjectKey.set(null);
 
     }
 
