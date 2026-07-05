@@ -164,6 +164,8 @@ export class SendComponent {
 
                 // Update Status Messages
                 this.statusMessage.set("Upload completed");
+                // Set Completed Object Key
+                this.completedObjectKey.set(message.objectKey);
                 // Clear Upload State
                 this.clearUploadState();
                 // Exit
