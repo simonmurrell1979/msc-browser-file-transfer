@@ -528,7 +528,6 @@ var FileTransferUpload = class {
         throw new Error("Failed to upload part " + partIndex);
       }
       const eTag = uploadPartResponse.headers.get("ETag")?.replaceAll('"', "") ?? "";
-      this._logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
       uploadedParts.push({
         PartNumber: partIndex,
         ETag: eTag
