@@ -60,8 +60,8 @@ export class FileTransferEncryption {
 
     }
 
-    async function decryptFilePart(key,
-        filePart) {
+    async decryptFilePart(key: CryptoKey,
+        filePart: Uint8Array): Promise<ArrayBuffer> {
 
         // Extract IV
         const iv = filePart.slice(0, 12);
