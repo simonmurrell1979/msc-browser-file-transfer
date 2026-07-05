@@ -9,8 +9,8 @@ const fileTransferDb = new FileTransferDb();
 const fileTransferUpload = new FileTransferUpload(fileTransferApi, 
     fileTransferDb, 
     logMessage,
-    (uploadId: string) => sendEvent(MessageType.COMPLETEUPLOAD, uploadId),
-    (uploadId: string) => sendEvent(MessageType.CANCELLEDUPLOAD, uploadId));
+    (uploadId: string, objectKey: string) => sendEvent(MessageType.COMPLETEUPLOAD, uploadId),
+    (uploadId: string, objectKey: string) => sendEvent(MessageType.CANCELLEDUPLOAD, uploadId));
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -18,7 +18,7 @@ let serviceWorkerClient: Client | null = null;
 let uploadInProgress = false;
 
 // Send Event
-function sendEvent(type: MessageType, uploadId: string) {
+function sendEvent(type: MessageType, uploadId: string, objectKey: string) {
 
     // Check Value
     if (serviceWorkerClient == null) {
@@ -30,7 +30,8 @@ function sendEvent(type: MessageType, uploadId: string) {
     // Post Message
     serviceWorkerClient.postMessage({
         type: type,
-        uploadId: uploadId
+        uploadId: uploadId,
+        objectKey: objectKey
     });
 
 }

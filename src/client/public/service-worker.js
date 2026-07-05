@@ -637,18 +637,19 @@ var fileTransferUpload = new FileTransferUpload(
   fileTransferApi,
   fileTransferDb,
   logMessage,
-  (uploadId) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId),
-  (uploadId) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId)
+  (uploadId, objectKey) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId),
+  (uploadId, objectKey) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId)
 );
 var serviceWorkerClient = null;
 var uploadInProgress = false;
-function sendEvent(type, uploadId) {
+function sendEvent(type, uploadId, objectKey) {
   if (serviceWorkerClient == null) {
     return;
   }
   serviceWorkerClient.postMessage({
     type,
-    uploadId
+    uploadId,
+    objectKey
   });
 }
 function logMessage(message) {
