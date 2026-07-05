@@ -19,7 +19,7 @@ export class FileTransferEncryption {
 
     }
 
-    async function getDecryptionKey(encryptionKey) {
+    async getDecryptionKey(encryptionKey: string | null): Promise<CryptoKey> {
 
         // Convert to bytes
         const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
