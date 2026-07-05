@@ -39,6 +39,17 @@ export class FileTransferApi {
 
     }
 
+    public async getDownloadUrl(objectKey: string): Promise<string> {
+
+        // Build URL
+        const requestUrl = `GetDownloadUrl?objectKey=${encodeURIComponent(objectKey)}`;
+        // Make HTTP request
+        const response = await this.getJson<ApiResponseWithData<string>>(requestUrl);
+        // Check Value
+        return this.checkResponseWithData<string>(response);
+
+    }
+
     public async initiateMultipartUpload(objectKey: string, contentType: string): Promise<string> {
 
         // Build URL
