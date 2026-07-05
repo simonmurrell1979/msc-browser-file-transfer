@@ -1,9 +1,5 @@
-//*************************************************/
-// https://www.npmjs.com/package/idb
-// https://github.com/jakearchibald/idb
-//*************************************************/
 import { Injectable } from "@angular/core";
-import { FileTransferDb } from "../shared/filetransferdb";
+import { FileTransferEncryption } from "../shared/filetransferencryption";
 
 @Injectable({ providedIn: "root" })
-export class DbService extends FileTransferDb {}
+export class EncryptionService extends FileTransferEncryption {}
