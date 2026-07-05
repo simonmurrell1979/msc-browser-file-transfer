@@ -20,6 +20,7 @@ export class SendComponent {
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
     protected readonly statusMessage = signal<string | null>(null);
+    protected readonly completedObjectKey = signal<string | null>(null);
 
     public async ngOnInit(): Promise<void> {
 
@@ -127,6 +128,24 @@ export class SendComponent {
 
     }
 
+    private clearUploadState(): void {
+
+        // Clear Pending Upload
+        this.pendingUpload.set(null);
+        // Clear Selected File
+        this.selectedFile.set(null);
+        // Initialize Class
+        const fileInputElement = this._fileInput();
+        // Clear File Input
+        if (fileInputElement) {
+
+            // Clear File Input Value
+            fileInputElement.nativeElement.value = "";
+
+        }       
+
+    }
+
     private handleServiceWorkerMessages(message: any): void {
 
         // Check Message Type
@@ -140,25 +159,23 @@ export class SendComponent {
                 // Exit
                 break;
 
-            // Complete / Cancelled Upload
+            // Complete Upload
             case MessageType.COMPLETEUPLOAD:
+
+                // Update Status Messages
+                this.statusMessage.set("Upload completed");
+                // Clear Upload State
+                this.clearUploadState();
+                // Exit
+                break;
+
+            // Cancelled Upload
             case MessageType.CANCELLEDUPLOAD:
 
                 // Update Status Messages
-                this.statusMessage.set("Upload completed or cancelled");
-                // Clear Pending Upload
-                this.pendingUpload.set(null);
-                // Clear Selected File
-                this.selectedFile.set(null);
-                // Initialize Class
-                const fileInputElement = this._fileInput();
-                // Clear File Input
-                if (fileInputElement) {
-
-                    // Clear File Input Value
-                    fileInputElement.nativeElement.value = "";
-
-                }
+                this.statusMessage.set("Upload cancelled");
+                // Clear Upload State
+                this.clearUploadState();
                 // Exit
                 break;
 
