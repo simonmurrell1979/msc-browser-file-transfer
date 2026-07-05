@@ -8,6 +8,7 @@ export class FileTransferUpload {
     // Private variables
     private readonly _api: FileTransferApi;
     private readonly _db: FileTransferDb;
+    private readonly _encryption: FileTransferEncryption;
     private readonly _logMessage: (message: string) => void;
     private readonly _onComplete: (uploadId: string) => void;
     private readonly _onCancelled: (uploadId: string) => void;
@@ -22,6 +23,7 @@ export class FileTransferUpload {
         // Initialize Classes
         this._api = api;
         this._db = db;
+        this._encryption = new FileTransferEncryption();
         this._logMessage = logMessage ?? console.log;
         this._onComplete = onComplete ?? (() => {});
         this._onCancelled = onCancelled ?? (() => {});
