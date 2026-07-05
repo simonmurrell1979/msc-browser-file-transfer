@@ -639,8 +639,8 @@ var fileTransferUpload = new FileTransferUpload(
   fileTransferApi,
   fileTransferDb,
   logMessage,
-  (uploadId, objectKey) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId),
-  (uploadId, objectKey) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId)
+  (uploadId, objectKey) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey),
+  (uploadId, objectKey) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
 var serviceWorkerClient = null;
 var uploadInProgress = false;
