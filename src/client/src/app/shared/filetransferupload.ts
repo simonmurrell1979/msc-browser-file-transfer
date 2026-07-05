@@ -55,6 +55,9 @@ export class FileTransferUpload {
         totalParts: number,
         skippedParts: Set<number>,
         uploadedParts: UploadPart[]) {
+
+        // Mock Encryption Key 
+        const encryptionKey = await this._encryption.getEncryptionKey(null);
     
         // Search for each part
         for (let i = 0; i < totalParts; i++) {
@@ -76,6 +79,11 @@ export class FileTransferUpload {
             const fileStart = i * partSize;
             const fileEnd = Math.min(fileStart + partSize, file.size);
             const fileChunk = file.slice(fileStart, fileEnd);
+
+            // Encrypt File Chunk
+            const chunkBytes = await fileChunk.arrayBuffer();
+            // Encrypt File Part
+            const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
     
             // Generate Multipart Upload URL
             const multipartUploadUrl = await this._api.generateMultipartUploadUrl(file.name, uploadId, partIndex);
@@ -83,7 +91,7 @@ export class FileTransferUpload {
             // Upload to R2
             const uploadPartResponse = await fetch(multipartUploadUrl, {
                 method: "PUT",
-                body: fileChunk
+                body: encryptedChunk
             });
             // Check Value
             if (!uploadPartResponse.ok) {
