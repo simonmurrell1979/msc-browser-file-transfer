@@ -183,7 +183,7 @@ export class SendComponent {
             // Create Download Link
             const downloadLink = document.createElement("a");
             downloadLink.href = URL.createObjectURL(decryptedFile);
-            downloadLink.download = objectKey;
+            downloadLink.download = objectKey.split("/")[1];
             // Click Download Link
             downloadLink.click();
 

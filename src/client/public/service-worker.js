@@ -368,10 +368,10 @@ var FileTransferDb = class {
     const database = await this.openDatabase();
     return await database.getAll(this._storeName);
   }
-  async createUploadRecord(uploadId, file, partSize, totalParts) {
+  async createUploadRecord(uploadId, objectKey, file, partSize, totalParts) {
     const newRecord = {
       uploadId,
-      objectKey: file.name,
+      objectKey,
       contentType: file.type || "application/octet-stream",
       fileIdentifier: {
         name: file.name,
@@ -502,7 +502,7 @@ var FileTransferUpload = class {
       throw new Error(`Failed to upload file: ${response.statusText}`);
     }
   }
-  async uploadParts(file, uploadId, partSize, totalParts, skippedParts, uploadedParts) {
+  async uploadParts(file, objectKey, uploadId, partSize, totalParts, skippedParts, uploadedParts) {
     const encryptionKey = await this._encryption.getEncryptionKey(null);
     for (let i = 0; i < totalParts; i++) {
       const partIndex = i + 1;
@@ -515,7 +515,7 @@ var FileTransferUpload = class {
       const fileChunk = file.slice(fileStart, fileEnd);
       const chunkBytes = await fileChunk.arrayBuffer();
       const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
-      const multipartUploadUrl = await this._api.generateMultipartUploadUrl(file.name, uploadId, partIndex);
+      const multipartUploadUrl = await this._api.generateMultipartUploadUrl(objectKey, uploadId, partIndex);
       const uploadPartResponse = await fetch(multipartUploadUrl, {
         method: "PUT",
         body: encryptedChunk
@@ -540,25 +540,26 @@ var FileTransferUpload = class {
   async newUpload(file) {
     try {
       this._logMessage("Uploading file: " + file.name);
-      const uploadId = await this._api.initiateMultipartUpload(file.name, file.type || "application/octet-stream");
+      const objectKey = crypto.randomUUID() + "/" + file.name;
+      const uploadId = await this._api.initiateMultipartUpload(objectKey, file.type || "application/octet-stream");
       if (!uploadId) {
         this._logMessage("Failed to initiate multipart upload.");
         return;
       }
       const totalParts = Math.ceil(file.size / this._partSize);
-      await this._db.createUploadRecord(uploadId, file, this._partSize, totalParts);
+      await this._db.createUploadRecord(uploadId, objectKey, file, this._partSize, totalParts);
       this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
       const uploadedParts = [];
       try {
-        await this.uploadParts(file, uploadId, this._partSize, totalParts, /* @__PURE__ */ new Set(), uploadedParts);
+        await this.uploadParts(file, objectKey, uploadId, this._partSize, totalParts, /* @__PURE__ */ new Set(), uploadedParts);
         if (uploadedParts.length !== totalParts) {
           this._logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
           throw new Error("Not all parts were uploaded successfully.");
         }
-        await this.completeUpload(file.name, uploadId, uploadedParts);
+        await this.completeUpload(objectKey, uploadId, uploadedParts);
       } catch (error) {
         this._logMessage("An error occurred during multipart upload: " + error.message);
-        await this.cancelUpload(file.name, uploadId);
+        await this.cancelUpload(objectKey, uploadId);
       }
     } catch (error) {
       this._logMessage("An error occurred while uploading file: " + error.message);
@@ -588,12 +589,12 @@ var FileTransferUpload = class {
       }));
       this._logMessage(skippedParts.size + " out of " + totalParts + " parts already uploaded. Resuming upload...");
       try {
-        await this.uploadParts(file, uploadId, partSize, totalParts, skippedParts, uploadedParts);
+        await this.uploadParts(file, existingRecord.objectKey, uploadId, partSize, totalParts, skippedParts, uploadedParts);
         if (uploadedParts.length !== totalParts) {
           this._logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
           throw new Error("Not all parts were uploaded successfully.");
         }
-        await this.completeUpload(file.name, uploadId, uploadedParts);
+        await this.completeUpload(existingRecord.objectKey, uploadId, uploadedParts);
       } catch (error) {
         this._logMessage("An error occurred during multipart upload: " + error.message);
         await this.cancelUpload(existingRecord.objectKey, uploadId);
@@ -625,10 +626,7 @@ var FileTransferUpload = class {
     this._logMessage("All parts uploaded successfully. Completed multipart upload...");
     await this._db.deleteUpload(uploadId);
     this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-    this._onComplete(
-      uploadId,
-      objectKey
-    );
+    this._onComplete(uploadId, objectKey);
   }
 };
 

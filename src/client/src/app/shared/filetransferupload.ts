@@ -52,6 +52,7 @@ export class FileTransferUpload {
     }
     
     private async uploadParts(file: File,
+        objectKey: string,
         uploadId: string,
         partSize: number,
         totalParts: number,
@@ -88,7 +89,7 @@ export class FileTransferUpload {
             const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
     
             // Generate Multipart Upload URL
-            const multipartUploadUrl = await this._api.generateMultipartUploadUrl(file.name, uploadId, partIndex);
+            const multipartUploadUrl = await this._api.generateMultipartUploadUrl(objectKey, uploadId, partIndex);
             
             // Upload to R2
             const uploadPartResponse = await fetch(multipartUploadUrl, {
@@ -131,8 +132,10 @@ export class FileTransferUpload {
             // Log Message
             this._logMessage("Uploading file: " + file.name);
 
+            // Build Object Key
+            const objectKey = crypto.randomUUID() + "/" + file.name;
             // Initialize Multipart Upload
-            const uploadId = await this._api.initiateMultipartUpload(file.name, file.type || "application/octet-stream");
+            const uploadId = await this._api.initiateMultipartUpload(objectKey, file.type || "application/octet-stream");
             // Check Value
             if (!uploadId) {
             
@@ -147,7 +150,7 @@ export class FileTransferUpload {
             const totalParts = Math.ceil(file.size / this._partSize);
 
             // Create Record
-            await this._db.createUploadRecord(uploadId, file, this._partSize, totalParts);
+            await this._db.createUploadRecord(uploadId, objectKey, file, this._partSize, totalParts);
             // Log Message
             this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
 
@@ -157,7 +160,7 @@ export class FileTransferUpload {
             try {
 
                 // Upload Parts
-                await this.uploadParts(file, uploadId, this._partSize, totalParts, new Set(), uploadedParts);
+                await this.uploadParts(file, objectKey, uploadId, this._partSize, totalParts, new Set(), uploadedParts);
 
                 // Check Value
                 if (uploadedParts.length !== totalParts) {
@@ -169,7 +172,7 @@ export class FileTransferUpload {
 
                 }
                 // Complete Multipart Upload
-                await this.completeUpload(file.name, uploadId, uploadedParts);
+                await this.completeUpload(objectKey, uploadId, uploadedParts);
 
             }
             catch (error: any) {
@@ -178,7 +181,7 @@ export class FileTransferUpload {
                 this._logMessage("An error occurred during multipart upload: " + error.message);            
 
                 // Cancel Multipart Upload
-                await this.cancelUpload(file.name, uploadId);
+                await this.cancelUpload(objectKey, uploadId);
 
             }
 
@@ -248,7 +251,7 @@ export class FileTransferUpload {
             try {
     
                 // Upload Parts
-                await this.uploadParts(file, uploadId, partSize, totalParts, skippedParts, uploadedParts);
+                await this.uploadParts(file, existingRecord.objectKey, uploadId, partSize, totalParts, skippedParts, uploadedParts);
     
                 // Check Value
                 if (uploadedParts.length !== totalParts) {
@@ -261,7 +264,7 @@ export class FileTransferUpload {
                 }
                 
                 // Complete Multipart Upload
-                await this.completeUpload(file.name, uploadId, uploadedParts);
+                await this.completeUpload(existingRecord.objectKey, uploadId, uploadedParts);
     
             }
             catch (error: any) {
@@ -338,8 +341,7 @@ export class FileTransferUpload {
         this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
 
         // Call onComplete callback
-        this._onComplete(uploadId, 
-            objectKey);
+        this._onComplete(uploadId, objectKey);
     
     }
 
