@@ -162,7 +162,7 @@ export class SendComponent {
             // Reset File Position
             let filePosition = 0;
             // Set Encrypted Part Size
-            const encryptedPartSize = this._uploadService.partSize;
+            const encryptedPartSize = this._uploadService.partSize + 28;
 
             // Decrypt File
             while (filePosition < downloadedBytes.byteLength) {
