@@ -405,11 +405,71 @@ var FileTransferDb = class {
   }
 };
 
+// src/app/shared/filetransferencryption.ts
+var TEST_KEY = "1234567890abcdef";
+var FileTransferEncryption = class {
+  async getEncryptionKey(encryptionKey) {
+    const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      "AES-GCM",
+      true,
+      [
+        "encrypt"
+      ]
+    );
+    return key;
+  }
+  async getDecryptionKey(encryptionKey) {
+    const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
+    const key = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      "AES-GCM",
+      true,
+      [
+        "decrypt"
+      ]
+    );
+    return key;
+  }
+  async encryptFilePart(key, filePart) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encryptedFilePart = await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv
+      },
+      key,
+      filePart
+    );
+    const retVal = new Uint8Array(iv.byteLength + encryptedFilePart.byteLength);
+    retVal.set(new Uint8Array(iv), 0);
+    retVal.set(new Uint8Array(encryptedFilePart), iv.byteLength);
+    return retVal;
+  }
+  async decryptFilePart(key, filePart) {
+    const iv = filePart.slice(0, 12);
+    const encryptedFilePart = filePart.slice(12);
+    const decryptedFilePart = await crypto.subtle.decrypt(
+      {
+        name: "AES-GCM",
+        iv
+      },
+      key,
+      encryptedFilePart
+    );
+    return decryptedFilePart;
+  }
+};
+
 // src/app/shared/filetransferupload.ts
 var FileTransferUpload = class {
   // Private variables
   _api;
   _db;
+  _encryption;
   _logMessage;
   _onComplete;
   _onCancelled;
@@ -418,6 +478,7 @@ var FileTransferUpload = class {
   constructor(api, db, logMessage2, onComplete, onCancelled) {
     this._api = api;
     this._db = db;
+    this._encryption = new FileTransferEncryption();
     this._logMessage = logMessage2 ?? console.log;
     this._onComplete = onComplete ?? (() => {
     });
@@ -435,6 +496,7 @@ var FileTransferUpload = class {
     }
   }
   async uploadParts(file, uploadId, partSize, totalParts, skippedParts, uploadedParts) {
+    const encryptionKey = await this._encryption.getEncryptionKey(null);
     for (let i = 0; i < totalParts; i++) {
       const partIndex = i + 1;
       if (skippedParts.has(partIndex)) {
@@ -444,10 +506,12 @@ var FileTransferUpload = class {
       const fileStart = i * partSize;
       const fileEnd = Math.min(fileStart + partSize, file.size);
       const fileChunk = file.slice(fileStart, fileEnd);
+      const chunkBytes = await fileChunk.arrayBuffer();
+      const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
       const multipartUploadUrl = await this._api.generateMultipartUploadUrl(file.name, uploadId, partIndex);
       const uploadPartResponse = await fetch(multipartUploadUrl, {
         method: "PUT",
-        body: fileChunk
+        body: encryptedChunk
       });
       if (!uploadPartResponse.ok) {
         this._logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
