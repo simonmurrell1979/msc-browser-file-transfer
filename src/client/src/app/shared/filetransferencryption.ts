@@ -2,7 +2,7 @@ const TEST_KEY = "1234567890abcdef";
 
 export class FileTransferEncryption {
 
-    async function getEncryptionKey(encryptionKey) {
+    async getEncryptionKey(encryptionKey: string | null): Promise<CryptoKey> {
 
         // Convert to bytes
         const keyData = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(encryptionKey || TEST_KEY));
