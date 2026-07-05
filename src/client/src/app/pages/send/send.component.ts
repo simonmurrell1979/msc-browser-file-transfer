@@ -5,7 +5,7 @@ import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.ser
 import { MessageType } from "../../models/messagetype";
 import { StorageService } from "../../services/storage.service";
 import { EncryptionService } from "../../services/encryption.service";
-import { FileTransferUpload } from "../../shared/filetransferupload";
+import { UploadService } from "../../services/upload.service";
 
 @Component({
     selector: "app-send",
@@ -21,7 +21,7 @@ export class SendComponent {
     private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>("fileInput");
     private readonly _storageService = inject(StorageService);
     private readonly _encryptionService = inject(EncryptionService);
-    private readonly _uploadService = inject(FileTransferUpload);
+    private readonly _uploadService = inject(UploadService);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
@@ -168,7 +168,7 @@ export class SendComponent {
             while (filePosition < downloadedBytes.byteLength) {
 
                 // Extract Encrypted Part
-                const encryptedPart = downloadedBytes.slice(filePosition, filePosition + encryptedPartSize);
+                const encryptedPart = new Uint8Array(downloadedBytes.slice(filePosition, filePosition + encryptedPartSize));
                 // Decrypt Part
                 const decryptedPart = await this._encryptionService.decryptFilePart(decryptionKey, encryptedPart);
                 // Append Decrypted Part
