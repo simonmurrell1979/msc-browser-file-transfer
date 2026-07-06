@@ -27,6 +27,8 @@ export class SendComponent {
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
     protected readonly statusMessage = signal<string | null>(null);
     protected readonly completedObjectKey = signal<string | null>(null);
+    protected readonly activeUploadId = signal<string | null>(null);
+    protected readonly activeObjectKey = signal<string | null>(null);
     protected readonly progressPartNumber = signal<number | null>(null);
     protected readonly progressTotalParts = signal<number | null>(null);
 
@@ -115,10 +117,12 @@ export class SendComponent {
 
     protected onCancelUpload(): void {
 
-        // Assign Value
-        const pendingUpload = this.pendingUpload();
+        // Assign Values
+        const uploadId = this.pendingUpload()?.uploadId ?? this.activeUploadId();
+        const objectKey = this.pendingUpload()?.objectKey ?? this.activeObjectKey();
         // Check Value
-        if (pendingUpload == null) {
+        if ((uploadId == null) || 
+            (objectKey == null)) {
 
             // Exit
             return;
@@ -128,8 +132,8 @@ export class SendComponent {
         // Send Cancel Command
         this._serviceWorkerCommsService.sendCommand({ 
             type: MessageType.CANCELUPLOAD, 
-            objectKey: pendingUpload.objectKey,
-            uploadId: pendingUpload.uploadId
+            objectKey: objectKey,
+            uploadId: uploadId
         });
 
     }
@@ -199,6 +203,14 @@ export class SendComponent {
 
     private clearUploadState(): void {
 
+        // Clear Active Upload ID
+        this.activeUploadId.set(null);
+        // Clear Active Object Key
+        this.activeObjectKey.set(null);
+        // Clear Progress Part Number
+        this.progressPartNumber.set(null);
+        // Clear Progress Total Parts
+        this.progressTotalParts.set(null);
         // Clear Pending Upload
         this.pendingUpload.set(null);
         // Clear Selected File
@@ -234,6 +246,8 @@ export class SendComponent {
                 // Update Status Messages
                 this.statusMessage.set("");
                 // Assign Values
+                this.activeUploadId.set(message.uploadId);
+                this.activeObjectKey.set(message.objectKey);
                 this.progressPartNumber.set(message.partNumber);
                 this.progressTotalParts.set(message.totalParts);
                 // Exit
