@@ -32,6 +32,7 @@ export class SendComponent {
     protected readonly progressPartNumber = signal<number | null>(null);
     protected readonly progressTotalParts = signal<number | null>(null);
     protected readonly transferGuid = computed(() => this.completedObjectKey()?.split("/")[0] ?? null);
+    protected readonly password = signal<string | null>(null);
 
     public async ngOnInit(): Promise<void> {
 
@@ -261,6 +262,8 @@ export class SendComponent {
                 this.statusMessage.set("Upload completed");
                 // Set Completed Object Key
                 this.completedObjectKey.set(message.objectKey);
+                // Set Password
+                this.password.set(message.password);
                 // Clear Upload State
                 this.clearUploadState();
                 // Exit
