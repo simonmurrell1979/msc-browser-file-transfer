@@ -33,6 +33,7 @@ export class SendComponent {
     protected readonly progressTotalParts = signal<number | null>(null);
     protected readonly transferGuid = computed(() => this.completedObjectKey()?.split("/")[0] ?? null);
     protected readonly password = signal<string | null>(null);
+    protected readonly shareableLink = computed(() => { return this.buildShareableLink(); });
 
     public async ngOnInit(): Promise<void> {
 
@@ -288,6 +289,24 @@ export class SendComponent {
                 break;
 
         }
+
+    }
+
+    private buildShareableLink(): string | null {
+
+        // Assign Values
+        const transferGuid = this.transferGuid();
+        const password = this.password();
+        // Check Values
+        if ((transferGuid == null) || 
+            (password == null)) {
+
+            // Exit
+            return null;
+
+        }
+        // Return
+        return window.location.origin + "/download/" + transferGuid + "#" + password;
 
     }
 

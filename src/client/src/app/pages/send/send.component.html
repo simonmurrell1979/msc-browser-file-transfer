@@ -49,6 +49,14 @@
                         <progress [value]="progressPartNumber() || 0" [max]="progressTotalParts() || 0" class="w-100"></progress>
                     </div>
 
+                    @if (shareableLink()) {
+
+                        <div class="border rounded p-3 mt-3">
+                            <p class="mb-1 small text-muted">{{ shareableLink() }}</p>
+                        </div>
+
+                    }
+
                 </div>
 
             </div>
