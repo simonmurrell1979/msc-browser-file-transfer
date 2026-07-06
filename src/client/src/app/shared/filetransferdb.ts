@@ -91,6 +91,7 @@ export class FileTransferDb {
 
     public async createUploadRecord(uploadId: string,
         objectKey: string,
+        password: string,
         file: File,
         partSize: number,
         totalParts: number): Promise<UploadRecord> {
@@ -99,6 +100,7 @@ export class FileTransferDb {
         const newRecord: UploadRecord = {
             uploadId: uploadId,
             objectKey: objectKey,
+            password: password,
             contentType: file.type || "application/octet-stream",
             fileIdentifier: {
                 name: file.name,

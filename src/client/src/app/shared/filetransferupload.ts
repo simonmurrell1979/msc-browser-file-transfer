@@ -11,7 +11,7 @@ export class FileTransferUpload {
     private readonly _encryption: FileTransferEncryption;
     private readonly _logMessage: (message: string) => void;
     private readonly _onProgress: (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => void;
-    private readonly _onComplete: (uploadId: string, objectKey: string) => void;
+    private readonly _onComplete: (uploadId: string, objectKey: string, password: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
     // Public Variables
@@ -21,7 +21,7 @@ export class FileTransferUpload {
         db: FileTransferDb, 
         logMessage?: (message: string) => void, 
         onProgress?: (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => void,
-        onComplete?: (uploadId: string, objectKey: string) => void, 
+        onComplete?: (uploadId: string, objectKey: string, password: string) => void, 
         onCancelled?: (uploadId: string, objectKey: string) => void) {
 
         // Initialize Classes
@@ -57,13 +57,14 @@ export class FileTransferUpload {
     private async uploadParts(file: File,
         objectKey: string,
         uploadId: string,
+        password: string,
         partSize: number,
         totalParts: number,
         skippedParts: Set<number>,
         uploadedParts: UploadPart[]) {
 
         // Mock Encryption Key 
-        const encryptionKey = await this._encryption.getEncryptionKey(null);
+        const encryptionKey = await this._encryption.getEncryptionKey(password);
     
         // Search for each part
         for (let i = 0; i < totalParts; i++) {
@@ -155,8 +156,10 @@ export class FileTransferUpload {
             // Calculate Number of Parts
             const totalParts = Math.ceil(file.size / this._partSize);
 
+            // Generate Password
+            const password = await this._encryption.generatePassword();
             // Create Record
-            await this._db.createUploadRecord(uploadId, objectKey, file, this._partSize, totalParts);
+            await this._db.createUploadRecord(uploadId, objectKey, password, file, this._partSize, totalParts);
             // Log Message
             this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
             // Report Progress
@@ -171,7 +174,7 @@ export class FileTransferUpload {
             try {
 
                 // Upload Parts
-                await this.uploadParts(file, objectKey, uploadId, this._partSize, totalParts, new Set(), uploadedParts);
+                await this.uploadParts(file, objectKey, uploadId, password, this._partSize, totalParts, new Set(), uploadedParts);
 
                 // Check Value
                 if (uploadedParts.length !== totalParts) {
@@ -182,8 +185,8 @@ export class FileTransferUpload {
                     throw new Error("Not all parts were uploaded successfully.");
 
                 }
-                // Complete Multipart Upload
-                await this.completeUpload(objectKey, uploadId, uploadedParts);
+                // Complete Multipart Upload    
+                await this.completeUpload(objectKey, uploadId, password, uploadedParts);
 
             }
             catch (error: any) {
@@ -262,7 +265,7 @@ export class FileTransferUpload {
             try {
     
                 // Upload Parts
-                await this.uploadParts(file, existingRecord.objectKey, uploadId, partSize, totalParts, skippedParts, uploadedParts);
+                await this.uploadParts(file, existingRecord.objectKey, uploadId, existingRecord.password, partSize, totalParts, skippedParts, uploadedParts);
     
                 // Check Value
                 if (uploadedParts.length !== totalParts) {
@@ -275,7 +278,7 @@ export class FileTransferUpload {
                 }
                 
                 // Complete Multipart Upload
-                await this.completeUpload(existingRecord.objectKey, uploadId, uploadedParts);
+                await this.completeUpload(existingRecord.objectKey, uploadId, existingRecord.password, uploadedParts);
     
             }
             catch (error: any) {
@@ -339,6 +342,7 @@ export class FileTransferUpload {
     
     public async completeUpload(objectKey: string,
         uploadId: string,
+        password: string,
         uploadedParts: UploadPart[]) {
     
         // Complete Multipart Upload
@@ -352,7 +356,7 @@ export class FileTransferUpload {
         this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
 
         // Call onComplete callback
-        this._onComplete(uploadId, objectKey);
+        this._onComplete(uploadId, objectKey, password);
     
     }
 
