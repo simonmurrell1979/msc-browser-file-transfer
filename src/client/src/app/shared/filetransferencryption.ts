@@ -80,4 +80,13 @@ export class FileTransferEncryption {
 
     }
 
+    public generatePassword(): string {
+
+        // Generate random password
+        const password = crypto.getRandomValues(new Uint8Array(32));
+        // Replace +, / and = with - for URL issues
+        return btoa(String.fromCharCode(...password)).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+
+    }
+
 }
