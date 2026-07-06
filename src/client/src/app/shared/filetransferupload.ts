@@ -10,7 +10,7 @@ export class FileTransferUpload {
     private readonly _db: FileTransferDb;
     private readonly _encryption: FileTransferEncryption;
     private readonly _logMessage: (message: string) => void;
-    private readonly _onProgress: (uploadId: string, partNumber: number, totalParts: number) => void;
+    private readonly _onProgress: (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => void;
     private readonly _onComplete: (uploadId: string, objectKey: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
@@ -20,7 +20,7 @@ export class FileTransferUpload {
     constructor(api: FileTransferApi, 
         db: FileTransferDb, 
         logMessage?: (message: string) => void, 
-        onProgress?: (uploadId: string, partNumber: number, totalParts: number) => void,
+        onProgress?: (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => void,
         onComplete?: (uploadId: string, objectKey: string) => void, 
         onCancelled?: (uploadId: string, objectKey: string) => void) {
 
@@ -111,8 +111,6 @@ export class FileTransferUpload {
     
             // Assign Value
             const eTag = uploadPartResponse.headers.get("ETag")?.replaceAll('"', "") ?? "";
-            // Log Message
-            //this._logMessage("Part " + partIndex + " uploaded successfully with ETag: " + eTag);
             // Add to Uploaded Parts Array
             uploadedParts.push({
                 PartNumber: partIndex,
@@ -125,6 +123,7 @@ export class FileTransferUpload {
                 eTag);
             // Report Progress
             this._onProgress(uploadId, 
+                objectKey,
                 partIndex, 
                 totalParts);
     
@@ -162,6 +161,7 @@ export class FileTransferUpload {
             this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
             // Report Progress
             this._onProgress(uploadId, 
+                objectKey,
                 0, 
                 totalParts);
 
