@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, viewChild } from "@angular/core";
+import { Component, computed, ElementRef, inject, signal, viewChild } from "@angular/core";
 import { UploadRecord } from "../../models/uploadrecord";
 import { DbService } from "../../services/db.service";
 import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.service";
@@ -31,6 +31,7 @@ export class SendComponent {
     protected readonly activeObjectKey = signal<string | null>(null);
     protected readonly progressPartNumber = signal<number | null>(null);
     protected readonly progressTotalParts = signal<number | null>(null);
+    protected readonly transferGuid = computed(() => this.completedObjectKey()?.split("/")[0] ?? null);
 
     public async ngOnInit(): Promise<void> {
 
