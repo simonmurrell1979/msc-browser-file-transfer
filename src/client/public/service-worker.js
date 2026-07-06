@@ -368,10 +368,11 @@ var FileTransferDb = class {
     const database = await this.openDatabase();
     return await database.getAll(this._storeName);
   }
-  async createUploadRecord(uploadId, objectKey, file, partSize, totalParts) {
+  async createUploadRecord(uploadId, objectKey, password, file, partSize, totalParts) {
     const newRecord = {
       uploadId,
       objectKey,
+      password,
       contentType: file.type || "application/octet-stream",
       fileIdentifier: {
         name: file.name,
@@ -467,6 +468,10 @@ var FileTransferEncryption = class {
     );
     return decryptedFilePart;
   }
+  generatePassword() {
+    const password = crypto.getRandomValues(new Uint8Array(32));
+    return btoa(String.fromCharCode(...password)).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+  }
 };
 
 // src/app/shared/filetransferupload.ts
@@ -505,8 +510,8 @@ var FileTransferUpload = class {
       throw new Error(`Failed to upload file: ${response.statusText}`);
     }
   }
-  async uploadParts(file, objectKey, uploadId, partSize, totalParts, skippedParts, uploadedParts) {
-    const encryptionKey = await this._encryption.getEncryptionKey(null);
+  async uploadParts(file, objectKey, uploadId, password, partSize, totalParts, skippedParts, uploadedParts) {
+    const encryptionKey = await this._encryption.getEncryptionKey(password);
     for (let i = 0; i < totalParts; i++) {
       const partIndex = i + 1;
       if (skippedParts.has(partIndex)) {
@@ -555,7 +560,8 @@ var FileTransferUpload = class {
         return;
       }
       const totalParts = Math.ceil(file.size / this._partSize);
-      await this._db.createUploadRecord(uploadId, objectKey, file, this._partSize, totalParts);
+      const password = await this._encryption.generatePassword();
+      await this._db.createUploadRecord(uploadId, objectKey, password, file, this._partSize, totalParts);
       this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
       this._onProgress(
         uploadId,
@@ -565,12 +571,12 @@ var FileTransferUpload = class {
       );
       const uploadedParts = [];
       try {
-        await this.uploadParts(file, objectKey, uploadId, this._partSize, totalParts, /* @__PURE__ */ new Set(), uploadedParts);
+        await this.uploadParts(file, objectKey, uploadId, password, this._partSize, totalParts, /* @__PURE__ */ new Set(), uploadedParts);
         if (uploadedParts.length !== totalParts) {
           this._logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
           throw new Error("Not all parts were uploaded successfully.");
         }
-        await this.completeUpload(objectKey, uploadId, uploadedParts);
+        await this.completeUpload(objectKey, uploadId, password, uploadedParts);
       } catch (error) {
         this._logMessage("An error occurred during multipart upload: " + error.message);
         await this.cancelUpload(objectKey, uploadId);
@@ -603,12 +609,12 @@ var FileTransferUpload = class {
       }));
       this._logMessage(skippedParts.size + " out of " + totalParts + " parts already uploaded. Resuming upload...");
       try {
-        await this.uploadParts(file, existingRecord.objectKey, uploadId, partSize, totalParts, skippedParts, uploadedParts);
+        await this.uploadParts(file, existingRecord.objectKey, uploadId, existingRecord.password, partSize, totalParts, skippedParts, uploadedParts);
         if (uploadedParts.length !== totalParts) {
           this._logMessage("Not all parts were uploaded successfully. Uploaded " + uploadedParts.length + " out of " + totalParts);
           throw new Error("Not all parts were uploaded successfully.");
         }
-        await this.completeUpload(existingRecord.objectKey, uploadId, uploadedParts);
+        await this.completeUpload(existingRecord.objectKey, uploadId, existingRecord.password, uploadedParts);
       } catch (error) {
         this._logMessage("An error occurred during multipart upload: " + error.message);
         await this.cancelUpload(existingRecord.objectKey, uploadId);
@@ -635,12 +641,12 @@ var FileTransferUpload = class {
       objectKey
     );
   }
-  async completeUpload(objectKey, uploadId, uploadedParts) {
+  async completeUpload(objectKey, uploadId, password, uploadedParts) {
     await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
     this._logMessage("All parts uploaded successfully. Completed multipart upload...");
     await this._db.deleteUpload(uploadId);
     this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-    this._onComplete(uploadId, objectKey);
+    this._onComplete(uploadId, objectKey, password);
   }
 };
 
@@ -652,21 +658,11 @@ var fileTransferUpload = new FileTransferUpload(
   fileTransferDb,
   logMessage,
   (uploadId, objectKey, partNumber, totalParts) => sendProgressEvent("PROGRESSUPLOAD" /* PROGRESSUPLOAD */, uploadId, objectKey, partNumber, totalParts),
-  (uploadId, objectKey) => sendEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey),
-  (uploadId, objectKey) => sendEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
+  (uploadId, objectKey, password) => sendCompleteEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey, password),
+  (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
 var serviceWorkerClient = null;
 var uploadInProgress = false;
-function sendEvent(type, uploadId, objectKey) {
-  if (serviceWorkerClient == null) {
-    return;
-  }
-  serviceWorkerClient.postMessage({
-    type,
-    uploadId,
-    objectKey
-  });
-}
 function sendProgressEvent(type, uploadId, objectKey, partNumber, totalParts) {
   if (serviceWorkerClient == null) {
     return;
@@ -677,6 +673,27 @@ function sendProgressEvent(type, uploadId, objectKey, partNumber, totalParts) {
     objectKey,
     partNumber,
     totalParts
+  });
+}
+function sendCompleteEvent(type, uploadId, objectKey, password) {
+  if (serviceWorkerClient == null) {
+    return;
+  }
+  serviceWorkerClient.postMessage({
+    type,
+    uploadId,
+    objectKey,
+    password
+  });
+}
+function sendCancelEvent(type, uploadId, objectKey) {
+  if (serviceWorkerClient == null) {
+    return;
+  }
+  serviceWorkerClient.postMessage({
+    type,
+    uploadId,
+    objectKey
   });
 }
 function logMessage(message) {

@@ -10,32 +10,13 @@ const fileTransferUpload = new FileTransferUpload(fileTransferApi,
     fileTransferDb, 
     logMessage,
     (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => sendProgressEvent(MessageType.PROGRESSUPLOAD, uploadId, objectKey, partNumber, totalParts),
-    (uploadId: string, objectKey: string) => sendEvent(MessageType.COMPLETEUPLOAD, uploadId, objectKey),
-    (uploadId: string, objectKey: string) => sendEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey));
+    (uploadId: string, objectKey: string, password: string) => sendCompleteEvent(MessageType.COMPLETEUPLOAD, uploadId, objectKey, password),
+    (uploadId: string, objectKey: string) => sendCancelEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey));
 
 declare const self: ServiceWorkerGlobalScope;
 
 let serviceWorkerClient: Client | null = null;
 let uploadInProgress = false;
-
-// Send Event
-function sendEvent(type: MessageType, uploadId: string, objectKey: string) {
-
-    // Check Value
-    if (serviceWorkerClient == null) {
-
-        // Exit
-        return; 
-
-    }
-    // Post Message
-    serviceWorkerClient.postMessage({
-        type: type,
-        uploadId: uploadId,
-        objectKey: objectKey
-    });
-
-}
 
 function sendProgressEvent(type: MessageType, uploadId: string, objectKey: string, partNumber: number, totalParts: number) {
 
@@ -53,6 +34,45 @@ function sendProgressEvent(type: MessageType, uploadId: string, objectKey: strin
         objectKey: objectKey,
         partNumber: partNumber,
         totalParts: totalParts
+    });
+
+}
+
+// Send Complete Event
+function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: string, password: string) {
+
+    // Check Value
+    if (serviceWorkerClient == null) {
+
+        // Exit
+        return; 
+
+    }
+    // Post Message
+    serviceWorkerClient.postMessage({
+        type: type,
+        uploadId: uploadId,
+        objectKey: objectKey,
+        password: password
+    });
+
+}
+
+// Send Cancel Event
+function sendCancelEvent(type: MessageType, uploadId: string, objectKey: string) {
+
+    // Check Value
+    if (serviceWorkerClient == null) {
+
+        // Exit
+        return; 
+
+    }
+    // Post Message
+    serviceWorkerClient.postMessage({
+        type: type,
+        uploadId: uploadId,
+        objectKey: objectKey
     });
 
 }
