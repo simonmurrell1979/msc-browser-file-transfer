@@ -539,6 +539,7 @@ var FileTransferUpload = class {
       );
       this._onProgress(
         uploadId,
+        objectKey,
         partIndex,
         totalParts
       );
@@ -558,6 +559,7 @@ var FileTransferUpload = class {
       this._logMessage("Created upload record in IndexedDB with Upload ID: " + uploadId);
       this._onProgress(
         uploadId,
+        objectKey,
         0,
         totalParts
       );
