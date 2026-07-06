@@ -27,6 +27,8 @@ export class SendComponent {
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
     protected readonly statusMessage = signal<string | null>(null);
     protected readonly completedObjectKey = signal<string | null>(null);
+    protected readonly progressPartNumber = signal<number | null>(null);
+    protected readonly progressTotalParts = signal<number | null>(null);
 
     public async ngOnInit(): Promise<void> {
 
@@ -230,7 +232,10 @@ export class SendComponent {
             case MessageType.PROGRESSUPLOAD:
 
                 // Update Status Messages
-                this.statusMessage.set(`Uploading part ${message.partNumber} of ${message.totalParts}`);
+                this.statusMessage.set("");
+                // Assign Values
+                this.progressPartNumber.set(message.partNumber);
+                this.progressTotalParts.set(message.totalParts);
                 // Exit
                 break;
 
