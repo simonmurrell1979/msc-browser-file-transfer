@@ -272,27 +272,31 @@ namespace FileTransfer.Services.Storage
 
         #region GetTransferInformationAsync
 
-        public async Task<List<Uploads.UploadPart>> GetTransferInformationAsync(string ObjectKey, string UploadId)
+        public async Task<(string ObjectKey, long Size)?> GetTransferInformationAsync(string ObjectKeyGuid)
         {
 
             // Build Request
-            var request = new ListPartsRequest
+            var request = new ListObjectsV2Request
             {
                 BucketName = _options.BucketName,
-                Key = ObjectKey
+                Prefix = ObjectKeyGuid + "/"
             };
             // Abort Multipart Upload
-            var response = await _client.ListPartsAsync(request);
+            var response = await _client.ListObjectsV2Async(request);
 
-            // Map Parts
-            var parts = response.Parts.Select(p => new Uploads.UploadPart
+            // Check Value
+            if ((response.S3Objects == null) || 
+                (response.S3Objects.Count == 0))
             {
-                ETag = p.ETag.Replace("\"", ""),
-                PartNumber = p.PartNumber
-            }).ToList();
+                
+                // Return
+                return null;
 
+            }
+            // Get Object
+            var s3Object = response.S3Objects[0];
             // Return
-            return parts;
+            return (s3Object.Key, s3Object.Size);
 
         }
 

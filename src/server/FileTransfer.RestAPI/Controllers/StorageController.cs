@@ -290,7 +290,7 @@ namespace FileTransfer.RestAPI.Controllers
             {
 
                 // List Multipart Uploads
-                var parts = await _storageService.ListMultipartUploadParts(Request.ObjectKey,
+                var parts = await _storageService.ListMultipartUploadPartsAsync(Request.ObjectKey,
                     Request.UploadId);
                 // Log Information
                 _logger.LogInformation("Listed multipart upload parts for ObjectKey '{ObjectKey}', UploadId '{UploadId}'",
