@@ -4,7 +4,9 @@
     public class TransferInfoResponse
     {
 
-        public string TransferGuid { get; set; } = "";
+        public string Filename { get; set; } = "";
+        public long Size { get; set; } = 0;
+        public string DownloadUrl { get; set; } = "";
 
     }
 
