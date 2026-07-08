@@ -6,7 +6,7 @@ export const routes: Routes = [
         loadComponent: () => import("./pages/send/send.component").then((c) => c.SendComponent),
     },
     {
-        path: "download",
+        path: "download/:guid",
         loadComponent: () => import("./pages/download/download.component").then((c) => c.DownloadComponent),
     },
     {
