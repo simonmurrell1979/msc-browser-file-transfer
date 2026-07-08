@@ -6,6 +6,10 @@ export const routes: Routes = [
         loadComponent: () => import("./pages/send/send.component").then((c) => c.SendComponent),
     },
     {
+        path: "download",
+        loadComponent: () => import("./pages/download/download.component").then((c) => c.DownloadComponent),
+    },
+    {
         path: "",
         redirectTo: "send",
         pathMatch: "full",
