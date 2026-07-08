@@ -36,8 +36,9 @@ namespace FileTransfer.Common.Storage
         Task<string> GenerateMultipartUploadUrlAsync(string ObjectKey, string UploadId, int PartNumber);
         Task CompleteMultipartUploadAsync(string ObjectKey, string UploadId, List<UploadPart> Parts);
         Task AbortMultipartUploadAsync(string ObjectKey, string UploadId);
-        Task<List<UploadPart>> ListMultipartUploadParts(string ObjectKey, string UploadId);
+        Task<List<UploadPart>> ListMultipartUploadPartsAsync(string ObjectKey, string UploadId);
+        Task<(string ObjectKey, long Size)?> GetTransferInformationAsync(string ObjectKeyGuid);
 
     }
-
+        
 }

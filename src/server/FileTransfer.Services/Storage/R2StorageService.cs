@@ -241,9 +241,9 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
-        #region ListMultipartUploadParts
+        #region ListMultipartUploadPartsAsync
 
-        public async Task<List<Uploads.UploadPart>> ListMultipartUploadParts(string ObjectKey, string UploadId)
+        public async Task<List<Uploads.UploadPart>> ListMultipartUploadPartsAsync(string ObjectKey, string UploadId)
         {
 
             // Build Request
@@ -252,6 +252,34 @@ namespace FileTransfer.Services.Storage
                 BucketName = _options.BucketName,
                 Key = ObjectKey,
                 UploadId = UploadId
+            };
+            // Abort Multipart Upload
+            var response = await _client.ListPartsAsync(request);
+
+            // Map Parts
+            var parts = response.Parts.Select(p => new Uploads.UploadPart
+            {
+                ETag = p.ETag.Replace("\"", ""),
+                PartNumber = p.PartNumber
+            }).ToList();
+
+            // Return
+            return parts;
+
+        }
+
+        #endregion
+
+        #region GetTransferInformationAsync
+
+        public async Task<List<Uploads.UploadPart>> GetTransferInformationAsync(string ObjectKey, string UploadId)
+        {
+
+            // Build Request
+            var request = new ListPartsRequest
+            {
+                BucketName = _options.BucketName,
+                Key = ObjectKey
             };
             // Abort Multipart Upload
             var response = await _client.ListPartsAsync(request);
