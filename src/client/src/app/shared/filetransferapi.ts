@@ -132,6 +132,22 @@ export class FileTransferApi {
 
     }
 
+    public async listMultipartUploadParts(objectKey: string, uploadId: string): Promise<UploadPart[]> {
+
+        // Build URL
+        const requestUrl = "ListMultipartUploadParts";
+        // Build Request Body
+        const requestBody = {
+            objectKey: objectKey,
+            uploadId: uploadId
+        };
+        // Make HTTP request
+        const response = await this.postJson<ApiResponseWithData<UploadPart[]>>(requestUrl, requestBody);
+        // Check Value
+        return this.checkResponseWithData<UploadPart[]>(response);
+
+    }
+
     private checkResponse(response: ApiResponse): boolean {
 
         // Check Response
