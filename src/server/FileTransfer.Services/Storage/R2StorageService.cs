@@ -296,7 +296,7 @@ namespace FileTransfer.Services.Storage
             // Get Object
             var s3Object = response.S3Objects[0];
             // Return
-            return (s3Object.Key, s3Object.Size);
+            return (s3Object.Key, s3Object.Size ?? 0);
 
         }
 
