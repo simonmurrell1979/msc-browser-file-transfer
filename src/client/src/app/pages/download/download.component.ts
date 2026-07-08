@@ -1,5 +1,7 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { StorageService } from "../../services/storage.service";
+import { TransferInfo } from "../../models/transferinfo";
 
 @Component({
     selector: "app-download",
@@ -11,10 +13,29 @@ export class DownloadComponent {
 
     // Private Variables
     private readonly _route = inject(ActivatedRoute);
+    private readonly _storageService = inject(StorageService);
     // Protected Variables
     protected readonly guid = this._route.snapshot.paramMap.get("guid") ?? "";
     protected readonly password = window.location.hash.substring(1) ?? "";
+    protected readonly transferInfo = signal<TransferInfo | null>(null);
+    protected readonly statusMessage = signal<string>("");
 
-    
+    async ngOnInit(): Promise<void> {
+
+        try {
+            // Get Transfer Information
+            this.transferInfo.set(await this._storageService.getTransferInformation(this.guid));
+
+        } 
+        catch (error) {
+
+            // Log Error
+            console.error("Error fetching transfer information:", error);
+            // Set Status Message
+            this.statusMessage.set("Error fetching transfer information.");
+
+        }
+
+    }
 
 }
