@@ -12,8 +12,19 @@
 
                     <div class="upload-zone border rounded text-center p-5 mb-3">
 
-                        {{guid}}
-                        {{password}}
+                        @if (transferInfo()) {
+
+                            <p>{{transferInfo()?.Filename}}</p>
+                            <p>{{transferInfo()?.Size}}</p>
+                            <p>{{transferInfo()?.DownloadUrl}}</p>
+
+                        }
+
+                        @if (statusMessage()) {
+
+                            <p>{{statusMessage()}}</p>
+
+                        }
 
                     </div>
 
