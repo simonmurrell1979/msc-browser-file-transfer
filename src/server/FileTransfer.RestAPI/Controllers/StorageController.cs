@@ -342,7 +342,7 @@ namespace FileTransfer.RestAPI.Controllers
                 }
 
                 // Get Download Url
-                var downloadUrl = await _storageService.GenerateGetUrlAsync(Request.ObjectKeyGuid);
+                var downloadUrl = await _storageService.GenerateGetUrlAsync(transferInfo.Value.ObjectKey);
                 // Log Information
                 _logger.LogInformation("Retrieved transfer information for ObjectKeyGuid '{ObjectKeyGuid}'",
                     Request.ObjectKeyGuid);
