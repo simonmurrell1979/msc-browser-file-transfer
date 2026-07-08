@@ -1,1 +1,68 @@
-<p>download works!</p>
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card shadow-lg">
+
+                <div class="card-body p-4">
+
+                    <h5 class="card-title mb-4">Send Files</h5>
+
+                    <div class="upload-zone border rounded text-center p-5 mb-3">
+
+                        <p class="text-muted mb-3">
+                            Drag and drop files here or click to select files
+                        </p>
+
+                        <input type="file" #fileInput class="form-control" (change)="onFileSelected($event)" />
+
+                        @if (selectedFile()) {
+
+                            <p class="mt-2 mb-0 text-muted">
+                                Selected File: {{ selectedFile()?.name }}
+                            </p>
+
+                        }
+
+                    </div>
+
+                    <button type="button" class="btn btn-primary w-100" (click)="onSendFile()">Send</button>
+
+                    @if (pendingUpload() || (activeUploadId() && activeObjectKey())) {
+
+                        <button type="button" class="btn btn-secondary w-100 mt-2" (click)="onCancelUpload()">Cancel</button>
+
+                    }
+
+                    @if (completedObjectKey()) {
+
+                        <button type="button" class="btn btn-secondary w-100 mt-2" (click)="onDownloadFile()">Download</button>
+
+                    }
+
+                    <div class="border rounded p-3 mt-3">
+                        <p class="mb-1 small text-muted">{{ statusMessage() }}</p>
+                    </div>
+                    <div class="border rounded p-3 mt-3">
+                        <progress [value]="progressPartNumber() || 0" [max]="progressTotalParts() || 0" class="w-100"></progress>
+                    </div>
+
+                    @if (shareableLink()) {
+
+                        <div class="border rounded p-3 mt-3">
+                            <p class="mb-1 small text-muted">{{ shareableLink() }}</p>
+                        </div>
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
