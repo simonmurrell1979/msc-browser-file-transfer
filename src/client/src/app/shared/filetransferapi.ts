@@ -1,5 +1,6 @@
 import { environment } from "../../environments/environment.development";
 import { ApiResponse, ApiResponseWithData } from "../models/apiresponse";
+import { TransferInfo } from "../models/transferinfo";
 import { UploadPart } from "../models/uploadpart";
 
 export class FileTransferApi {
@@ -132,19 +133,18 @@ export class FileTransferApi {
 
     }
 
-    public async listMultipartUploadParts(objectKey: string, uploadId: string): Promise<UploadPart[]> {
+    public async getTransferInformation(objectKeyGuid: string): Promise<TransferInfo> {
 
         // Build URL
-        const requestUrl = "ListMultipartUploadParts";
+        const requestUrl = "GetTransferInformation";
         // Build Request Body
         const requestBody = {
-            objectKey: objectKey,
-            uploadId: uploadId
+            objectKeyGuid: objectKeyGuid
         };
         // Make HTTP request
-        const response = await this.postJson<ApiResponseWithData<UploadPart[]>>(requestUrl, requestBody);
+        const response = await this.postJson<ApiResponseWithData<TransferInfo>>(requestUrl, requestBody);
         // Check Value
-        return this.checkResponseWithData<UploadPart[]>(response);
+        return this.checkResponseWithData<TransferInfo>(response);
 
     }
 
