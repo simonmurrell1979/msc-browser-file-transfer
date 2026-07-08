@@ -329,12 +329,32 @@ namespace FileTransfer.RestAPI.Controllers
 
                 // Get Transfer Information
                 var transferInfo = await _storageService.GetTransferInformationAsync(Request.ObjectKeyGuid);
+                // Check Value
+                if (transferInfo == null)
+                {
+
+                    // Log Warning
+                    _logger.LogWarning("Transfer information not found for ObjectKeyGuid '{ObjectKeyGuid}'",
+                        Request.ObjectKeyGuid);
+                    // Return Error Response
+                    return Ok(JsonResponseFactory.ErrorResponse($"Transfer information not found"));
+
+                }
+
+                // Get Download Url
+                var downloadUrl = await _storageService.GenerateGetUrlAsync(Request.ObjectKeyGuid);
                 // Log Information
                 _logger.LogInformation("Retrieved transfer information for ObjectKeyGuid '{ObjectKeyGuid}'",
                     Request.ObjectKeyGuid);
-
+                // Build Response
+                var response = new TransferInfoResponse
+                {
+                    Filename = transferInfo.Value.ObjectKey.Substring(transferInfo.Value.ObjectKey.IndexOf("/") + 1),
+                    Size = transferInfo?.Size ?? 0,
+                    DownloadUrl = downloadUrl
+                };
                 // Return
-                return Ok(JsonResponseFactory.SuccessResponse(transferInfo));
+                return Ok(JsonResponseFactory.SuccessResponse(response));
 
             }
             catch (Exception ex)
