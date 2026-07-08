@@ -1,4 +1,5 @@
 ﻿using FileTransfer.Common.Factories;
+using FileTransfer.Common.Models.Downloads;
 using FileTransfer.Common.Models.Uploads;
 using FileTransfer.Common.Storage;
 using Microsoft.AspNetCore.Mvc;
@@ -310,6 +311,40 @@ namespace FileTransfer.RestAPI.Controllers
                     Request.UploadId);
                 // Return Error Response
                 return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while listing the multipart upload parts: {ex.Message}"));
+
+            }
+
+        }
+
+        #endregion
+
+        #region GetTransferInformation
+
+        [HttpPost]
+        public async Task<IActionResult> GetTransferInformation(TransferInfoRequest Request)
+        {
+
+            try
+            {
+
+                // Get Transfer Information
+                var transferInfo = await _storageService.GetTransferInformationAsync(Request.ObjectKeyGuid);
+                // Log Information
+                _logger.LogInformation("Retrieved transfer information for ObjectKeyGuid '{ObjectKeyGuid}'",
+                    Request.ObjectKeyGuid);
+
+                // Return
+                return Ok(JsonResponseFactory.SuccessResponse(transferInfo));
+
+            }
+            catch (Exception ex)
+            {
+
+                // Log Error
+                _logger.LogError(ex, "Error retrieving transfer information for ObjectKeyGuid '{ObjectKeyGuid}'",
+                    Request.ObjectKeyGuid);
+                // Return Error Response
+                return Ok(JsonResponseFactory.ErrorResponse($"An error occurred while retrieving the transfer information: {ex.Message}"));
 
             }
 

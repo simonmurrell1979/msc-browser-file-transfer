@@ -4,7 +4,7 @@
     public class TransferInfoRequest
     {
 
-        public string TransferGuid { get; set; } = "";
+        public string ObjectKeyGuid { get; set; } = "";
 
     }
 
