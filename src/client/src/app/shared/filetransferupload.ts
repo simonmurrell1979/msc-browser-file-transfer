@@ -347,6 +347,17 @@ export class FileTransferUpload {
         uploadId: string,
         password: string,
         uploadedParts: UploadPart[]) {
+
+        // Get Existing Record
+        const existingRecord = await this._db.getUpload(uploadId);
+        // Check Value
+        if (existingRecord == null) {   
+
+            // Throw Exception
+            throw new Error("No existing upload record found for Upload ID: " + uploadId);
+
+        }
+        // Build out hashes
     
         // Complete Multipart Upload
         await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
