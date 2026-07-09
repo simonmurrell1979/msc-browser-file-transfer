@@ -89,6 +89,26 @@ export class FileTransferEncryption {
 
     }
 
+    public async buildIntegrityHash(partsHashes: string[]): Promise<string> {
+
+        // Initialize Final Hash
+        const finalHash = new Uint8Array(partsHashes.length * 32);
+        // Search through Part Hashs
+        for (let i = 0; i < partsHashes.length; i++) {
+
+            // Decode Part Hash
+            const decodedPartHash = this.decodeBase64(partsHashes[i]);
+            // Assign Value
+            finalHash.set(decodedPartHash, i * 32);
+
+        }
+        // Calculate Final Hash
+        const integrityHash = await crypto.subtle.digest("SHA-256", finalHash);
+        // Return
+        return this.encodeBase64(integrityHash);
+
+    }
+
     public encodeBase64(hash: ArrayBuffer): string {
 
         // Replace +, / and = with - for URL issues
@@ -96,9 +116,23 @@ export class FileTransferEncryption {
 
     }
 
-    public buildIntegrityHash(filePart: string[]): Promise<string> {
+    public decodeBase64(hash: string): Uint8Array {
 
-        
+        // Reverse Replace - and _ with + and / for URL issues
+        const base64 = hash.replaceAll("-", "+").replaceAll("_", "/");
+        // Decode
+        const decoded = atob(base64);
+        // Initialize Class
+        const retVal = new Uint8Array(decoded.length);
+        // Search through Decoded
+        for (let i = 0; i < decoded.length; i++) {
+
+            // Assign Value
+            retVal[i] = decoded.charCodeAt(i);
+
+        }
+        // Return
+        return retVal;
 
     }
 

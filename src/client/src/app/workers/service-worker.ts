@@ -10,7 +10,7 @@ const fileTransferUpload = new FileTransferUpload(fileTransferApi,
     fileTransferDb, 
     logMessage,
     (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => sendProgressEvent(MessageType.PROGRESSUPLOAD, uploadId, objectKey, partNumber, totalParts),
-    (uploadId: string, objectKey: string, password: string) => sendCompleteEvent(MessageType.COMPLETEUPLOAD, uploadId, objectKey, password),
+    (uploadId: string, objectKey: string, password: string, integrityHash: string) => sendCompleteEvent(MessageType.COMPLETEUPLOAD, uploadId, objectKey, password, integrityHash),
     (uploadId: string, objectKey: string) => sendCancelEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey));
 
 declare const self: ServiceWorkerGlobalScope;
@@ -39,7 +39,7 @@ function sendProgressEvent(type: MessageType, uploadId: string, objectKey: strin
 }
 
 // Send Complete Event
-function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: string, password: string) {
+function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: string, password: string, integrityHash: string) {
 
     // Check Value
     if (serviceWorkerClient == null) {
@@ -53,7 +53,8 @@ function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: strin
         type: type,
         uploadId: uploadId,
         objectKey: objectKey,
-        password: password
+        password: password,
+        integrityHash: integrityHash
     });
 
 }

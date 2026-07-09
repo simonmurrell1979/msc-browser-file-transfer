@@ -391,12 +391,13 @@ var FileTransferDb = class {
       partSize,
       totalParts,
       createDate: Date.now(),
-      uploadedParts: []
+      uploadedParts: [],
+      originalPartsHashes: []
     };
     await this.saveUpload(newRecord);
     return newRecord;
   }
-  async addUploadedPart(uploadId, partNumber, eTag) {
+  async addUploadedPart(uploadId, partNumber, eTag, filePartHash) {
     const record = await this.getUpload(uploadId);
     if (!record) {
       throw new Error("Upload record not found for uploadId: " + uploadId);
@@ -406,6 +407,7 @@ var FileTransferDb = class {
       ETag: eTag,
       UploadedAt: Date.now()
     });
+    record.originalPartsHashes[partNumber - 1] = filePartHash;
     await this.saveUpload(record);
     return record;
   }
@@ -478,7 +480,28 @@ var FileTransferEncryption = class {
   }
   generatePassword() {
     const password = crypto.getRandomValues(new Uint8Array(32));
-    return btoa(String.fromCharCode(...password)).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+    return this.encodeBase64(password.buffer);
+  }
+  async buildIntegrityHash(partsHashes) {
+    const finalHash = new Uint8Array(partsHashes.length * 32);
+    for (let i = 0; i < partsHashes.length; i++) {
+      const decodedPartHash = this.decodeBase64(partsHashes[i]);
+      finalHash.set(decodedPartHash, i * 32);
+    }
+    const integrityHash = await crypto.subtle.digest("SHA-256", finalHash);
+    return this.encodeBase64(integrityHash);
+  }
+  encodeBase64(hash) {
+    return btoa(String.fromCharCode(...new Uint8Array(hash))).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+  }
+  decodeBase64(hash) {
+    const base64 = hash.replaceAll("-", "+").replaceAll("_", "/");
+    const decoded = atob(base64);
+    const retVal = new Uint8Array(decoded.length);
+    for (let i = 0; i < decoded.length; i++) {
+      retVal[i] = decoded.charCodeAt(i);
+    }
+    return retVal;
   }
 };
 
@@ -530,6 +553,7 @@ var FileTransferUpload = class {
       const fileEnd = Math.min(fileStart + partSize, file.size);
       const fileChunk = file.slice(fileStart, fileEnd);
       const chunkBytes = await fileChunk.arrayBuffer();
+      const filePartHash = await crypto.subtle.digest("SHA-256", chunkBytes);
       const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
       const multipartUploadUrl = await this._api.generateMultipartUploadUrl(objectKey, uploadId, partIndex);
       const uploadPartResponse = await fetch(multipartUploadUrl, {
@@ -548,7 +572,8 @@ var FileTransferUpload = class {
       await this._db.addUploadedPart(
         uploadId,
         partIndex,
-        eTag
+        eTag,
+        this._encryption.encodeBase64(filePartHash)
       );
       this._onProgress(
         uploadId,
@@ -650,11 +675,16 @@ var FileTransferUpload = class {
     );
   }
   async completeUpload(objectKey, uploadId, password, uploadedParts) {
+    const existingRecord = await this._db.getUpload(uploadId);
+    if (existingRecord == null) {
+      throw new Error("No existing upload record found for Upload ID: " + uploadId);
+    }
+    const integrityHash = await this._encryption.buildIntegrityHash(existingRecord.originalPartsHashes);
     await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
     this._logMessage("All parts uploaded successfully. Completed multipart upload...");
     await this._db.deleteUpload(uploadId);
     this._logMessage("Deleted upload record from IndexedDB for Upload ID: " + uploadId);
-    this._onComplete(uploadId, objectKey, password);
+    this._onComplete(uploadId, objectKey, password, integrityHash);
   }
 };
 
@@ -666,7 +696,7 @@ var fileTransferUpload = new FileTransferUpload(
   fileTransferDb,
   logMessage,
   (uploadId, objectKey, partNumber, totalParts) => sendProgressEvent("PROGRESSUPLOAD" /* PROGRESSUPLOAD */, uploadId, objectKey, partNumber, totalParts),
-  (uploadId, objectKey, password) => sendCompleteEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey, password),
+  (uploadId, objectKey, password, integrityHash) => sendCompleteEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey, password, integrityHash),
   (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
 var serviceWorkerClient = null;
@@ -683,7 +713,7 @@ function sendProgressEvent(type, uploadId, objectKey, partNumber, totalParts) {
     totalParts
   });
 }
-function sendCompleteEvent(type, uploadId, objectKey, password) {
+function sendCompleteEvent(type, uploadId, objectKey, password, integrityHash) {
   if (serviceWorkerClient == null) {
     return;
   }
@@ -691,7 +721,8 @@ function sendCompleteEvent(type, uploadId, objectKey, password) {
     type,
     uploadId,
     objectKey,
-    password
+    password,
+    integrityHash
   });
 }
 function sendCancelEvent(type, uploadId, objectKey) {
