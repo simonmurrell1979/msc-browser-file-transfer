@@ -38,10 +38,10 @@ export class DownloadComponent {
 
     }
 
-    protected async onSendFile(): Promise<void> {
+    protected async onDownloadFile(): Promise<void> {
 
         // Get selected file
-        const file = this.selectedFile();
+        const file = this.transferInfo();
         // Check Value
         if (file == null) {
 
@@ -52,34 +52,13 @@ export class DownloadComponent {
 
         try {
 
-            // Load Value
-            const pendingUpload = this.pendingUpload();
-            // Check Value
-            if (pendingUpload) {
-
-                // Resume Upload
-                await this._serviceWorkerCommsService.sendCommand({ 
-                    type: MessageType.RESUMEUPLOAD, 
-                    file: file,
-                    uploadId: pendingUpload.uploadId
-                });
-
-            }
-            else {
-
-                // Resume Upload
-                await this._serviceWorkerCommsService.sendCommand({ 
-                    type: MessageType.NEWUPLOAD, 
-                    file: file
-                });
-
-            }
+            
 
         }
         catch (error) {
 
             // Log Error
-            console.error("Error sending file:", error);
+            console.error("Error downloading file:", error);
 
         }
 
