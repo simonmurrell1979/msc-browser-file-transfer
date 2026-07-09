@@ -73,6 +73,8 @@ export class DownloadComponent {
             const encryptedPartSize = this._uploadService.partSize + 28;
             // Reset File Position
             let filePosition = 0;
+            // Set up part hashes array
+            const partHashes: string[] = [];
 
             // Decrypt File
             while (filePosition < transferInformation.Size) {
@@ -89,12 +91,35 @@ export class DownloadComponent {
                 const encryptedPart = new Uint8Array(await encryptedPartResponse.arrayBuffer());
                 // Decrypt Part
                 const decryptedPart = await this._encryptionService.decryptFilePart(decryptionKey, encryptedPart);
+                // Calculate Hash of Decrypted Part
+                const filePartHash = await crypto.subtle.digest("SHA-256", decryptedPart);
+                // Add Hash to Array
+                partHashes.push(this._encryptionService.encodeBase64(filePartHash));
                 // Write Decrypted Part
                 await writableStream.write(decryptedPart);
                 // Update File Position
                 filePosition += encryptedPartSize;
 
             }           
+            // Calculate Integrity Hash
+            const integrityHash = await this._encryptionService.buildIntegrityHash(partHashes);
+            // Check Integrity Hash
+            if (integrityHash !== this.integrityHash) {
+
+                // Abort Stream
+                await writableStream.abort();
+                // Set Status Message
+                this.statusMessage.set("Integrity hash mismatch. The downloaded file may be corrupted.");
+                // Exit
+                return;
+
+            }
+            else {
+
+                // Set Status Message
+                this.statusMessage.set("File downloaded and verified successfully.");
+
+            }
             // Close Stream
             await writableStream.close();
 
