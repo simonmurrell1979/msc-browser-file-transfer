@@ -41,9 +41,9 @@ export class DownloadComponent {
     protected async onDownloadFile(): Promise<void> {
 
         // Get selected file
-        const file = this.transferInfo();
+        const transferInformation = this.transferInfo();
         // Check Value
-        if (file == null) {
+        if (transferInformation == null) {
 
             // Exit
             return;
@@ -52,7 +52,16 @@ export class DownloadComponent {
 
         try {
 
-            
+            // https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker
+
+            // Get File Handle
+            var fileHandle = await (window as any).showSaveFilePicker({
+                suggestedName: transferInformation.Filename
+            });
+            // Create Writable Stream
+            const writableStream = await fileHandle.createWritable();
+            // Close Stream
+            await writableStream.close();
 
         }
         catch (error) {
