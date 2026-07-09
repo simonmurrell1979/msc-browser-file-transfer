@@ -96,4 +96,10 @@ export class FileTransferEncryption {
 
     }
 
+    public buildIntegrityHash(filePart: string[]): Promise<string> {
+
+        
+
+    }
+
 }

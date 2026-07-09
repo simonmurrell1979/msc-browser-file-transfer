@@ -358,6 +358,7 @@ export class FileTransferUpload {
 
         }
         // Build out hashes
+        const integrityHash = await this._encryption.buildIntegrityHash(existingRecord.originalPartsHashes);
     
         // Complete Multipart Upload
         await this._api.completeMultipartUpload(objectKey, uploadId, uploadedParts);
