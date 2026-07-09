@@ -21,7 +21,8 @@ export class DownloadComponent {
     private readonly _uploadService = inject(UploadService);
     // Protected Variables
     protected readonly guid = this._route.snapshot.paramMap.get("guid") ?? "";
-    protected readonly password = window.location.hash.substring(1) ?? "";
+    protected readonly password = window.location.hash.substring(1).split(".")[0] ?? "";
+    protected readonly integrityHash = window.location.hash.substring(1).split(".")[1] ?? "";
     protected readonly transferInfo = signal<TransferInfo | null>(null);
     protected readonly statusMessage = signal<string>("");
 
