@@ -2,6 +2,8 @@ import { Component, inject, signal } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { StorageService } from "../../services/storage.service";
 import { TransferInfo } from "../../models/transferinfo";
+import { EncryptionService } from "../../services/encryption.service";
+import { UploadService } from "../../services/upload.service";
 
 @Component({
     selector: "app-download",
@@ -14,6 +16,8 @@ export class DownloadComponent {
     // Private Variables
     private readonly _route = inject(ActivatedRoute);
     private readonly _storageService = inject(StorageService);
+    private readonly _encryptionService = inject(EncryptionService);
+    private readonly _uploadService = inject(UploadService);
     // Protected Variables
     protected readonly guid = this._route.snapshot.paramMap.get("guid") ?? "";
     protected readonly password = window.location.hash.substring(1) ?? "";
@@ -62,28 +66,33 @@ export class DownloadComponent {
             const writableStream = await fileHandle.createWritable();
             
             // Get Decryption Key
-            const decryptionKey = await getDecryptionKey();
-            // Initialize Decryption File Parts
-            const decryptedFileParts = [];
+            const decryptionKey = await this._encryptionService.getDecryptionKey(this.password);
+            // Set Encrypted Part Size
+            const encryptedPartSize = this._uploadService.partSize + 28;
             // Reset File Position
             let filePosition = 0;
 
             // Decrypt File
-            while (filePosition < downloadedBytes.byteLength) {
+            while (filePosition < transferInformation.Size) {
 
-                // Extract Encrypted Part
-                const encryptedPart = downloadedBytes.slice(filePosition, filePosition + encryptedPartSize);
+                // Build Range
+                const range = Math.min(filePosition + encryptedPartSize, transferInformation.Size) - 1;
+                // Fetch Encrypted Part
+                const encryptedPartResponse = await fetch(transferInformation.DownloadUrl, {
+                    headers: {
+                        "Range": `bytes=${filePosition}-${range}`
+                    }
+                });
+                // Read Encrypted Part
+                const encryptedPart = new Uint8Array(await encryptedPartResponse.arrayBuffer());
                 // Decrypt Part
-                const decryptedPart = await decryptFilePart(decryptionKey, encryptedPart);
-                // Log Message
-                logMessage("Decrypted part of size: " + decryptedPart.byteLength + " bytes.");
-                // Append Decrypted Part
-                decryptedFileParts.push(decryptedPart);
+                const decryptedPart = await this._encryptionService.decryptFilePart(decryptionKey, encryptedPart);
+                // Write Decrypted Part
+                await writableStream.write(decryptedPart);
                 // Update File Position
                 filePosition += encryptedPartSize;
 
             }           
-
             // Close Stream
             await writableStream.close();
 
