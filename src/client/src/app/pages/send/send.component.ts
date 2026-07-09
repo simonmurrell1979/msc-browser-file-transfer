@@ -141,69 +141,6 @@ export class SendComponent {
 
     }
 
-    protected async onDownloadFile(): Promise<void> {
-
-        // Assign Value
-        const objectKey = this.completedObjectKey();
-        // Check Value
-        if (objectKey == null) {
-
-            // Exit
-            return;
-
-        }
-
-        try {
-
-            // Get Download URL
-            const downloadUrl = await this._storageService.getDownloadUrl(objectKey);
-            // Download File from R2
-            const downloadedFile = await fetch(downloadUrl);
-            // Extract bytes
-            const downloadedBytes = await downloadedFile.arrayBuffer();
-            
-            // Get Decryption Key
-            const decryptionKey = await this._encryptionService.getDecryptionKey();
-            // Initialize Decryption File Parts
-            const decryptedFileParts = [];
-            // Reset File Position
-            let filePosition = 0;
-            // Set Encrypted Part Size
-            const encryptedPartSize = this._uploadService.partSize + 28;
-
-            // Decrypt File
-            while (filePosition < downloadedBytes.byteLength) {
-
-                // Extract Encrypted Part
-                const encryptedPart = new Uint8Array(downloadedBytes.slice(filePosition, filePosition + encryptedPartSize));
-                // Decrypt Part
-                const decryptedPart = await this._encryptionService.decryptFilePart(decryptionKey, encryptedPart);
-                // Append Decrypted Part
-                decryptedFileParts.push(decryptedPart);
-                // Update File Position
-                filePosition += encryptedPartSize;
-
-            }
-
-            // Combine Decrypted Parts
-            const decryptedFile = new Blob(decryptedFileParts);
-            // Create Download Link
-            const downloadLink = document.createElement("a");
-            downloadLink.href = URL.createObjectURL(decryptedFile);
-            downloadLink.download = objectKey.split("/")[1];
-            // Click Download Link
-            downloadLink.click();
-
-        }
-        catch (error: any) {
-
-            // Log Error
-            console.error("Error sending file:", error);
-
-        }
-
-    }
-
     private clearUploadState(): void {
 
         // Clear Active Upload ID
