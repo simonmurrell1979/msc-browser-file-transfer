@@ -50,8 +50,6 @@ export class SendComponent {
         }
         // Set Pending Upload
         this.pendingUpload.set(latestUpload);
-        // Log Message
-        console.log("Latest pending upload found:", latestUpload);
 
     }
 
