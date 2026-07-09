@@ -98,8 +98,15 @@ export class DownloadComponent {
             await writableStream.close();
 
         }
-        catch (error) {
+        catch (error: any) {
 
+            // Check if Abort Error
+            if (error.name === "AbortError") {
+
+                // Exit
+                return;
+
+            }
             // Log Error
             console.error("Error downloading file:", error);
 
