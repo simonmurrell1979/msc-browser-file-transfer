@@ -68,6 +68,9 @@ export class SendComponent {
         }
         // Set selected file
         this.selectedFile.set(input.files[0]);
+        // Set shareable link to null
+        this.completedObjectKey.set(null);
+        this.password.set(null);
 
     }
 
