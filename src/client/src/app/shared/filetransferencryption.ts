@@ -85,7 +85,14 @@ export class FileTransferEncryption {
         // Generate random password
         const password = crypto.getRandomValues(new Uint8Array(32));
         // Replace +, / and = with - for URL issues
-        return btoa(String.fromCharCode(...password)).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+        return this.encodeBase64(password.buffer);
+
+    }
+
+    public encodeBase64(hash: ArrayBuffer): string {
+
+        // Replace +, / and = with - for URL issues
+        return btoa(String.fromCharCode(...new Uint8Array(hash))).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 
     }
 

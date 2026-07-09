@@ -11,4 +11,5 @@ export interface UploadRecord {
     totalParts: number;
     createDate: number;
     uploadedParts: UploadPart[];
+    originalPartsHashes: string[];
 }

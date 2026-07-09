@@ -89,6 +89,8 @@ export class FileTransferUpload {
 
             // Encrypt File Chunk
             const chunkBytes = await fileChunk.arrayBuffer();
+            // Generate Hash for Original Part
+            const filePartHash = await crypto.subtle.digest("SHA-256", chunkBytes);
             // Encrypt File Part
             const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
     
@@ -121,7 +123,8 @@ export class FileTransferUpload {
             // Update Record
             await this._db.addUploadedPart(uploadId,
                 partIndex,
-                eTag);
+                eTag,
+                this._encryption.encodeBase64(filePartHash));
             // Report Progress
             this._onProgress(uploadId, 
                 objectKey,

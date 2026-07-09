@@ -111,7 +111,8 @@ export class FileTransferDb {
             partSize: partSize,
             totalParts: totalParts,
             createDate: Date.now(),
-            uploadedParts: []
+            uploadedParts: [],
+            originalPartsHashes: []
         }
         // Save Record
         await this.saveUpload(newRecord);
@@ -122,7 +123,8 @@ export class FileTransferDb {
 
     public async addUploadedPart(uploadId: string, 
         partNumber: number, 
-        eTag: string): Promise<UploadRecord> {
+        eTag: string,
+        filePartHash: string): Promise<UploadRecord> {
 
         // Get Record
         const record = await this.getUpload(uploadId);
@@ -140,6 +142,8 @@ export class FileTransferDb {
             ETag: eTag,
             UploadedAt: Date.now()
         });
+        // Assign Value
+        record.originalPartsHashes[partNumber - 1] = filePartHash;
         // Save Record
         await this.saveUpload(record);
         // Return
