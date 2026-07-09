@@ -77,6 +77,14 @@ var FileTransferApi = class {
     const response = await this.postJson(requestUrl, requestBody);
     return this.checkResponseWithData(response);
   }
+  async getTransferInformation(objectKeyGuid) {
+    const requestUrl = "GetTransferInformation";
+    const requestBody = {
+      objectKeyGuid
+    };
+    const response = await this.postJson(requestUrl, requestBody);
+    return this.checkResponseWithData(response);
+  }
   checkResponse(response) {
     if (!response || !response.Success) {
       throw new Error(response.ErrorMessage || "An error occurred while processing the request.");

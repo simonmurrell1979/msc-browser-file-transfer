@@ -38,4 +38,51 @@ export class DownloadComponent {
 
     }
 
+    protected async onSendFile(): Promise<void> {
+
+        // Get selected file
+        const file = this.selectedFile();
+        // Check Value
+        if (file == null) {
+
+            // Exit
+            return;
+
+        }
+
+        try {
+
+            // Load Value
+            const pendingUpload = this.pendingUpload();
+            // Check Value
+            if (pendingUpload) {
+
+                // Resume Upload
+                await this._serviceWorkerCommsService.sendCommand({ 
+                    type: MessageType.RESUMEUPLOAD, 
+                    file: file,
+                    uploadId: pendingUpload.uploadId
+                });
+
+            }
+            else {
+
+                // Resume Upload
+                await this._serviceWorkerCommsService.sendCommand({ 
+                    type: MessageType.NEWUPLOAD, 
+                    file: file
+                });
+
+            }
+
+        }
+        catch (error) {
+
+            // Log Error
+            console.error("Error sending file:", error);
+
+        }
+
+    }
+
 }
