@@ -12,11 +12,9 @@
 
                     <div class="upload-zone border rounded text-center p-5 mb-3">
 
-                        @if (transferInfo()) {
+                        @if (transferInfo(); as info) {
 
-                            <p>{{transferInfo()?.Filename}}</p>
-                            <p>{{transferInfo()?.Size}}</p>
-                            <p>{{transferInfo()?.DownloadUrl}}</p>
+                            <p>{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
 
                             <button type="button" class="btn btn-primary w-100" (click)="onDownloadFile()">Download</button>
                             

@@ -4,6 +4,7 @@ import { StorageService } from "../../services/storage.service";
 import { TransferInfo } from "../../models/transferinfo";
 import { EncryptionService } from "../../services/encryption.service";
 import { UploadService } from "../../services/upload.service";
+import { Bytes, fromKibiBytes, fromMegaBytes } from '@shie1/bytes';
 
 @Component({
     selector: "app-download",
@@ -103,6 +104,15 @@ export class DownloadComponent {
             console.error("Error downloading file:", error);
 
         }
+
+    }
+
+    // https://github.com/shie1/bytes
+    protected formatBytes(fileSize: number): string {
+
+        // Return
+        return new Bytes(fileSize,
+            'decimal').toString();
 
     }
 
