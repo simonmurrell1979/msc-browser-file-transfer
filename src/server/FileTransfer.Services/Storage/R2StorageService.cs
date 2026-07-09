@@ -105,7 +105,7 @@ namespace FileTransfer.Services.Storage
                 BucketName = _options.BucketName,
                 Key = ObjectKey,
                 Verb = HttpVerb.PUT,
-                Expires = DateTime.UtcNow.AddMinutes(15)
+                Expires = DateTime.UtcNow.AddHours(2)
             };
             // Generate URL
             var url = _client.GetPreSignedURL(request);
@@ -136,7 +136,7 @@ namespace FileTransfer.Services.Storage
                 BucketName = _options.BucketName,
                 Key = ObjectKey,
                 Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddMinutes(15)
+                Expires = DateTime.UtcNow.AddHours(2)
             };
             // Generate URL
             var url = _client.GetPreSignedURL(request);
