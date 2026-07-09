@@ -60,6 +60,30 @@ export class DownloadComponent {
             });
             // Create Writable Stream
             const writableStream = await fileHandle.createWritable();
+            
+            // Get Decryption Key
+            const decryptionKey = await getDecryptionKey();
+            // Initialize Decryption File Parts
+            const decryptedFileParts = [];
+            // Reset File Position
+            let filePosition = 0;
+
+            // Decrypt File
+            while (filePosition < downloadedBytes.byteLength) {
+
+                // Extract Encrypted Part
+                const encryptedPart = downloadedBytes.slice(filePosition, filePosition + encryptedPartSize);
+                // Decrypt Part
+                const decryptedPart = await decryptFilePart(decryptionKey, encryptedPart);
+                // Log Message
+                logMessage("Decrypted part of size: " + decryptedPart.byteLength + " bytes.");
+                // Append Decrypted Part
+                decryptedFileParts.push(decryptedPart);
+                // Update File Position
+                filePosition += encryptedPartSize;
+
+            }           
+
             // Close Stream
             await writableStream.close();
 
