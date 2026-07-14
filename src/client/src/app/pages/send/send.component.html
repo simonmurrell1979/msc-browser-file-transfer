@@ -63,13 +63,18 @@
 
                     <input type="text" class="form-control" [value]="shareableLink()" readonly />
 
-                    <button class="btn btn-cancel" type="button" (click)="onCopyLink()">
+                    <button class="btn btn-cancel" type="button" (click)="onCopyLink()" title="Copy link to the clipboard">
                         Copy Link
                     </button>
-                    <a class="btn btn-cancel" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}">
+
+                </div>
+
+                <div class="d-flex gap-2 mb-3">
+
+                    <a class="btn btn-cancel" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}" title="Send link via email">
                         Email
                     </a>
-                    <a class="btn btn-cancel" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank">
+                    <a class="btn btn-cancel" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank" title="Send link via WhatsApp">
                         Whatsapp
                     </a>
 
