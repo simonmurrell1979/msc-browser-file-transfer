@@ -1,38 +1,26 @@
-<div class="container py-5">
+<div class="download-card">
 
-    <div class="row justify-content-center">
+    <div class="card shadow-lg">
 
-        <div class="col-md-8 col-lg-6">
+        <div class="card-body p-4">
 
-            <div class="card shadow-lg">
+            <h5 class="card-title mb-4">Download File</h5>
 
-                <div class="card-body p-4">
+            @if (transferInfo(); as info) {
 
-                    <h5 class="card-title mb-4">Download File</h5>
+                <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
 
-                    <div class="upload-zone border rounded text-center p-5 mb-3">
+                <button type="button" class="btn btn-download w-100" (click)="onDownloadFile()">
+                    <i class="bi bi-download me-2"></i>Download
+                </button>
+                
+            }
 
-                        @if (transferInfo(); as info) {
+            @if (statusMessage()) {
 
-                            <p>{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
+                <p class="small text-muted mt-3 mb-0">{{statusMessage()}}</p>
 
-                            <button type="button" class="btn btn-primary w-100" (click)="onDownloadFile()">Download</button>
-
-                            <p></p>
-                            
-                        }
-
-                        @if (statusMessage()) {
-
-                            <p>{{statusMessage()}}</p>
-
-                        }
-
-                    </div>
-
-                </div>
-
-            </div>
+            }
 
         </div>
 

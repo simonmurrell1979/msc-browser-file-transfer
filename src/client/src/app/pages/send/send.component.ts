@@ -6,6 +6,7 @@ import { MessageType } from "../../models/messagetype";
 import { StorageService } from "../../services/storage.service";
 import { EncryptionService } from "../../services/encryption.service";
 import { UploadService } from "../../services/upload.service";
+import { Bytes } from "@shie1/bytes";
 
 @Component({
     selector: "app-send",
@@ -303,5 +304,14 @@ export class SendComponent {
         return encodeURIComponent(body);
 
     });
+
+    // https://github.com/shie1/bytes
+    protected formatBytes(fileSize: number): string {
+
+        // Return
+        return new Bytes(fileSize,
+            'decimal').toString();
+
+    }
 
 }

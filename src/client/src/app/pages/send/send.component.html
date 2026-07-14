@@ -23,7 +23,7 @@
                     @if (selectedFile()) {
 
                         <p class="mt-2 mb-0 text-muted">
-                            Selected File: {{ selectedFile()?.name }}
+                            Selected File: {{ selectedFile()?.name }} ({{formatBytes(selectedFile()?.size ?? 0)}})
                         </p>
 
                     }

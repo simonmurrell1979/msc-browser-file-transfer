@@ -1,0 +1,13 @@
+.download-card {
+    width: 800px;
+}
+
+.btn-download {
+    background-color: var(--brand-primary);
+    color: var(--brand-surface);
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.20rem;
+    letter-spacing: 0.05rem;
+}
