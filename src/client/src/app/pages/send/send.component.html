@@ -4,7 +4,25 @@
 
         <div class="card-body p-4">
 
-            <h5 class="card-title mb-4">Send Files</h5>
+            @if (!shareableLink() && 
+                 !pendingUpload() && 
+                 !activeUploadId()) {
+
+                <!-- Landing Screen -->
+
+            }
+            @else if (!shareableLink()) {
+
+                <!-- Uploading File -->
+
+            }
+            @if (shareableLink()) {
+
+                <!-- Transfer Completed -->
+
+            }
+
+            <!-- <h5 class="card-title mb-4">Send Files</h5>
 
             <div class="upload-zone border rounded text-center p-5 mb-3">
 
@@ -45,7 +63,7 @@
                     <p class="mb-1 small text-muted">{{ shareableLink() }}</p>
                 </div>
 
-            }
+            } -->
 
         </div>
 
