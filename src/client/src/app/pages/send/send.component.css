@@ -4,11 +4,34 @@
 
 .btn-send {
     background-color: var(--brand-primary);
-    border-color: var(--brand-primary);
     color: var(--brand-surface);
     border: none;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     border-radius: 0.20rem;
     letter-spacing: 0.05rem;
+}
+
+.btn-send:hover {
+    background-color: var(--brand-primary-dark);
+    color: var(--brand-surface);
+}
+
+.btn-cancel {
+    background-color: transparent;
+    color: var(--brand-text-mid);
+    border: 1px solid var(--brand-border);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.20rem;
+    letter-spacing: 0.05rem;
+}
+
+.btn-cancel:hover {
+    background-color: var(--brand-surface-alt);
+    color: var(--brand-text-dark);
+}
+
+progress {
+    accent-color: var(--brand-primary);
 }
