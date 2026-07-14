@@ -63,15 +63,15 @@
 
                     <input type="text" class="form-control" [value]="shareableLink()" readonly />
 
-                    <button class="btn btn-outline-secondary" type="button" (click)="onCopyLink()">
+                    <button class="btn btn-cancel" type="button" (click)="onCopyLink()">
                         Copy Link
                     </button>
-                    <button class="btn btn-outline-secondary" type="button" (click)="onCopyLink()">
-                        Copy Link
-                    </button>
-                    <button class="btn btn-outline-secondary" type="button" (click)="onCopyLink()">
-                        Copy Link
-                    </button>
+                    <a class="btn btn-cancel" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}">
+                        Email
+                    </a>
+                    <a class="btn btn-cancel" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank">
+                        Whatsapp
+                    </a>
 
                 </div>
 

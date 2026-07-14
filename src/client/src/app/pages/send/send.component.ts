@@ -32,6 +32,7 @@ export class SendComponent {
     protected readonly password = signal<string | null>(null);
     protected readonly integrityHash = signal<string | null>(null);
     protected readonly shareableLink = computed(() => { return this.buildShareableLink(); });
+    protected readonly encodedShareableLink = computed(() => { return encodeURIComponent(this.buildShareableLink() ?? ""); });
 
     public async ngOnInit(): Promise<void> {
 
@@ -289,6 +290,15 @@ export class SendComponent {
         }
         // Return
         return window.location.origin + "/download/" + transferGuid + "#" + password + "." + integrityHash;
+
+    }
+
+    protected readonly buildEmailBody = computed(() => {
+
+        // Assign Value
+        const body = "Hello,\n\nI have sent you a file using the File Transfer App. You can download it using the following link:\n\n" + this.shareableLink() + "\n\nPlease make sure to keep the password and integrity hash safe, as they are required to access the file.\n\nBest regards,\n[Your Name]";
+        // Return
+        return encodeURIComponent(body);
 
     }
 
