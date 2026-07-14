@@ -59,7 +59,7 @@
                     {{ selectedFile()?.name }}
                 </p>
 
-                <div class="input-group mb-3">
+                <div class="input-group gap-2 mb-3">
 
                     <input type="text" class="form-control" [value]="shareableLink()" readonly />
 
@@ -71,10 +71,10 @@
 
                 <div class="d-flex gap-2 mb-3">
 
-                    <a class="btn btn-cancel" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}" title="Send link via email">
+                    <a class="btn btn-cancel flex-fill" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}" title="Send link via email">
                         Email
                     </a>
-                    <a class="btn btn-cancel" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank" title="Send link via WhatsApp">
+                    <a class="btn btn-cancel flex-fill" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank" title="Send link via WhatsApp">
                         Whatsapp
                     </a>
 
