@@ -19,9 +19,6 @@ export class SendComponent {
     private readonly _dbService = inject(DbService);
     private readonly _serviceWorkerCommsService = inject(ServiceWorkerCommsService);
     private readonly _fileInput = viewChild<ElementRef<HTMLInputElement>>("fileInput");
-    private readonly _storageService = inject(StorageService);
-    private readonly _encryptionService = inject(EncryptionService);
-    private readonly _uploadService = inject(UploadService);
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
@@ -161,8 +158,27 @@ export class SendComponent {
 
     public async onSendAnotherFile(): Promise<void> {
 
-        // Clear Upload State
-        this.clearUploadState();
+        // Reset All States
+        this.selectedFile.set(null);
+        this.pendingUpload.set(null);
+        this.statusMessage.set(null);
+        this.completedObjectKey.set(null);
+        this.activeUploadId.set(null);
+        this.activeObjectKey.set(null);
+        this.progressPartNumber.set(0);
+        this.progressTotalParts.set(0);
+        this.password.set(null);
+        this.integrityHash.set(null);
+        // Initialize Class
+        const fileInputElement = this._fileInput();
+        // Clear File Input
+        if (fileInputElement) {
+
+            // Clear File Input Value
+            fileInputElement.nativeElement.value = "";
+
+        }       
+        
 
     }
 
@@ -188,7 +204,7 @@ export class SendComponent {
             // Clear File Input Value
             fileInputElement.nativeElement.value = "";
 
-        }       
+        }
 
     }
 
