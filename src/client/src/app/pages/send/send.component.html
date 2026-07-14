@@ -1,4 +1,4 @@
-<div class="send-card">
+<div class="container-card">
 
     <div class="card shadow-lg">
 
@@ -30,7 +30,7 @@
 
                 </div>
 
-                <button type="button" class="btn btn-send w-100" (click)="onSendFile()">
+                <button type="button" class="btn btn-core w-100" (click)="onSendFile()">
                     <i class="bi bi-send me-2"></i>Send
                 </button>
 
@@ -49,7 +49,7 @@
 
                 <p class="small text-muted mt-2">{{ statusMessage() }}</p>
 
-                <button type="button" class="btn btn-cancel w-100 mt-3" (click)="onCancelUpload()">
+                <button type="button" class="btn btn-alternate w-100 mt-3" (click)="onCancelUpload()">
                     <i class="bi bi-x-circle me-2"></i>Cancel
                 </button>
 
@@ -67,7 +67,7 @@
 
                     <input type="text" class="form-control" [value]="shareableLink()" readonly />
 
-                    <button class="btn btn-cancel" type="button" (click)="onCopyLink()" title="Copy link to the clipboard">
+                    <button class="btn btn-alternate" type="button" (click)="onCopyLink()" title="Copy link to the clipboard">
                         <i class="bi bi-clipboard"></i>
                     </button>
 
@@ -75,16 +75,16 @@
 
                 <div class="d-flex gap-2 mb-3">
 
-                    <a class="btn btn-cancel flex-fill" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}" title="Send link via email">
+                    <a class="btn btn-alternate flex-fill" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}" title="Send link via email">
                         <i class="bi bi-envelope me-2"></i>Email
                     </a>
-                    <a class="btn btn-cancel flex-fill" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank" title="Send link via WhatsApp">
+                    <a class="btn btn-alternate flex-fill" href="https://wa.me/?text={{ encodedShareableLink() }}" target="_blank" title="Send link via WhatsApp">
                         <i class="bi bi-whatsapp me-2"></i>WhatsApp
                     </a>
 
                 </div>
 
-                <button type="button" class="btn btn-send w-100" (click)="onSendAnotherFile()">
+                <button type="button" class="btn btn-core w-100" (click)="onSendAnotherFile()">
                     <i class="bi bi-send me-2"></i>Send Another File
                 </button>
 
