@@ -143,6 +143,29 @@ export class SendComponent {
 
     }
 
+    public async onCopyLink(): Promise<void> {
+
+        // Get Shareable Link
+        const shareableLink = this.shareableLink();
+        // Check Value
+        if (shareableLink == null) {
+
+            // Exit
+            return;
+
+        }
+        // Copy to Clipboard
+        await navigator.clipboard.writeText(shareableLink);
+
+    }
+
+    public async onSendAnotherFile(): Promise<void> {
+
+        // Clear Upload State
+        this.clearUploadState();
+
+    }
+
     private clearUploadState(): void {
 
         // Clear Active Upload ID

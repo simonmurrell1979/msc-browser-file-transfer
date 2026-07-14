@@ -53,51 +53,25 @@
             @if (shareableLink()) {
 
                 <!-- Transfer Completed -->
+                <h5 class="card-title mb-4">Transfer Complete</h5>
 
-            }
-
-            <!-- <h5 class="card-title mb-4">Send Files</h5>
-
-            <div class="upload-zone border rounded text-center p-5 mb-3">
-
-                <p class="text-muted mb-3">
-                    Drag and drop files here or click to select files
+                <p class="mb-3">
+                    {{ selectedFile()?.name }}
                 </p>
 
-                <input type="file" #fileInput class="form-control" (change)="onFileSelected($event)" />
+                <div class="input-group mb-3">
 
-                @if (selectedFile()) {
+                    <input type="text" class="form-control" [value]="shareableLink()" readonly />
 
-                    <p class="mt-2 mb-0 text-muted">
-                        Selected File: {{ selectedFile()?.name }}
-                    </p>
+                    <button class="btn btn-outline-secondary" type="button" (click)="onCopyLink()">
+                        Copy Link
+                    </button>
 
-                }
-
-            </div>
-
-            <button type="button" class="btn btn-send w-100" (click)="onSendFile()">Send</button>
-
-            @if (pendingUpload() || (activeUploadId() && activeObjectKey())) {
-
-                <button type="button" class="btn btn-secondary w-100 mt-2" (click)="onCancelUpload()">Cancel</button>
-
-            }
-
-            <div class="border rounded p-3 mt-3">
-                <p class="mb-1 small text-muted">{{ statusMessage() }}</p>
-            </div>
-            <div class="border rounded p-3 mt-3">
-                <progress [value]="progressPartNumber() || 0" [max]="progressTotalParts() || 0" class="w-100"></progress>
-            </div>
-
-            @if (shareableLink()) {
-
-                <div class="border rounded p-3 mt-3">
-                    <p class="mb-1 small text-muted">{{ shareableLink() }}</p>
                 </div>
 
-            } -->
+                <button type="button" class="btn btn-send w-100" (click)="onSendAnotherFile()">Send Another File</button>
+
+            }
 
         </div>
 
