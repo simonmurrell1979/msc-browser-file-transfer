@@ -23,27 +23,17 @@
 
                         <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
 
-                        <button type="button" class="btn btn-core w-100" (click)="onDownloadFile()">
-                            <i class="bi bi-download me-2"></i>Download
-                        </button>
+                        
 
                     }
                     @case ("failed") {
 
-                        <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
-
-                        <button type="button" class="btn btn-core w-100" (click)="onDownloadFile()">
-                            <i class="bi bi-download me-2"></i>Download
-                        </button>
+                        <p class="small text-muted mt-3 mb-0">{{statusMessage()}}</p>
 
                     }
                     @case ("completed") {
 
-                        <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
-
-                        <button type="button" class="btn btn-core w-100" (click)="onDownloadFile()">
-                            <i class="bi bi-download me-2"></i>Download
-                        </button>
+                        <p class="small text-muted mt-3 mb-0">{{statusMessage()}}</p>
 
                     }
 
@@ -53,7 +43,7 @@
 
             @if (statusMessage()) {
 
-                <p class="small text-muted mt-3 mb-0">{{statusMessage()}}</p>
+                
 
             }
 
