@@ -1,0 +1,1 @@
+export type DownloadState = "ready" | "downloading" | "completed" | "failed";

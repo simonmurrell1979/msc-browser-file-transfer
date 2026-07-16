@@ -5,6 +5,7 @@ import { TransferInfo } from "../../models/transferinfo";
 import { EncryptionService } from "../../services/encryption.service";
 import { UploadService } from "../../services/upload.service";
 import { Bytes, fromKibiBytes, fromMegaBytes } from '@shie1/bytes';
+import { DownloadState } from "../../models/downloadstate";
 
 @Component({
     selector: "app-download",
@@ -25,6 +26,7 @@ export class DownloadComponent {
     protected readonly integrityHash = window.location.hash.substring(1).split(".")[1] ?? "";
     protected readonly transferInfo = signal<TransferInfo | null>(null);
     protected readonly statusMessage = signal<string>("");
+    protected readonly downloadState = signal<DownloadState>("ready");
 
     async ngOnInit(): Promise<void> {
 
