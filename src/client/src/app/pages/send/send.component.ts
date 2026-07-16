@@ -196,8 +196,6 @@ export class SendComponent {
         this.progressTotalParts.set(null);
         // Clear Pending Upload
         this.pendingUpload.set(null);
-        // Clear Selected File
-        this.selectedFile.set(null);
         // Initialize Class
         const fileInputElement = this._fileInput();
         // Clear File Input
@@ -259,6 +257,8 @@ export class SendComponent {
                 this.statusMessage.set("Upload cancelled");
                 // Clear Upload State
                 this.clearUploadState();
+                // Clear Selected File
+                this.selectedFile.set(null);
                 // Exit
                 break;
 
@@ -299,18 +299,21 @@ export class SendComponent {
         // Assign Value
         const body = "Hello,\n\nI have sent you a file using the File Transfer App. You can download it using the following link:\n\n" + 
             this.shareableLink() + 
-            "\n\nPlease make sure to keep the password and integrity hash safe, as they are required to access the file.\n\nBest regards,\n";
+            "\n\nAnyone with this link can download the file, so please share it carefully!!\n\nBest regards,\n";
         // Return
         return encodeURIComponent(body);
 
     });
 
-    protected readonly buildEmailBody = computed(() => {
+    protected readonly buildWhatsAppBody = computed(() => {
 
         // Assign Value
-        const body = "Hello,\n\nI have sent you a file using the File Transfer App. You can download it using the following link:\n\n" + 
+        const body = "*File Transfer*\n\n" + 
+            "Hello! I have sent you a file:\n" + 
+            "*" + (this.selectedFile()?.name ?? "") + "*\n\n" + 
+            "Download it here:\n" +
             this.shareableLink() + 
-            "\n\nPlease make sure to keep the password and integrity hash safe, as they are required to access the file.\n\nBest regards,\n";
+            "\n\nAnyone with this link can download the file, so please share it carefully!!";
         // Return
         return encodeURIComponent(body);
 
