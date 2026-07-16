@@ -26,6 +26,7 @@ export class DownloadComponent {
     protected readonly integrityHash = window.location.hash.substring(1).split(".")[1] ?? "";
     protected readonly transferInfo = signal<TransferInfo | null>(null);
     protected readonly statusMessage = signal<string>("");
+    protected readonly downloadProgress = signal<number>(0);
     protected readonly downloadState = signal<DownloadState>("ready");
 
     async ngOnInit(): Promise<void> {
@@ -105,6 +106,9 @@ export class DownloadComponent {
                 await writableStream.write(decryptedPart);
                 // Update File Position
                 filePosition += encryptedPartSize;
+
+                // Increment Download Progress
+                this.downloadProgress.set(Math.min(Math.round((filePosition / transferInformation.Size) * 100), 100));
 
             }           
             // Calculate Integrity Hash
