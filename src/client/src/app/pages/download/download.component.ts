@@ -53,6 +53,8 @@ export class DownloadComponent {
         // Check Value
         if (transferInformation == null) {
 
+            // Set Download State
+            this.downloadState.set("failed");
             // Exit
             return;
 
@@ -66,6 +68,8 @@ export class DownloadComponent {
             var fileHandle = await (window as any).showSaveFilePicker({
                 suggestedName: transferInformation.Filename
             });
+            // Set Download State
+            this.downloadState.set("downloading");
             // Create Writable Stream
             const writableStream = await fileHandle.createWritable();
             
@@ -112,6 +116,8 @@ export class DownloadComponent {
                 await writableStream.abort();
                 // Set Status Message
                 this.statusMessage.set("Integrity hash mismatch. The downloaded file may be corrupted.");
+                // Set Download State
+                this.downloadState.set("failed");
                 // Exit
                 return;
 
@@ -120,6 +126,8 @@ export class DownloadComponent {
 
                 // Set Status Message
                 this.statusMessage.set("File downloaded and verified successfully.");
+                // Set Download State
+                this.downloadState.set("completed");
 
             }
             // Close Stream
@@ -130,13 +138,15 @@ export class DownloadComponent {
 
             // Check if Abort Error
             if (error.name === "AbortError") {
-
+                
                 // Exit
                 return;
 
             }
             // Log Error
             console.error("Error downloading file:", error);
+            // Set Download State
+            this.downloadState.set("ready");
 
         }
 
