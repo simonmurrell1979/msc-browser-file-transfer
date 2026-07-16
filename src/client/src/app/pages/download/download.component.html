@@ -23,7 +23,7 @@
 
                         <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
 
-                        
+                        <progress [value]="downloadProgress()" [max]="100" class="w-100"></progress>
 
                     }
                     @case ("failed") {
