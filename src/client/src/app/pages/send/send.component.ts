@@ -305,6 +305,17 @@ export class SendComponent {
 
     });
 
+    protected readonly buildEmailBody = computed(() => {
+
+        // Assign Value
+        const body = "Hello,\n\nI have sent you a file using the File Transfer App. You can download it using the following link:\n\n" + 
+            this.shareableLink() + 
+            "\n\nPlease make sure to keep the password and integrity hash safe, as they are required to access the file.\n\nBest regards,\n";
+        // Return
+        return encodeURIComponent(body);
+
+    });
+
     // https://github.com/shie1/bytes
     protected formatBytes(fileSize: number): string {
 
