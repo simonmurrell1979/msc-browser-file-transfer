@@ -3,9 +3,6 @@ import { UploadRecord } from "../../models/uploadrecord";
 import { DbService } from "../../services/db.service";
 import { ServiceWorkerCommsService } from "../../services/serviceworkercomms.service";
 import { MessageType } from "../../models/messagetype";
-import { StorageService } from "../../services/storage.service";
-import { EncryptionService } from "../../services/encryption.service";
-import { UploadService } from "../../services/upload.service";
 import { Bytes } from "@shie1/bytes";
 
 @Component({
@@ -41,6 +38,19 @@ export class SendComponent {
         this._serviceWorkerCommsService.setMessageHandler(async (message: any) => this.handleServiceWorkerMessages(message));
         // Find Latest Pending Upload
         const latestUpload = await this._dbService.findLatestUpload();
+
+
+console.log("latestUpload:", latestUpload);
+console.log("activeUploadId:", this.activeUploadId());
+
+// Log Diagnostic Delayed
+setTimeout(() => {
+
+    console.log("pendingUpload delayed:", this.pendingUpload());
+    console.log("activeUploadId delayed:", this.activeUploadId());
+
+}, 2000);
+
         // Check Value
         if (latestUpload == null) {
 
@@ -50,6 +60,10 @@ export class SendComponent {
         }
         // Set Pending Upload
         this.pendingUpload.set(latestUpload);
+
+        // Log Diagnostic
+console.log("pendingUpload:", this.pendingUpload());
+console.log("activeUploadId:", this.activeUploadId());
 
     }
 

@@ -18,6 +18,9 @@ declare const self: ServiceWorkerGlobalScope;
 let serviceWorkerClient: Client | null = null;
 let uploadInProgress = false;
 
+async function sendMessageToAllClients(message: any): Promise<void> {
+}
+
 function sendProgressEvent(type: MessageType, uploadId: string, objectKey: string, partNumber: number, totalParts: number) {
 
     // Check Value
