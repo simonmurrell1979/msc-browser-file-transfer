@@ -184,8 +184,6 @@ export class DownloadComponent {
             // Initialize Class
             const decryptedParts: BlobPart[] = [];
 
-            // https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker
-
             // Set Download State
             this.downloadState.set("downloading");
             
@@ -240,6 +238,28 @@ export class DownloadComponent {
 
             }
             else {
+
+                // Referenced this link as could not remember this off the top of my head.
+                // https://coreui.io/answers/how-to-download-a-file-in-javascript/
+
+                // Build Blob
+                const blob = new Blob(decryptedParts, { type: "application/octet-stream" });
+                // Create Object URL
+                const objectUrl = URL.createObjectURL(blob);
+                // Create Anchor Element
+                const anchor = document.createElement("a");
+                // Set Href
+                anchor.href = objectUrl;
+                // Set Download Attribute
+                anchor.download = transferInformation.Filename;
+                // Append to Body
+                document.body.appendChild(anchor);
+                // Trigger Click
+                anchor.click();
+                // Remove Anchor
+                document.body.removeChild(anchor);
+                // Revoke Object URL
+                URL.revokeObjectURL(objectUrl);
 
                 // Set Status Message
                 this.statusMessage.set("File downloaded and verified successfully.");
