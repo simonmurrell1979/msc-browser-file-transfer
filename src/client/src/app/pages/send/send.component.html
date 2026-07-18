@@ -18,7 +18,7 @@
                         Drag and drop files here or click to select files
                     </p>
 
-                    <input type="file" #fileInput class="form-control" (change)="onFileSelected($event)" />
+                    <input type="file" #fileInput class="form-control" (change)="onFileSelected($event)" placeholder="Select a file to send" />
 
                     @if (selectedFile()) {
 
@@ -41,7 +41,25 @@
 
                 <!-- Resume Upload-->
 
-                
+                <h5 class="card-title mb-4">Unfinished Upload</h5>
+
+                <p class="mb-3">
+                    {{ displayFilename() }}
+                </p>
+
+                <p class="text-muted small mb-3">
+                    Reselect the same file to resume the upload.
+                </p>
+
+                <input type="file" #resumeFileInput class="form-control mb-3" (change)="onFileSelected($event)" title="Reselect the file to resume the upload" />
+
+                <button type="button" class="btn btn-core w-100 mb-2" [disabled]="!reselectedFileMatches()" (click)="onSendFile()">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Send
+                </button>
+
+                <button type="button" class="btn btn-alternate w-100 mt-2" (click)="onCancelUpload()">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                </button>
 
             }
             @else if (!shareableLink() &&
@@ -75,7 +93,7 @@
 
                 <div class="input-group gap-2 mb-3">
 
-                    <input type="text" class="form-control" [value]="shareableLink()" readonly />
+                    <input type="text" class="form-control" [value]="shareableLink()" readonly title="Shareable download link" />
 
                     <button class="btn btn-alternate" type="button" (click)="onCopyLink()" title="Copy link to the clipboard">
                         <i class="bi bi-clipboard"></i>
@@ -88,7 +106,7 @@
                     <a class="btn btn-alternate flex-fill" href="mailto:?subject=File%20Transfer&body={{ buildEmailBody() }}" title="Send link via email">
                         <i class="bi bi-envelope me-2"></i>Email
                     </a>
-                    <a class="btn btn-alternate flex-fill" href="https://wa.me/?text={{ buildWhatsAppBody() }}" target="_blank" title="Send link via WhatsApp">
+                    <a class="btn btn-alternate flex-fill" href="https://wa.me/?text={{ buildWhatsAppBody() }}" target="_blank" rel="noopener noreferrer" title="Send link via WhatsApp">
                         <i class="bi bi-whatsapp me-2"></i>WhatsApp
                     </a>
 
