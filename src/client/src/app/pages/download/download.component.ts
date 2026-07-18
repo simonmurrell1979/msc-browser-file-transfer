@@ -62,6 +62,23 @@ export class DownloadComponent {
 
         }
 
+        // Check Value
+        if (this.showSaveFilePickerIsSupported) {
+            
+            // Download File
+            await this.downloadFileWithSaveFilePicker(transferInformation);
+
+        }
+        else {
+
+            // Todo
+
+        }
+
+    }
+
+    private async downloadFileWithSaveFilePicker(transferInformation: TransferInfo): Promise<void> {
+
         try {
 
             // https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker
