@@ -35,7 +35,17 @@
                 </button>
 
             }
-            @else if (!shareableLink()) {
+            @else if (!shareableLink() && 
+                      pendingUpload() && 
+                      !activeUploadId()) {
+
+                <!-- Resume Upload-->
+
+                
+
+            }
+            @else if (!shareableLink() &&
+                      activeUploadId()) {
 
                 <!-- Uploading File -->
 

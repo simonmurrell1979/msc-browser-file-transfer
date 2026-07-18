@@ -21,6 +21,7 @@ export class SendComponent {
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
     protected readonly displayFilename = computed(() => this.selectedFile()?.name ?? this.pendingUpload()?.fileIdentifier?.name ?? "");
+    protected readonly reselectedFileMatches = computed(() => this.hasReselectedFile());
     protected readonly statusMessage = signal<string | null>(null);
     protected readonly completedObjectKey = signal<string | null>(null);
     protected readonly activeUploadId = signal<string | null>(null);
@@ -269,6 +270,26 @@ export class SendComponent {
                 break;
 
         }
+
+    }
+
+    private hasReselectedFile(): boolean | null {
+
+        // Assign Values
+        const file = this.selectedFile();
+        const pendingUpload = this.pendingUpload();
+        // Check Values
+        if ((file == null) || 
+            (pendingUpload == null)) {
+
+            // Exit
+            return false;
+
+        }
+        // Return
+        return file.name === pendingUpload.fileIdentifier.name &&
+            file.size === pendingUpload.fileIdentifier.size && 
+            file.lastModified === pendingUpload.fileIdentifier.lastModified;
 
     }
 
