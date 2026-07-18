@@ -12,7 +12,7 @@
 
                     @case ("ready") {
 
-                        <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size ?? 0)}})</p>
+                        <p class="mb-3">{{info.Filename}} ({{formatBytes(info.Size)}})</p>
 
                         <button type="button" class="btn btn-core w-100" (click)="onDownloadFile()">
                             <i class="bi bi-download me-2"></i>Download
