@@ -33,6 +33,7 @@ export class DownloadComponent {
     async ngOnInit(): Promise<void> {
 
         try {
+            
             // Get Transfer Information
             this.transferInfo.set(await this._storageService.getTransferInformation(this.guid));
 
