@@ -14,24 +14,26 @@ const fileTransferUpload = new FileTransferUpload(fileTransferApi,
     (uploadId: string, objectKey: string) => sendCancelEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey));
 
 declare const self: ServiceWorkerGlobalScope;
-
-let serviceWorkerClient: Client | null = null;
 let uploadInProgress = false;
 
 async function sendMessageToAllClients(message: any): Promise<void> {
+
+    // Get All Clients
+    const clients = await self.clients.matchAll({ window: true });
+    // Search through Clients
+    for (const client of clients) {
+
+        // Post Message
+        client.postMessage(message);        
+
+    }
+
 }
 
 function sendProgressEvent(type: MessageType, uploadId: string, objectKey: string, partNumber: number, totalParts: number) {
 
-    // Check Value
-    if (serviceWorkerClient == null) {
-
-        // Exit
-        return; 
-
-    }
     // Post Message
-    serviceWorkerClient.postMessage({
+    sendMessageToAllClients({
         type: type,
         uploadId: uploadId,
         objectKey: objectKey,
@@ -44,15 +46,8 @@ function sendProgressEvent(type: MessageType, uploadId: string, objectKey: strin
 // Send Complete Event
 function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: string, password: string, integrityHash: string) {
 
-    // Check Value
-    if (serviceWorkerClient == null) {
-
-        // Exit
-        return; 
-
-    }
     // Post Message
-    serviceWorkerClient.postMessage({
+    sendMessageToAllClients({
         type: type,
         uploadId: uploadId,
         objectKey: objectKey,
@@ -65,15 +60,8 @@ function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: strin
 // Send Cancel Event
 function sendCancelEvent(type: MessageType, uploadId: string, objectKey: string) {
 
-    // Check Value
-    if (serviceWorkerClient == null) {
-
-        // Exit
-        return; 
-
-    }
     // Post Message
-    serviceWorkerClient.postMessage({
+    sendMessageToAllClients({
         type: type,
         uploadId: uploadId,
         objectKey: objectKey
@@ -84,15 +72,8 @@ function sendCancelEvent(type: MessageType, uploadId: string, objectKey: string)
 // Log Message
 function logMessage(message: string) {
 
-    // Check Value
-    if (serviceWorkerClient == null) {
-
-        // Exit
-        return;
-
-    }
     // Post Message
-    serviceWorkerClient.postMessage({
+    sendMessageToAllClients({
         type: MessageType.LOGMESSAGE,
         message: message
     });
@@ -117,9 +98,6 @@ self.addEventListener("activate", (event: any) => {
 
 // Add Message Event
 self.addEventListener("message", (event: any) => {
-
-    // Assign Value
-    serviceWorkerClient = event.source;
 
     // Assign Value
     const data = event.data;

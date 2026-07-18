@@ -699,13 +699,15 @@ var fileTransferUpload = new FileTransferUpload(
   (uploadId, objectKey, password, integrityHash) => sendCompleteEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey, password, integrityHash),
   (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
-var serviceWorkerClient = null;
 var uploadInProgress = false;
-function sendProgressEvent(type, uploadId, objectKey, partNumber, totalParts) {
-  if (serviceWorkerClient == null) {
-    return;
+async function sendMessageToAllClients(message) {
+  const clients = await self.clients.matchAll({ window: true });
+  for (const client of clients) {
+    client.postMessage(message);
   }
-  serviceWorkerClient.postMessage({
+}
+function sendProgressEvent(type, uploadId, objectKey, partNumber, totalParts) {
+  sendMessageToAllClients({
     type,
     uploadId,
     objectKey,
@@ -714,10 +716,7 @@ function sendProgressEvent(type, uploadId, objectKey, partNumber, totalParts) {
   });
 }
 function sendCompleteEvent(type, uploadId, objectKey, password, integrityHash) {
-  if (serviceWorkerClient == null) {
-    return;
-  }
-  serviceWorkerClient.postMessage({
+  sendMessageToAllClients({
     type,
     uploadId,
     objectKey,
@@ -726,20 +725,14 @@ function sendCompleteEvent(type, uploadId, objectKey, password, integrityHash) {
   });
 }
 function sendCancelEvent(type, uploadId, objectKey) {
-  if (serviceWorkerClient == null) {
-    return;
-  }
-  serviceWorkerClient.postMessage({
+  sendMessageToAllClients({
     type,
     uploadId,
     objectKey
   });
 }
 function logMessage(message) {
-  if (serviceWorkerClient == null) {
-    return;
-  }
-  serviceWorkerClient.postMessage({
+  sendMessageToAllClients({
     type: "LOGMESSAGE" /* LOGMESSAGE */,
     message
   });
@@ -751,7 +744,6 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 self.addEventListener("message", (event) => {
-  serviceWorkerClient = event.source;
   const data = event.data;
   if (!data || !data.type) {
     logMessage("Received invalid message in Service Worker.");
