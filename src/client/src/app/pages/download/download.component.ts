@@ -181,16 +181,13 @@ export class DownloadComponent {
 
         try {
 
+            // Initialize Class
+            const decryptedParts: BlobPart[] = [];
+
             // https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker
 
-            // Get File Handle
-            var fileHandle = await (window as any).showSaveFilePicker({
-                suggestedName: transferInformation.Filename
-            });
             // Set Download State
             this.downloadState.set("downloading");
-            // Create Writable Stream
-            const writableStream = await fileHandle.createWritable();
             
             // Get Decryption Key
             const decryptionKey = await this._encryptionService.getDecryptionKey(this.password);
@@ -220,8 +217,8 @@ export class DownloadComponent {
                 const filePartHash = await crypto.subtle.digest("SHA-256", decryptedPart);
                 // Add Hash to Array
                 partHashes.push(this._encryptionService.encodeBase64(filePartHash));
-                // Write Decrypted Part
-                await writableStream.write(decryptedPart);
+                // Add Decrypted Part to Array
+                decryptedParts.push(decryptedPart);
                 // Update File Position
                 filePosition += encryptedPartSize;
 
@@ -234,8 +231,6 @@ export class DownloadComponent {
             // Check Integrity Hash
             if (integrityHash !== this.integrityHash) {
 
-                // Abort Stream
-                await writableStream.abort();
                 // Set Status Message
                 this.statusMessage.set("Integrity hash mismatch. The downloaded file may be corrupted.");
                 // Set Download State
@@ -252,19 +247,10 @@ export class DownloadComponent {
                 this.downloadState.set("completed");
 
             }
-            // Close Stream
-            await writableStream.close();
 
         }
         catch (error: any) {
 
-            // Check if Abort Error
-            if (error.name === "AbortError") {
-                
-                // Exit
-                return;
-
-            }
             // Log Error
             console.error("Error downloading file:", error);
             // Set Download State
