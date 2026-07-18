@@ -20,6 +20,7 @@ export class SendComponent {
     // Protected Variables
     protected readonly selectedFile = signal<File | null>(null);
     protected readonly pendingUpload = signal<UploadRecord | null>(null);
+    protected readonly displayFilename = computed(() => this.selectedFile()?.name ?? this.pendingUpload()?.fileIdentifier?.name ?? "");
     protected readonly statusMessage = signal<string | null>(null);
     protected readonly completedObjectKey = signal<string | null>(null);
     protected readonly activeUploadId = signal<string | null>(null);
@@ -38,19 +39,6 @@ export class SendComponent {
         this._serviceWorkerCommsService.setMessageHandler(async (message: any) => this.handleServiceWorkerMessages(message));
         // Find Latest Pending Upload
         const latestUpload = await this._dbService.findLatestUpload();
-
-
-console.log("latestUpload:", latestUpload);
-console.log("activeUploadId:", this.activeUploadId());
-
-// Log Diagnostic Delayed
-setTimeout(() => {
-
-    console.log("pendingUpload delayed:", this.pendingUpload());
-    console.log("activeUploadId delayed:", this.activeUploadId());
-
-}, 2000);
-
         // Check Value
         if (latestUpload == null) {
 
@@ -60,10 +48,6 @@ setTimeout(() => {
         }
         // Set Pending Upload
         this.pendingUpload.set(latestUpload);
-
-        // Log Diagnostic
-console.log("pendingUpload:", this.pendingUpload());
-console.log("activeUploadId:", this.activeUploadId());
 
     }
 

@@ -42,7 +42,7 @@
                 <h5 class="card-title mb-4">Sending...</h5>
 
                 <p class="mb-3">
-                    {{ selectedFile()?.name }}
+                    {{ displayFilename() }}
                 </p>
 
                 <progress [value]="progressPartNumber() || 0" [max]="progressTotalParts() || 0" class="w-100"></progress>
