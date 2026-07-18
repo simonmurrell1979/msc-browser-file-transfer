@@ -71,13 +71,113 @@ export class DownloadComponent {
         }
         else {
 
-            // Todo
+            // Download File Buffered
+            await this.downloadFileBuffered(transferInformation);
 
         }
 
     }
 
     private async downloadFileWithSaveFilePicker(transferInformation: TransferInfo): Promise<void> {
+
+        try {
+
+            // https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker
+
+            // Get File Handle
+            var fileHandle = await (window as any).showSaveFilePicker({
+                suggestedName: transferInformation.Filename
+            });
+            // Set Download State
+            this.downloadState.set("downloading");
+            // Create Writable Stream
+            const writableStream = await fileHandle.createWritable();
+            
+            // Get Decryption Key
+            const decryptionKey = await this._encryptionService.getDecryptionKey(this.password);
+            // Set Encrypted Part Size
+            const encryptedPartSize = this._uploadService.partSize + 28;
+            // Reset File Position
+            let filePosition = 0;
+            // Set up part hashes array
+            const partHashes: string[] = [];
+
+            // Decrypt File
+            while (filePosition < transferInformation.Size) {
+
+                // Build Range
+                const range = Math.min(filePosition + encryptedPartSize, transferInformation.Size) - 1;
+                // Fetch Encrypted Part
+                const encryptedPartResponse = await fetch(transferInformation.DownloadUrl, {
+                    headers: {
+                        "Range": `bytes=${filePosition}-${range}`
+                    }
+                });
+                // Read Encrypted Part
+                const encryptedPart = new Uint8Array(await encryptedPartResponse.arrayBuffer());
+                // Decrypt Part
+                const decryptedPart = await this._encryptionService.decryptFilePart(decryptionKey, encryptedPart);
+                // Calculate Hash of Decrypted Part
+                const filePartHash = await crypto.subtle.digest("SHA-256", decryptedPart);
+                // Add Hash to Array
+                partHashes.push(this._encryptionService.encodeBase64(filePartHash));
+                // Write Decrypted Part
+                await writableStream.write(decryptedPart);
+                // Update File Position
+                filePosition += encryptedPartSize;
+
+                // Increment Download Progress
+                this.downloadProgress.set(Math.min(Math.round((filePosition / transferInformation.Size) * 100), 100));
+
+            }           
+            // Calculate Integrity Hash
+            const integrityHash = await this._encryptionService.buildIntegrityHash(partHashes);
+            // Check Integrity Hash
+            if (integrityHash !== this.integrityHash) {
+
+                // Abort Stream
+                await writableStream.abort();
+                // Set Status Message
+                this.statusMessage.set("Integrity hash mismatch. The downloaded file may be corrupted.");
+                // Set Download State
+                this.downloadState.set("failed");
+                // Exit
+                return;
+
+            }
+            else {
+
+                // Set Status Message
+                this.statusMessage.set("File downloaded and verified successfully.");
+                // Set Download State
+                this.downloadState.set("completed");
+
+            }
+            // Close Stream
+            await writableStream.close();
+
+        }
+        catch (error: any) {
+
+            // Check if Abort Error
+            if (error.name === "AbortError") {
+                
+                // Exit
+                return;
+
+            }
+            // Log Error
+            console.error("Error downloading file:", error);
+            // Set Download State
+            this.downloadState.set("ready");
+
+        }
+
+    }
+
+    private async downloadFileBuffered(transferInformation: TransferInfo): Promise<void> {
+
+        // Catering for FireFox / Safari / other non Chromium browsers that do not support the File System Access API
 
         try {
 
