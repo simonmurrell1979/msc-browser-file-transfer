@@ -4,7 +4,7 @@ import { StorageService } from "../../services/storage.service";
 import { TransferInfo } from "../../models/transferinfo";
 import { EncryptionService } from "../../services/encryption.service";
 import { UploadService } from "../../services/upload.service";
-import { Bytes, fromKibiBytes, fromMegaBytes } from '@shie1/bytes';
+import { Bytes } from '@shie1/bytes';
 import { DownloadState } from "../../models/downloadstate";
 
 @Component({
@@ -28,6 +28,7 @@ export class DownloadComponent {
     protected readonly statusMessage = signal<string>("");
     protected readonly downloadProgress = signal<number>(0);
     protected readonly downloadState = signal<DownloadState>("ready");
+    protected readonly showSaveFilePickerIsSupported = typeof (window as any).showSaveFilePicker === "function";
 
     async ngOnInit(): Promise<void> {
 
