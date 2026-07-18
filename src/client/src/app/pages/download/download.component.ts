@@ -179,6 +179,12 @@ export class DownloadComponent {
 
         // Catering for FireFox / Safari / other non Chromium browsers that do not support the File System Access API
 
+        // Files tested
+        // 1. 44kb file - works fine
+        // 2. 2mb file - works fine
+        // 3. 25mb file - works fine
+        // 4. 200mb file - works fine
+
         try {
 
             // Initialize Class
