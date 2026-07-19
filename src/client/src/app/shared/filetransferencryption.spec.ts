@@ -9,7 +9,7 @@ describe("Check if SubtleCrypto is available", () => {
 
     });
 
-    it("computer 256 bit hash of a string", async () => {
+    it("compute 256 bit hash of a string", async () => {
 
         // Generate Fake Data
         const data = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
