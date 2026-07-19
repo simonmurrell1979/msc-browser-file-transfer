@@ -1,3 +1,11 @@
+// Keeping track of the following links for future reference on testing in browser environments with Vitest and JSDOM
+// https://github.com/vitest-dev/vitest
+// https://vitest.dev/guide/browser/
+// https://github.com/jsdom/jsdom
+// https://github.com/capricorn86/happy-dom
+// https://www.testim.io/blog/jsdom-a-guide-to-how-to-get-started-and-what-you-can-do/
+// https://sparkbox.com/foundry/improve_unit_testing_with_mocha_chai_jsdom
+
 import { describe, expect, it } from "vitest";
 
 describe("Check if SubtleCrypto is available", () => {
@@ -19,5 +27,11 @@ describe("Check if SubtleCrypto is available", () => {
         expect(digest.byteLength).toBe(32);
 
     });
+
+});
+
+describe("File Transfer Encryption Tests", () => {
+
+    
 
 });
