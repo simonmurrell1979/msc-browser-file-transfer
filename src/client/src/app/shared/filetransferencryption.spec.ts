@@ -7,6 +7,7 @@
 // https://sparkbox.com/foundry/improve_unit_testing_with_mocha_chai_jsdom
 
 import { describe, expect, it } from "vitest";
+import { FileTransferEncryption } from "./filetransferencryption";
 
 describe("Check if SubtleCrypto is available", () => {
 
@@ -32,6 +33,12 @@ describe("Check if SubtleCrypto is available", () => {
 
 describe("File Transfer Encryption Tests", () => {
 
-    
+    it("Test getPassword", () => {
+
+        // 
+        var fileEncryption = new FileTransferEncryption();
+
+
+    });
 
 });
