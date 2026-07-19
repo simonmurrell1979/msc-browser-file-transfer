@@ -100,6 +100,33 @@ describe("File Transfer Encryption Tests", () => {
     });
 
     it("Test buildIntegrityHash", async () => {
+
+        // Initialize Class
+        const fileEncryption = new FileTransferEncryption();
+
+        // Generate Fake Hashes
+        const hash1 = await crypto.subtle.digest("SHA-256", new Uint8Array([1, 2, 3, 4, 5]).buffer);
+        const hash2 = await crypto.subtle.digest("SHA-256", new Uint8Array([6, 7, 8, 9, 10]).buffer);
+
+        // Encode Hashes to Base64
+        const encodedHashes = [
+            fileEncryption.encodeBase64(hash1),
+            fileEncryption.encodeBase64(hash2)
+        ];
+        // Build Integrity Hash
+        const integrityHash = await fileEncryption.buildIntegrityHash(encodedHashes);
+
+        // Concatenate the hashes
+        const concatenatedHashes = new Uint8Array(64);
+        // Set Hashes
+        concatenatedHashes.set(new Uint8Array(hash1), 0);
+        concatenatedHashes.set(new Uint8Array(hash2), 32);
+        // Calculate Expected Integrity Hash
+        const expectedIntegrityHash = await crypto.subtle.digest("SHA-256", concatenatedHashes.buffer);
+
+        // Check Integrity Hash vs Expected Integrity Hash
+        expect(integrityHash).toBe(fileEncryption.encodeBase64(expectedIntegrityHash));
+
     });
 
 });
