@@ -36,7 +36,7 @@ describe("File Transfer Encryption Tests", () => {
     it("Test generatePassword Length", () => {
 
         // Initialize Class
-        var fileEncryption = new FileTransferEncryption();
+        const fileEncryption = new FileTransferEncryption();
         // Generate Password
         const password = fileEncryption.generatePassword();
         // Check Length of the password
@@ -47,7 +47,7 @@ describe("File Transfer Encryption Tests", () => {
     it("Test encodeBase64 and decodeBase64", () => {
 
         // Initialize Class
-        var fileEncryption = new FileTransferEncryption();
+        const fileEncryption = new FileTransferEncryption();
         // Generate Hash
         const hash = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         // Encode the hash to Base64
@@ -62,7 +62,7 @@ describe("File Transfer Encryption Tests", () => {
     it("Test encryptFilePart and decryptFilePart", async () => {
 
         // Initialize Class
-        var fileEncryption = new FileTransferEncryption();
+        const fileEncryption = new FileTransferEncryption();
         // Generate Password
         const password = fileEncryption.generatePassword();
         // Get Encryption Key from Password
@@ -75,7 +75,12 @@ describe("File Transfer Encryption Tests", () => {
         // Encrypt the Fake File Part
         const encryptedFilePart = await fileEncryption.encryptFilePart(encryptionKey, filePart.buffer);
         // Check Encrypted File Part Length
-        expect(encryptedFilePart.byteLength).toBeGreaterThan(filePart.byteLength);
+        expect(encryptedFilePart.byteLength).toBe(filePart.byteLength + 28); // 28 bytes for IV and authentication tag
+
+        // Decrypt the Encrypted File Part
+        const decryptedFilePart = await fileEncryption.decryptFilePart(decryptionKey, encryptedFilePart);
+        // Check if decrypted file part matches the original file part
+        expect(new Uint8Array(decryptedFilePart)).toEqual(filePart);
 
     });
 
