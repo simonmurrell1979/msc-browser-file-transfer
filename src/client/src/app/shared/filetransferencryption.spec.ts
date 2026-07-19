@@ -129,4 +129,29 @@ describe("File Transfer Encryption Tests", () => {
 
     });
 
+    it("Test modified encrypted file part fails decryption", async () => {
+
+        // Initialize Class
+        const fileEncryption = new FileTransferEncryption();
+        // Generate Password
+        const password = fileEncryption.generatePassword();
+        // Get Encryption Key from Password
+        const encryptionKey = await fileEncryption.getEncryptionKey(password);
+        // Get Decryption Key from Password
+        const decryptionKey = await fileEncryption.getDecryptionKey(password);
+
+        // Generate Fake File Part
+        const filePart = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        // Encrypt the Fake File Part
+        const encryptedFilePart = await fileEncryption.encryptFilePart(encryptionKey, filePart.buffer);
+        // Check Encrypted File Part Length
+        expect(encryptedFilePart.byteLength).toBe(filePart.byteLength + 28); // 28 bytes for IV and authentication tag
+
+        // Decrypt the Encrypted File Part
+        const decryptedFilePart = await fileEncryption.decryptFilePart(decryptionKey, encryptedFilePart);
+        // Check if decrypted file part matches the original file part
+        expect(new Uint8Array(decryptedFilePart)).toEqual(filePart);
+
+    });
+
 });
