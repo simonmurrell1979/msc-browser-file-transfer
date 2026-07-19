@@ -99,4 +99,7 @@ describe("File Transfer Encryption Tests", () => {
 
     });
 
+    it("Test buildIntegrityHash", async () => {
+    });
+
 });
