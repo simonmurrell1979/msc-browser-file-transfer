@@ -33,11 +33,14 @@ describe("Check if SubtleCrypto is available", () => {
 
 describe("File Transfer Encryption Tests", () => {
 
-    it("Test getPassword", () => {
+    it("Test generatePassword Length", () => {
 
-        // 
+        // Initialize Class
         var fileEncryption = new FileTransferEncryption();
-
+        // Generate Password
+        const password = fileEncryption.generatePassword();
+        // Check Length of the password
+        expect(password.length).toBe(43);
 
     });
 
