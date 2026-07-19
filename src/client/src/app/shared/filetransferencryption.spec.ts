@@ -44,4 +44,19 @@ describe("File Transfer Encryption Tests", () => {
 
     });
 
+    it("Test encodeBase64 and decodeBase64", () => {
+
+        // Initialize Class
+        var fileEncryption = new FileTransferEncryption();
+        // Generate Hash
+        const hash = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        // Encode the hash to Base64
+        const encodedHash = fileEncryption.encodeBase64(hash.buffer);
+        // Decode the Base64 back to ArrayBuffer
+        const decodedHash = fileEncryption.decodeBase64(encodedHash);
+        // Check if decoded hash matches the original hash
+        expect(new Uint8Array(decodedHash)).toEqual(hash);
+
+    });
+
 });
