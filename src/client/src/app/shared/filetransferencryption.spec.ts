@@ -148,7 +148,7 @@ describe("File Transfer Encryption Tests", () => {
         expect(encryptedFilePart.byteLength).toBe(filePart.byteLength + 28); // 28 bytes for IV and authentication tag
 
         // Flip a bit in the encrypted file part to simulate tampering
-        encryptedFilePart[0] ^= 1; 
+        encryptedFilePart[12] ^= 1; 
 
         // Check if decrypt file part throws an exception!
         await expect(fileEncryption.decryptFilePart(decryptionKey, encryptedFilePart)).rejects.toThrow();
