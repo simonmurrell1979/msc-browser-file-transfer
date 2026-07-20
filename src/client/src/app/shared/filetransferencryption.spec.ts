@@ -147,10 +147,11 @@ describe("File Transfer Encryption Tests", () => {
         // Check Encrypted File Part Length
         expect(encryptedFilePart.byteLength).toBe(filePart.byteLength + 28); // 28 bytes for IV and authentication tag
 
-        // Decrypt the Encrypted File Part
-        const decryptedFilePart = await fileEncryption.decryptFilePart(decryptionKey, encryptedFilePart);
-        // Check if decrypted file part matches the original file part
-        expect(new Uint8Array(decryptedFilePart)).toEqual(filePart);
+        // Flip a bit in the encrypted file part to simulate tampering
+        encryptedFilePart[0] ^= 1; 
+
+        // Check if decrypt file part throws an exception!
+        await expect(fileEncryption.decryptFilePart(decryptionKey, encryptedFilePart)).rejects.toThrow();
 
     });
 
