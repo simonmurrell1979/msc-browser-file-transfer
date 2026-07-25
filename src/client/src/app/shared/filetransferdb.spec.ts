@@ -22,12 +22,16 @@ describe("File Transfer DB Tests", () => {
         // Initialize Class
         const fileTransferDb = new FileTransferDb();
         // Build mock file
-        const mockFile = new File(["Hello World!", "testfile.txt", { type: "text/plain" }]);
+        const mockFile = new File(["Hello World!"], "testfile.txt", { type: "text/plain", lastModified: 12345 });
         // Create Upload
-        const record = await fileTransferDb.createUploadRecord("mockFile-1", "mockFile-1/testfile.txt", "password123", mockFile, 5, 2);
+        const createUploadRecord = await fileTransferDb.createUploadRecord("mockFile-1", "mockFile-1/testfile.txt", "password123", mockFile, 5, 2);
         // Get Upload
-        const getUploadRecord = await fileTransferDb.getUpload(record.uploadId);
+        const getUploadRecord = await fileTransferDb.getUpload(createUploadRecord.uploadId);
         // Check Mock File values match
+        expect(createUploadRecord).toBeDefined();
+        expect(createUploadRecord?.fileIdentifier.name).toBe("testfile.txt");
+        expect(createUploadRecord?.fileIdentifier.size).toBe(12);
+        expect(createUploadRecord?.createDate).toBe(getUploadRecord?.createDate);
 
     });
 
