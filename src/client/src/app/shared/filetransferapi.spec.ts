@@ -26,7 +26,7 @@ describe("FileTransferApi", () => {
 
     });
 
-    it("GetUploadUrl with null key", async () => {
+    it("GetUploadUrl with Success false / null key", async () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
@@ -40,6 +40,40 @@ describe("FileTransferApi", () => {
         const fileTransferApi = new FileTransferApi();
         // Get Upload Url
         await expect(fileTransferApi.getUploadUrl("test-object-key")).rejects.toThrow("An error occurred while processing the request.");
+
+    });
+
+    it("GetUploadUrl with Success true / null key", async () => {
+
+        // Mock global function
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            json: async () => ({
+                Success: true,
+                ReturnedObject: null
+            })
+        }));
+
+        // Initialize Class
+        const fileTransferApi = new FileTransferApi();
+        // Get Upload Url
+        await expect(fileTransferApi.getUploadUrl("test-object-key")).rejects.toThrow("An error occurred while processing the request.");
+
+    });
+
+    it("GetUploadUrl with Success false / ErrorMessage set", async () => {
+
+        // Mock global function
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            json: async () => ({
+                Success: false,
+                ErrorMessage: "Object key not found"
+            })
+        }));
+
+        // Initialize Class
+        const fileTransferApi = new FileTransferApi();
+        // Get Upload Url
+        await expect(fileTransferApi.getUploadUrl("test-object-key")).rejects.toThrow("Object key not found");
 
     });
 
