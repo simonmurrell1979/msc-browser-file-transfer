@@ -76,4 +76,31 @@ describe("File Transfer DB Tests", () => {
 
     });
 
+    it("Test deleteUpload and getUploads", async () => {
+
+        // Initialize Class
+        const fileTransferDb = new FileTransferDb();
+        // Build mock file
+        const mockFile = new File(["Hello World!"], "testfile.txt", { type: "text/plain", lastModified: 12345 });
+        // Create Upload
+        await fileTransferDb.createUploadRecord("mockFile-1", "mockFile-1/testfile.txt", "password123", mockFile, 5, 2);
+        // Delete Upload
+        await fileTransferDb.deleteUpload("mockFile-1");
+        // Get Upload
+        const getUploadRecord = await fileTransferDb.getUpload("mockFile-1");
+        // Check if the upload record is null post deletion
+        expect(getUploadRecord).toBeUndefined();
+        
+        // Delete 2nd Upload
+        await fileTransferDb.deleteUpload("mockFile-2");
+        // Get Uploads
+        const uploads = await fileTransferDb.getUploads();
+        // Get Latest Upload
+        const latestUpload = await fileTransferDb.findLatestUpload();
+        // Check if the uploads array is empty post deletion
+        expect(uploads.length).toBe(0);
+        expect(latestUpload).toBeNull();
+
+    });
+
 });
