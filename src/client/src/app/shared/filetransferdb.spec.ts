@@ -103,4 +103,13 @@ describe("File Transfer DB Tests", () => {
 
     });
 
+    it("Test addUploadedPart throws error for non-existent upload", async () => {
+
+        // Initialize Class
+        const fileTransferDb = new FileTransferDb();
+        // Add Uploaded Part from before where no record exists
+        await expect(fileTransferDb.addUploadedPart("mockFile-1", 1, "mockETag123", "mockHash123")).rejects.toThrow();
+
+    });
+
 });
