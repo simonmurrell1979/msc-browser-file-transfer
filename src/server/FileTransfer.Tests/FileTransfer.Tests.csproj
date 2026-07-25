@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FileTransfer.RestAPI\FileTransfer.RestAPI.csproj" />
+    <ProjectReference Include="..\FileTransfer.Services\FileTransfer.Services.csproj" />
+  </ItemGroup>
+
 </Project>
