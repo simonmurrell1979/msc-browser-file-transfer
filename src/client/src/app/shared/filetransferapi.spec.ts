@@ -28,7 +28,20 @@ describe("FileTransferApi", () => {
 
     it("initiateMultipartUpload", async () => {
 
-        
+        // Mock global function
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            json: async () => ({
+                Success: true,
+                ReturnedObject: "mockFile-1"
+            })
+        }));
+        // Initialize Class
+        const fileTransferApi = new FileTransferApi();
+        // Initiate Multipart Upload
+        const uploadId = await fileTransferApi.initiateMultipartUpload("test-object-key", "application/octet-stream");
+        // Expect
+        expect(uploadId).toBeDefined();
+        expect(uploadId).toBe("mockFile-1");
 
     });
 
