@@ -1,8 +1,8 @@
-﻿using Castle.Core.Logging;
-using FileTransfer.Common.Models;
+﻿using FileTransfer.Common.Models;
 using FileTransfer.Common.Storage;
 using FileTransfer.RestAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace FileTransfer.Tests
