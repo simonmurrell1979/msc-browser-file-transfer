@@ -6,12 +6,14 @@ import { FileTransferDb } from "./filetransferdb";
 
 describe("File Transfer DB Tests", () => {
 
-    it("Test findLastest Upload", () => {
+    it("Test findLatestUpload is null when database is empty", async () => {
 
         // Initialize Class
         const fileTransferDb = new FileTransferDb();
         // Find Latest Upload
-        const latestUpload = fileTransferDb.findLatestUpload();
+        const latestUpload = await fileTransferDb.findLatestUpload();
+        // Check if the latest upload is null (database is empty)
+        expect(latestUpload).toBeNull();
 
     });
 
