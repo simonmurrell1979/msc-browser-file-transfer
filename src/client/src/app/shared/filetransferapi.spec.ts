@@ -26,4 +26,10 @@ describe("FileTransferApi", () => {
 
     });
 
+    it("initiateMultipartUpload", async () => {
+
+        
+
+    });
+
 });
