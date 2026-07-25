@@ -96,4 +96,22 @@ describe("FileTransferApi", () => {
 
     });
 
+    it("completeMultipartUpload returns true", async () => {
+
+        // Mock global function
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            json: async () => ({
+                Success: true
+            })
+        }));
+
+        // Initialize Class
+        const fileTransferApi = new FileTransferApi();
+        // Complete Multipart Upload
+        const completed = await fileTransferApi.completeMultipartUpload("mockFile-2/testfile.txt", "mockFile-2", []);
+        // Expect
+        expect(completed).toBe(true);
+
+    });
+
 });
