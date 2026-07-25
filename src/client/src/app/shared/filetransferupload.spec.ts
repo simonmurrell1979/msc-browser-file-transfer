@@ -5,6 +5,8 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 
 import { expect, it, vi } from "vitest";
+import { FileTransferUpload } from "./filetransferupload";
+import { FileTransferDb } from "./filetransferdb";
 
 describe("Mocking Functions", () => {
 
@@ -53,6 +55,18 @@ describe("Mocking Functions", () => {
     });
 
     it("Test newUpload function", async () => {
+
+        // Build Mock API Functions
+        const api = {
+            initiateMultipartUpload: vi.fn().mockResolvedValue("mockFile-1"),
+            generateMultipartUploadUrl: vi.fn().mockResolvedValue("http://helloworld.com/uploadparturl"),
+            completeMultipartUpload: vi.fn().mockResolvedValue(true),
+        }
+        // Initialize Class
+        const fileTransferUpload = new FileTransferUpload(api,
+            new FileTransferDb(),
+            vi.fn());
+
     });
 
 });
