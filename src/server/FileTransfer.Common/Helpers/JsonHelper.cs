@@ -349,7 +349,7 @@ namespace FileTransfer.Common.Helpers
 
         #region Deserialize
 
-        public static object Deserialize(string json, Type returnType = null)
+        public static object Deserialize(string json, Type? returnType = null)
         {
 
             // Check Value

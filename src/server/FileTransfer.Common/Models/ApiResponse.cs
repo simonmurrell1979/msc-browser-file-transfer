@@ -8,14 +8,14 @@ namespace FileTransfer.Common.Models
 
         public bool Success { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = "";
 
     }
 
     public class ApiResponse<T> : ApiResponse
     {
 
-        public T ReturnedObject { get; set; }
+        public T? ReturnedObject { get; set; }
 
     }
 
