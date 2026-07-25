@@ -86,15 +86,15 @@ namespace FileTransfer.Tests
 
             // Initialize Mock StorageService
             var mockStorageService = new Mock<IR2StorageService>();
-            // Setup GenerateGetUrlAsync
-            mockStorageService.Setup(s => s.GenerateGetUrlAsync("mockFile-2/testfile.txt"))
+            // Setup GeneratePutUrlAsync
+            mockStorageService.Setup(s => s.GeneratePutUrlAsync("mockFile-2/testfile.txt"))
                 .ReturnsAsync(mockUrl);
 
             // Initialize StorageController
             var controller = new StorageController(NullLogger<StorageController>.Instance,
                 mockStorageService.Object);
 
-            // Run the TestConnection method
+            // Run the GetUploadUrl method
             var result = await controller.GetUploadUrl("mockFile-2/testfile.txt") as OkObjectResult;
             // Assign Value
             var response = result?.Value as ApiResponse<string>;
@@ -103,7 +103,7 @@ namespace FileTransfer.Tests
             Assert.NotNull(response);
             // Check Value Success
             Assert.True(response.Success);
-            // Check Error Message
+            // Check Returned Object
             Assert.Equal(mockUrl, response.ReturnedObject);
 
         }
