@@ -10,6 +10,7 @@ describe("FileTransferApi", () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: true,
             json: async () => ({
                 Success: true,
                 ReturnedObject: "https://helloworld.com/upload-url"
@@ -30,6 +31,7 @@ describe("FileTransferApi", () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: true,
             json: async () => ({
                 Success: false,
                 ReturnedObject: null
@@ -47,6 +49,7 @@ describe("FileTransferApi", () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: true,
             json: async () => ({
                 Success: true,
                 ReturnedObject: null
@@ -64,6 +67,7 @@ describe("FileTransferApi", () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: true,
             json: async () => ({
                 Success: false,
                 ErrorMessage: "Object key not found"
@@ -81,6 +85,7 @@ describe("FileTransferApi", () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: true,
             json: async () => ({
                 Success: true,
                 ReturnedObject: "mockFile-1"
@@ -100,6 +105,7 @@ describe("FileTransferApi", () => {
 
         // Mock global function
         vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: true,
             json: async () => ({
                 Success: true
             })
@@ -126,9 +132,7 @@ describe("FileTransferApi", () => {
         // Initialize Class
         const fileTransferApi = new FileTransferApi();
         // Complete Multipart Upload
-        const completed = await fileTransferApi.completeMultipartUpload("mockFile-2/testfile.txt", "mockFile-2", []);
-        // Expect
-        expect(completed).toBe(true);
+        await expect(fileTransferApi.completeMultipartUpload("mockFile-2/testfile.txt", "mockFile-2", [])).rejects.toThrow("Request failed with status: 500");
 
     });
 
