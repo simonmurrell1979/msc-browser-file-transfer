@@ -9,6 +9,8 @@ export class FileTransferApi {
 
         // Send Request
         const response = await fetch(`${environment.apiBaseUrl}/Storage/${url}`);
+        // Check Response
+        this.checkResponseNotOk(response);
         // Return
         return await response.json() as T;
 
@@ -24,6 +26,8 @@ export class FileTransferApi {
             },
             body: JSON.stringify(body)
         });
+        // Check Response
+        this.checkResponseNotOk(response);
         // Return
         return await response.json() as T;
 
@@ -145,6 +149,18 @@ export class FileTransferApi {
         const response = await this.postJson<ApiResponseWithData<TransferInfo>>(requestUrl, requestBody);
         // Check Value
         return this.checkResponseWithData<TransferInfo>(response);
+
+    }
+
+    private checkResponseNotOk(response: Response): void {
+
+        // Check Value
+        if (!response.ok) {
+            
+            // Throw Exception
+            throw new Error(`Request failed with status: ${response.status}`);
+
+        }
 
     }
 

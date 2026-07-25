@@ -114,4 +114,22 @@ describe("FileTransferApi", () => {
 
     });
 
+    it("completeMultipartUpload with HTTP 500 error", async () => {
+
+        // Mock global function
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            ok: false,
+            status: 500,
+            json: async () => ({})
+        }));
+
+        // Initialize Class
+        const fileTransferApi = new FileTransferApi();
+        // Complete Multipart Upload
+        const completed = await fileTransferApi.completeMultipartUpload("mockFile-2/testfile.txt", "mockFile-2", []);
+        // Expect
+        expect(completed).toBe(true);
+
+    });
+
 });
