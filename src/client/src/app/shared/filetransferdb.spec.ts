@@ -55,4 +55,25 @@ describe("File Transfer DB Tests", () => {
 
     });
 
+    it("Test findLatestUpload returns the latest upload record", async () => {
+
+        // Initialize Class
+        const fileTransferDb = new FileTransferDb();
+        // Build mock file
+        const mockFile = new File(["Hello World!"], "testfile.txt", { type: "text/plain", lastModified: 12345 });
+        // Create Upload
+        const firstRecord = await fileTransferDb.createUploadRecord("mockFile-1", "mockFile-1/testfile.txt", "password123", mockFile, 5, 2);
+        // Reduce date
+        firstRecord.createDate -= 1000; // Subtract 1 second
+        // Save Updated Record
+        await fileTransferDb.saveUpload(firstRecord);
+        // Create Upload
+        const secondRecord = await fileTransferDb.createUploadRecord("mockFile-2", "mockFile-2/testfile.txt", "password123", mockFile, 5, 2);
+        // Find Latest Upload
+        const latestUpload = await fileTransferDb.findLatestUpload();
+        // Check if the latest upload is the second record
+        expect(latestUpload?.uploadId).toBe(secondRecord.uploadId);
+
+    });
+
 });
