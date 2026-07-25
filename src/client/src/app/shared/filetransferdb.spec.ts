@@ -1,25 +1,17 @@
 // https://github.com/dumbmatter/fakeIndexedDB
 
+import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
-import { FileTransferEncryption } from "./filetransferencryption";
+import { FileTransferDb } from "./filetransferdb"; 
 
-describe("Check if SubtleCrypto is available", () => {
+describe("File Transfer DB Tests", () => {
 
-    it("should have SubtleCrypto available", () => {
+    it("Test findLastest Upload", () => {
 
-        // Check if SubtleCrypto is available in the browser
-        expect(crypto && crypto.subtle).toBeDefined();
-
-    });
-
-    it("compute 256 bit hash of a string", async () => {
-
-        // Generate Fake Data
-        const data = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-        // Digest the data using SHA-256
-        const digest = await crypto.subtle.digest("SHA-256", data);
-        // Check Length of the digest
-        expect(digest.byteLength).toBe(32);
+        // Initialize Class
+        const fileTransferDb = new FileTransferDb();
+        // Find Latest Upload
+        const latestUpload = fileTransferDb.findLatestUpload();
 
     });
 
