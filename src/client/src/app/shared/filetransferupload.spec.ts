@@ -52,4 +52,7 @@ describe("Mocking Functions", () => {
 
     });
 
+    it("Test newUpload function", async () => {
+    });
+
 });
