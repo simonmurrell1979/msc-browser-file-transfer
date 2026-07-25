@@ -26,6 +26,23 @@ describe("FileTransferApi", () => {
 
     });
 
+    it("GetUploadUrl with null key", async () => {
+
+        // Mock global function
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+            json: async () => ({
+                Success: false,
+                ReturnedObject: null
+            })
+        }));
+
+        // Initialize Class
+        const fileTransferApi = new FileTransferApi();
+        // Get Upload Url
+        await expect(fileTransferApi.getUploadUrl("test-object-key")).rejects.toThrow("An error occurred while processing the request.");
+
+    });
+
     it("initiateMultipartUpload", async () => {
 
         // Mock global function
