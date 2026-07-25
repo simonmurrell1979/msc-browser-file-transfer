@@ -35,21 +35,23 @@ describe("File Transfer DB Tests", () => {
 
     });
 
-    it("Test createUpload and getUpload", async () => {
+    it("Test addUploadedPart", async () => {
 
         // Initialize Class
         const fileTransferDb = new FileTransferDb();
         // Build mock file
         const mockFile = new File(["Hello World!"], "testfile.txt", { type: "text/plain", lastModified: 12345 });
         // Create Upload
-        const createUploadRecord = await fileTransferDb.createUploadRecord("mockFile-1", "mockFile-1/testfile.txt", "password123", mockFile, 5, 2);
+        await fileTransferDb.createUploadRecord("mockFile-1", "mockFile-1/testfile.txt", "password123", mockFile, 5, 2);
+        // Add Uploaded Part
+        await fileTransferDb.addUploadedPart("mockFile-1", 1, "mockETag123", "mockHash123");
         // Get Upload
-        const getUploadRecord = await fileTransferDb.getUpload(createUploadRecord.uploadId);
+        const getUploadRecord = await fileTransferDb.getUpload("mockFile-1");
         // Check Mock File values match
-        expect(createUploadRecord).toBeDefined();
-        expect(createUploadRecord?.fileIdentifier.name).toBe("testfile.txt");
-        expect(createUploadRecord?.fileIdentifier.size).toBe(12);
-        expect(createUploadRecord?.createDate).toBe(getUploadRecord?.createDate);
+        expect(getUploadRecord?.uploadedParts.length).toBe(1);
+        expect(getUploadRecord?.uploadedParts[0].ETag).toBe("mockETag123");
+        expect(getUploadRecord?.uploadedParts[0].PartNumber).toBe(1);
+        expect(getUploadRecord?.originalPartsHashes[0]).toBe("mockHash123");
 
     });
 
