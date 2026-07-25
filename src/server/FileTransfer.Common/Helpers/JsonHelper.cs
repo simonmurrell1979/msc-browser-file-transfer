@@ -188,7 +188,7 @@ namespace FileTransfer.Common.Helpers
 
         #region GetString
 
-        public static string GetString(JsonObject Obj, string PropertyName)
+        public static string? GetString(JsonObject Obj, string PropertyName)
         {
 
             // Return
@@ -224,7 +224,7 @@ namespace FileTransfer.Common.Helpers
                 // Return
                 return result;
             // Check Value
-            if (Obj[PropertyName] is JsonValue vs && vs.TryGetValue(out string s) && int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedResult))
+            if (Obj[PropertyName] is JsonValue vs && vs.TryGetValue(out string? s) && int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedResult))
                 // Return
                 return parsedResult;
 
@@ -247,7 +247,7 @@ namespace FileTransfer.Common.Helpers
                 // Return
                 return result;
             // Check Value
-            if (Obj[PropertyName] is JsonValue vs && vs.TryGetValue(out string s) && long.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedResult))
+            if (Obj[PropertyName] is JsonValue vs && vs.TryGetValue(out string? s) && long.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsedResult))
                 // Return
                 return parsedResult;
             // Return
@@ -349,7 +349,7 @@ namespace FileTransfer.Common.Helpers
 
         #region Deserialize
 
-        public static object Deserialize(string json, Type? returnType = null)
+        public static object? Deserialize(string json, Type? returnType = null)
         {
 
             // Check Value
