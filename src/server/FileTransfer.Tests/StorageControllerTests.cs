@@ -75,6 +75,41 @@ namespace FileTransfer.Tests
 
         #endregion
 
+        #region GetUploadUrlReturnsUrl
+
+        [Fact]
+        public async Task GetUploadUrlReturnsUrl()
+        {
+
+            // Assign Value
+            var mockUrl = "https://175ebc0de772c1b1de292240c3ddfe85.r2.cloudflarestorage.com/msc-prototype/mockFile-1/testfile.txt?X-Amz-Expires=7200&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=7a5a092dd59c31632c97b18b8f48f179%2F20260725%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260725T234935Z&X-Amz-SignedHeaders=host&X-Amz-Signature=f18dba9cfc3cf80b987b4b3c0e222f56833e91f7bfd181d7ad5b14d002aa5078";
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup GenerateGetUrlAsync
+            mockStorageService.Setup(s => s.GenerateGetUrlAsync("mockFile-2/testfile.txt"))
+                .ReturnsAsync(mockUrl);
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Run the TestConnection method
+            var result = await controller.GetUploadUrl("mockFile-2/testfile.txt") as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse<string>;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.True(response.Success);
+            // Check Error Message
+            Assert.Equal(mockUrl, response.ReturnedObject);
+
+        }
+
+        #endregion
+
     }
 
 }
