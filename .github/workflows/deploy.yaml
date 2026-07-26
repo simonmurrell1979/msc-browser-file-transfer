@@ -14,9 +14,9 @@ jobs:
         runs-on: ubuntu-latest
         defaults:
             run:
-                working-directory: /src/server
+                working-directory: src/server
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
             - name: Restore .NET Projects
               run: dotnet restore
             - name: Build .NET Projects
