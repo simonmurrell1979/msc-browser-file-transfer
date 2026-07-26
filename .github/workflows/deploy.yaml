@@ -17,7 +17,7 @@ jobs:
                 working-directory: src/server/FileTransfer.RestAPI
         steps:
             - uses: actions/checkout@v4
-            - name: Restore .NET Projects
+            - name: Restore .NET Projects                                   # Copied from existing .NET project
               run: dotnet restore
-            - name: Build .NET Projects
+            - name: Build .NET Projects                                     # Copied from existing .NET project
               run: dotnet build --no-restore
