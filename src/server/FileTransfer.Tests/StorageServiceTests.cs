@@ -1,4 +1,5 @@
 ﻿using Amazon.S3;
+using Amazon.S3.Model;
 using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Models;
 using FileTransfer.Common.Storage;
@@ -88,39 +89,39 @@ namespace FileTransfer.Tests
 
         #endregion
 
-        #region ListMultipartUploadPartsReturnsError
+        #region ListMultipartUploadPartsStripETagsProperly
 
         [Fact]
-        public async Task ListMultipartUploadReturnsError()
+        public async Task ListMultipartUploadPartsStripETagsProperly()
         {
 
-            // Initialize Mock StorageService
-            var mockStorageService = new Mock<IR2StorageService>();
-            // Setup ListMultipartUploadAsync
-            mockStorageService.Setup(s => s.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1"))
-                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was Listed."));
-
-            // Initialize StorageController
-            var controller = new StorageController(NullLogger<StorageController>.Instance,
-                mockStorageService.Object);
-
-            // Initialize Class
-            var ListMultipartUploadRequest = new ListMultipartUploadRequest
-            {
-                ObjectKey = "mockFile-1/testfile.txt",
-                UploadId = "mockFile-1"
-            };
-            // Run the ListMultipartUpload method
-            var result = await controller.ListMultipartUploadParts(ListMultipartUploadRequest) as OkObjectResult;
-            // Assign Value
-            var response = result?.Value as ApiResponse;
+            // Initialize Mock Amazon S3 Client
+            var amazons3Client = new Mock<IAmazonS3>();
+            // Setup ListPartsAsync
+            amazons3Client.Setup(s => s.ListPartsAsync(It.IsAny<ListPartsRequest>(), default))
+                .ReturnsAsync(new ListPartsResponse
+                {
+                    Parts = new List<PartDetail>
+                    {
+                        new PartDetail { PartNumber = 1, ETag = "\"mockETag123\"" },
+                        new PartDetail { PartNumber = 2, ETag = "\"mockETag456\"" }
+                    }
+                });
+            // Initialize R2 Storage Service
+            var service = new R2StorageService(SetupOptions(), amazons3Client.Object);
+            // List Multipart Upload Parts
+            var parts = await service.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1");
 
             // Check Not Null
-            Assert.NotNull(response);
-            // Check Value Success
-            Assert.False(response.Success);
-            // Check Error Message
-            Assert.Contains("Multipart upload does not exist or was Listed.", response.ErrorMessage);
+            Assert.NotNull(parts);
+            // Check Length
+            Assert.Equal(2, parts.Count);
+            // Check ETags
+            Assert.Equal("mockETag123", parts[0].ETag);
+            Assert.Equal("mockETag456", parts[1].ETag);
+            // Check Part Numbers
+            Assert.Equal(1, parts[0].PartNumber);
+            Assert.Equal(2, parts[1].PartNumber);
 
         }
 
