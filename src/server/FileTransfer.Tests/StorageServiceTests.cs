@@ -27,6 +27,26 @@ namespace FileTransfer.Tests
 
         #endregion
 
+        #region TestConnectionReturnsError
+
+        [Fact]
+        public async Task TestConnectionReturnsError()
+        {
+
+            // Initialize R2 Storage Service
+            var service = new R2StorageService(SetupOptions());
+            // Assert
+            var (connected, errorMessage) = await service.TestConnectionAsync();
+
+            // Assert
+            Assert.False(connected);
+            // Assert Error Message
+            Assert.NotNull(errorMessage);
+
+        }
+
+        #endregion
+
         #region GeneratePutUrlReturnsError
 
         [Fact]
