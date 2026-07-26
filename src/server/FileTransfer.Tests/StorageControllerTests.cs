@@ -394,7 +394,7 @@ namespace FileTransfer.Tests
             // Initialize Mock StorageService
             var mockStorageService = new Mock<IR2StorageService>();
             // Setup AbortMultipartUploadAsync
-            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1", It.IsAny<List<UploadPart>>()))
+            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1"))
                 .Returns(Task.CompletedTask);
 
             // Initialize StorageController
@@ -405,11 +405,7 @@ namespace FileTransfer.Tests
             var AbortMultipartUploadRequest = new AbortMultipartUploadRequest
             {
                 ObjectKey = "mockFile-1/testfile.txt",
-                UploadId = "mockFile-1",
-                Parts = new List<UploadPart>
-                {
-                    new UploadPart { PartNumber = 1, ETag = "mockETag123" }
-                }
+                UploadId = "mockFile-1"
             };
             // Run the AbortMultipartUpload method
             var result = await controller.AbortMultipartUpload(AbortMultipartUploadRequest) as OkObjectResult;
@@ -434,8 +430,8 @@ namespace FileTransfer.Tests
             // Initialize Mock StorageService
             var mockStorageService = new Mock<IR2StorageService>();
             // Setup AbortMultipartUploadAsync
-            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1", It.IsAny<List<UploadPart>>()))
-                .ThrowsAsync(new AmazonS3Exception("One or more parts could not be found when completing the upload."));
+            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1"))
+                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was aborted."));
 
             // Initialize StorageController
             var controller = new StorageController(NullLogger<StorageController>.Instance,
@@ -445,11 +441,7 @@ namespace FileTransfer.Tests
             var AbortMultipartUploadRequest = new AbortMultipartUploadRequest
             {
                 ObjectKey = "mockFile-1/testfile.txt",
-                UploadId = "mockFile-1",
-                Parts = new List<UploadPart>
-                {
-                    new UploadPart { PartNumber = 1, ETag = "mockETag123" }
-                }
+                UploadId = "mockFile-1"
             };
             // Run the AbortMultipartUpload method
             var result = await controller.AbortMultipartUpload(AbortMultipartUploadRequest) as OkObjectResult;
@@ -461,7 +453,7 @@ namespace FileTransfer.Tests
             // Check Value Success
             Assert.False(response.Success);
             // Check Error Message
-            Assert.Contains("One or more parts could not be found when completing the upload.", response.ErrorMessage);
+            Assert.Contains("Multipart upload does not exist or was aborted.", response.ErrorMessage);
 
         }
 
