@@ -1,5 +1,7 @@
 ﻿// https://developers.cloudflare.com/r2/api/error-codes/
+// https://docs.aws.amazon.com/AmazonS3/latest/API/API_Error.html
 
+using Amazon.S3;
 using FileTransfer.Common.Models;
 using FileTransfer.Common.Models.Uploads;
 using FileTransfer.Common.Storage;
@@ -177,6 +179,44 @@ namespace FileTransfer.Tests
             Assert.True(response.Success);
             // Check Returned Object
             Assert.Equal("mockFile-1", response.ReturnedObject);
+
+        }
+
+        #endregion
+
+        #region InitiateMultipartUploadReturnsError
+
+        [Fact]
+        public async Task InitiateMultipartUploadReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup GeneratePutUrlAsync
+            mockStorageService.Setup(s => s.InitiateMultipartUploadAsync("mockFile-1/testfile.txt"))
+                .ThrowsAsync(new AmazonS3Exception("The specified bucket does not exist."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var initiateMultipartUploadRequest = new InitiateMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                ContentType = "application/octet-stream"
+            };
+            // Run the InitiateMultipartUpload method
+            var result = await controller.InitiateMultipartUpload(initiateMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("The specified bucket does not exist.", response.ErrorMessage);
 
         }
 

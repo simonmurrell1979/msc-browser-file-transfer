@@ -1,4 +1,6 @@
-﻿using Amazon.S3;
+﻿// https://dev.to/alexisfranorge/cloudflare-r2-in-net-without-the-aws-sdk-headaches-52a0
+
+using Amazon.S3;
 using Amazon.S3.Model;
 using FileTransfer.Common.Configuration;
 using FileTransfer.Common.Storage;
