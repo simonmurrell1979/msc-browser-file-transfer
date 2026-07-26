@@ -459,6 +459,80 @@ namespace FileTransfer.Tests
 
         #endregion
 
+        #region AbortMultipartUploadUrlReturnsSuccess
+
+        [Fact]
+        public async Task AbortMultipartUploadUrlReturnsSuccess()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup AbortMultipartUploadAsync
+            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1"))
+                .Returns(Task.CompletedTask);
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var AbortMultipartUploadRequest = new AbortMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1"
+            };
+            // Run the AbortMultipartUpload method
+            var result = await controller.AbortMultipartUpload(AbortMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.True(response.Success);
+
+        }
+
+        #endregion
+
+        #region AbortMultipartUploadUrlReturnsError
+
+        [Fact]
+        public async Task AbortMultipartUploadReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup AbortMultipartUploadAsync
+            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1"))
+                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was aborted."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var AbortMultipartUploadRequest = new AbortMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1"
+            };
+            // Run the AbortMultipartUpload method
+            var result = await controller.AbortMultipartUpload(AbortMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("Multipart upload does not exist or was aborted.", response.ErrorMessage);
+
+        }
+
+        #endregion
+
     }
 
 }
