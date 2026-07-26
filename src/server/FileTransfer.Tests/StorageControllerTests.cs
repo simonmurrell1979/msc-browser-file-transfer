@@ -7,7 +7,6 @@ using FileTransfer.Common.Models.Downloads;
 using FileTransfer.Common.Models.Uploads;
 using FileTransfer.Common.Storage;
 using FileTransfer.RestAPI.Controllers;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
