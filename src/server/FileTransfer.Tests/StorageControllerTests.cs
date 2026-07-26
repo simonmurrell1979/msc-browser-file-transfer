@@ -75,10 +75,10 @@ namespace FileTransfer.Tests
 
         #endregion
 
-        #region GetUploadUrlReturnsUrlReturnsSuccess
+        #region PutUploadUrlReturnsSuccess
 
         [Fact]
-        public async Task GetUploadUrlReturnsUrlReturnsSuccess()
+        public async Task PutUploadUrlReturnsSuccess()
         {
 
             // Assign Value
@@ -110,10 +110,10 @@ namespace FileTransfer.Tests
 
         #endregion
 
-        #region GetUploadUrlReturnsUrlReturnsError
+        #region PutUploadUrlReturnsError
 
         [Fact]
-        public async Task GetUploadUrlReturnsUrlReturnsError()
+        public async Task PutUploadUrlReturnsError()
         {
 
             // Initialize Mock StorageService
