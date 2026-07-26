@@ -1,15 +1,6 @@
-﻿using Amazon.S3;
-using FileTransfer.Common.Configuration;
-using FileTransfer.Common.Models;
-using FileTransfer.Common.Models.Downloads;
-using FileTransfer.Common.Models.Uploads;
-using FileTransfer.Common.Storage;
-using FileTransfer.RestAPI.Controllers;
+﻿using FileTransfer.Common.Configuration;
 using FileTransfer.Services.Storage;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Moq;
 
 namespace FileTransfer.Tests
 {
@@ -46,6 +37,23 @@ namespace FileTransfer.Tests
             var service = new R2StorageService(SetupOptions());
             // Assert
             var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.GeneratePutUrlAsync(""));
+            // Assert Message
+            Assert.Contains("ObjectKey cannot be null or empty.", exception.Message);
+
+        }
+
+        #endregion
+
+        #region GenerateGetUrlReturnsError
+
+        [Fact]
+        public async Task GenerateGetUrlReturnsError()
+        {
+
+            // Initialize R2 Storage Service
+            var service = new R2StorageService(SetupOptions());
+            // Assert
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.GenerateGetUrlAsync(""));
             // Assert Message
             Assert.Contains("ObjectKey cannot be null or empty.", exception.Message);
 
