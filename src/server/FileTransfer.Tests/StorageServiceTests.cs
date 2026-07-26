@@ -1,6 +1,13 @@
-﻿using FileTransfer.Common.Configuration;
+﻿using Amazon.S3;
+using FileTransfer.Common.Configuration;
+using FileTransfer.Common.Models;
+using FileTransfer.Common.Storage;
+using FileTransfer.RestAPI.Controllers;
 using FileTransfer.Services.Storage;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Moq;
 
 namespace FileTransfer.Tests
 {
@@ -76,6 +83,44 @@ namespace FileTransfer.Tests
             var exception = await Assert.ThrowsAsync<ArgumentException>(() => service.GenerateGetUrlAsync(""));
             // Assert Message
             Assert.Contains("ObjectKey cannot be null or empty.", exception.Message);
+
+        }
+
+        #endregion
+
+        #region ListMultipartUploadPartsReturnsError
+
+        [Fact]
+        public async Task ListMultipartUploadReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup ListMultipartUploadAsync
+            mockStorageService.Setup(s => s.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1"))
+                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was Listed."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var ListMultipartUploadRequest = new ListMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1"
+            };
+            // Run the ListMultipartUpload method
+            var result = await controller.ListMultipartUploadParts(ListMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("Multipart upload does not exist or was Listed.", response.ErrorMessage);
 
         }
 
