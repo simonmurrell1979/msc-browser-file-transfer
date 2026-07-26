@@ -40,4 +40,4 @@ jobs:
             - name: Install Dependencies                                        # Copied from existing Angular project
               run: npm install
             - name: Run Angular Tests                                           # Copied from existing Angular project
-              run: npx vitest run
+              run: npm test
