@@ -620,26 +620,24 @@ namespace FileTransfer.Tests
 
         #endregion
 
-
-
-        #region GetUploadUrlReturnsSuccess
+        #region GetDownloadUrlReturnsSuccess
 
         [Fact]
-        public async Task GetUploadUrlReturnsSuccess()
+        public async Task GetDownloadUrlReturnsSuccess()
         {
 
             // Initialize Mock StorageService
             var mockStorageService = new Mock<IR2StorageService>();
-            // Setup GeneratePutUrlAsync
-            mockStorageService.Setup(s => s.GeneratePutUrlAsync("mockFile-2/testfile.txt"))
+            // Setup GenerateGetUrlAsync
+            mockStorageService.Setup(s => s.GenerateGetUrlAsync("mockFile-2/testfile.txt"))
                 .ReturnsAsync(_mockUrl);
 
             // Initialize StorageController
             var controller = new StorageController(NullLogger<StorageController>.Instance,
                 mockStorageService.Object);
 
-            // Run the GetUploadUrl method
-            var result = await controller.GetUploadUrl("mockFile-2/testfile.txt") as OkObjectResult;
+            // Run the GetDownloadUrl method
+            var result = await controller.GetDownloadUrl("mockFile-2/testfile.txt") as OkObjectResult;
             // Assign Value
             var response = result?.Value as ApiResponse<string>;
 
@@ -654,24 +652,24 @@ namespace FileTransfer.Tests
 
         #endregion
 
-        #region GetUploadUrlReturnsError
+        #region GetDownloadUrlReturnsError
 
         [Fact]
-        public async Task GetUploadUrlReturnsError()
+        public async Task GetDownloadUrlReturnsError()
         {
 
             // Initialize Mock StorageService
             var mockStorageService = new Mock<IR2StorageService>();
-            // Setup GeneratePutUrlAsync
-            mockStorageService.Setup(s => s.GeneratePutUrlAsync(""))
+            // Setup GenerateGetUrlAsync
+            mockStorageService.Setup(s => s.GenerateGetUrlAsync(""))
                 .ThrowsAsync(new ArgumentException("ObjectKey cannot be null or empty!"));
 
             // Initialize StorageController
             var controller = new StorageController(NullLogger<StorageController>.Instance,
                 mockStorageService.Object);
 
-            // Run the GetUploadUrl method
-            var result = await controller.GetUploadUrl("") as OkObjectResult;
+            // Run the GetDownloadUrl method
+            var result = await controller.GetDownloadUrl("") as OkObjectResult;
             // Assign Value
             var response = result?.Value as ApiResponse;
 
