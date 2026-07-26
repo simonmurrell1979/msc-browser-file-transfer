@@ -585,38 +585,38 @@ namespace FileTransfer.Tests
 
         #region GetTransferInformationReturnsError
 
-        //[Fact]
-        //public async Task GetTransferInformationReturnsError()
-        //{
+        [Fact]
+        public async Task GetTransferInformationReturnsError()
+        {
 
-        //    // Initialize Mock StorageService
-        //    var mockStorageService = new Mock<IR2StorageService>();
-        //    // Setup GetTransferInformationAsync    
-        //    mockStorageService.Setup(s => s.GetTransferInformationAsync("mockFile-1"))
-        //        .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was Listed."));
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup GetTransferInformationAsync    
+            mockStorageService.Setup(s => s.GetTransferInformationAsync("mockFile-0"))
+                .ReturnsAsync((ValueTuple<string, long>?)null);
 
-        //    // Initialize StorageController
-        //    var controller = new StorageController(NullLogger<StorageController>.Instance,
-        //        mockStorageService.Object);
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
 
-        //    // Initialize Class
-        //    var transferInformationRequest = new TransferInfoRequest
-        //    {
-        //        ObjectKeyGuid = "mockFile-1"
-        //    };
-        //    // Run the GetTransferInformation method
-        //    var result = await controller.GetTransferInformation(transferInformationRequest) as OkObjectResult;
-        //    // Assign Value
-        //    var response = result?.Value as ApiResponse;
+            // Initialize Class
+            var transferInformationRequest = new TransferInfoRequest
+            {
+                ObjectKeyGuid = "mockFile-0"
+            };
+            // Run the GetTransferInformation method
+            var result = await controller.GetTransferInformation(transferInformationRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
 
-        //    // Check Not Null
-        //    Assert.NotNull(response);
-        //    // Check Value Success
-        //    Assert.False(response.Success);
-        //    // Check Error Message
-        //    Assert.Contains("Multipart upload does not exist or was Listed.", response.ErrorMessage);
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("Transfer information not found", response.ErrorMessage);
 
-        //}
+        }
 
         #endregion
 
