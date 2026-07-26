@@ -44,6 +44,21 @@ namespace FileTransfer.Services.Storage
 
         #endregion
 
+        #region Constructor
+
+        public R2StorageService(IOptions<R2Options> r2Options,
+            IAmazonS3 client)
+        {
+
+            // Initialize Variables
+            _options = r2Options.Value;
+            // Initialize Class
+            _client = client;
+
+        }
+
+        #endregion
+
         #region TestConnectionAsync
 
         public async Task<(bool Connected, string? ErrorMessage)> TestConnectionAsync()
