@@ -537,6 +537,86 @@ namespace FileTransfer.Tests
 
         #endregion
 
+
+
+        #region ListMultipartUploadPartsReturnsSuccess
+
+        [Fact]
+        public async Task ListMultipartUploadPartsReturnsSuccess()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup ListMultipartUploadAsync
+            mockStorageService.Setup(s => s.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1"))
+                .ReturnsAsync(new List<UploadPart>
+                {
+                    new UploadPart { ETag = "mockETag123", PartNumber = 1 },
+                    new UploadPart { ETag = "mockETag456", PartNumber = 2 }
+                });
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var ListMultipartUploadRequest = new ListMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1"
+            };
+            // Run the ListMultipartUpload method
+            var result = await controller.ListMultipartUploadParts(ListMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.True(response.Success);
+
+        }
+
+        #endregion
+
+        #region ListMultipartUploadPartsReturnsError
+
+        [Fact]
+        public async Task ListMultipartUploadReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup ListMultipartUploadAsync
+            mockStorageService.Setup(s => s.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1"))
+                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was Listed."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var ListMultipartUploadRequest = new ListMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1"
+            };
+            // Run the ListMultipartUpload method
+            var result = await controller.ListMultipartUploadParts(ListMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("Multipart upload does not exist or was Listed.", response.ErrorMessage);
+
+        }
+
+        #endregion
+
     }
 
 }
