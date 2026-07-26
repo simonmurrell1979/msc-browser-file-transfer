@@ -75,10 +75,10 @@ namespace FileTransfer.Tests
 
         #endregion
 
-        #region GetUploadUrlReturnsUrl
+        #region GetUploadUrlReturnsUrlReturnsSuccess
 
         [Fact]
-        public async Task GetUploadUrlReturnsUrl()
+        public async Task GetUploadUrlReturnsUrlReturnsSuccess()
         {
 
             // Assign Value
@@ -105,6 +105,38 @@ namespace FileTransfer.Tests
             Assert.True(response.Success);
             // Check Returned Object
             Assert.Equal(mockUrl, response.ReturnedObject);
+
+        }
+
+        #endregion
+
+        #region GetUploadUrlReturnsUrlReturnsError
+
+        [Fact]
+        public async Task GetUploadUrlReturnsUrlReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup GeneratePutUrlAsync
+            mockStorageService.Setup(s => s.GeneratePutUrlAsync(""))
+                .ThrowsAsync(new ArgumentException("ObjectKey cannot be null or empty!"));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Run the GetUploadUrl method
+            var result = await controller.GetUploadUrl("") as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("ObjectKey cannot be null or empty!", response.ErrorMessage);
 
         }
 
