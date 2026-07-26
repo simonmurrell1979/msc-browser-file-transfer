@@ -12,7 +12,12 @@ jobs:
 
     server:
         runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./src/server
         steps:
             - uses: actions/checkout@v3
             - name: Restore .NET Projects
               run: dotnet restore
+            - name: Build .NET Projects
+              run: dotnet build --no-restore
