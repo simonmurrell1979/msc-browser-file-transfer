@@ -1,6 +1,6 @@
 name: CI Deploy Tests
 
-on:                                                                         # Copied from existing .NET project
+on:                                                                             # Copied from existing .NET project
     push:
         branches:
         - main
@@ -16,24 +16,28 @@ jobs:
             run:
                 working-directory: src/server/FileTransfer.RestAPI
         steps:
-            - uses: actions/checkout@v4
-            - name: Restore .NET Projects                                   # Copied from existing .NET project
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            - name: Restore .NET Projects                                       # Copied from existing .NET project
               run: dotnet restore
-            - name: Build .NET Projects                                     # Copied from existing .NET project
+            - name: Build .NET Projects                                         # Copied from existing .NET project
               run: dotnet build --no-restore
-            - name: Run .NET Tests                                          # Copied from existing .NET project
+            - name: Run .NET Tests                                              # Copied from existing .NET project
               run: dotnet test --no-build --verbosity normal
 
     client:
         runs-on: ubuntu-latest
         defaults:
             run:
-                working-directory: src/server/FileTransfer.RestAPI
+                working-directory: src/client
         steps:
-            - uses: actions/checkout@v4
-            - name: Restore .NET Projects                                   # Copied from existing .NET project
-              run: dotnet restore
-            - name: Build .NET Projects                                     # Copied from existing .NET project
-              run: dotnet build --no-restore
-            - name: Run .NET Tests                                          # Copied from existing .NET project
-              run: dotnet test --no-build --verbosity normal
+            - name: Checkout Repository                                         # Copied from existing Angular project
+              uses: actions/checkout@v4
+            - name: Setup Node.js Environment                                   # Copied from existing Angular project
+              uses: actions/setup-node@v5
+              with:
+                node-version: 22
+            - name: Install Dependencies                                        # Copied from existing Angular project
+              run: npm install
+            - name: Run Angular Tests                                           # Copied from existing Angular project
+              run: npx vitest --run --browsers=ChromeHeadless --single-run
