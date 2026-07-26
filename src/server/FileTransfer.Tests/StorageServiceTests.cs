@@ -122,39 +122,27 @@ namespace FileTransfer.Tests
 
         #endregion
 
-        #region ListMultipartUploadPartsStripETagsProperly
+        #region GetTransferInformationReturnsNull
 
         [Fact]
-        public async Task ListMultipartUploadPartsStripETagsProperly()
+        public async Task GetTransferInformationReturnsNull()
         {
 
             // Initialize Mock Amazon S3 Client
             var amazons3Client = new Mock<IAmazonS3>();
             // Setup ListPartsAsync
-            amazons3Client.Setup(s => s.ListPartsAsync(It.IsAny<ListPartsRequest>(), default))
-                .ReturnsAsync(new ListPartsResponse
+            amazons3Client.Setup(s => s.ListObjectsV2Async(It.IsAny<ListObjectsV2Request>(), default))
+                .ReturnsAsync(new ListObjectsV2Response
                 {
-                    Parts = new List<PartDetail>
-                    {
-                        new PartDetail { PartNumber = 1, ETag = "\"mockETag123\"" },
-                        new PartDetail { PartNumber = 2, ETag = "\"mockETag456\"" }
-                    }
+                    S3Objects = new List<S3Object>()
                 });
             // Initialize R2 Storage Service
             var service = new R2StorageService(SetupOptions(), amazons3Client.Object);
             // List Multipart Upload Parts
-            var parts = await service.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1");
+            var tranferInformation = await service.GetTransferInformationAsync("mockFile-0");
 
-            // Check Not Null
-            Assert.NotNull(parts);
-            // Check Length
-            Assert.Equal(2, parts.Count);
-            // Check ETags
-            Assert.Equal("mockETag123", parts[0].ETag);
-            Assert.Equal("mockETag456", parts[1].ETag);
-            // Check Part Numbers
-            Assert.Equal(1, parts[0].PartNumber);
-            Assert.Equal(2, parts[1].PartNumber);
+            // Check Null
+            Assert.Null(tranferInformation);
 
         }
 
