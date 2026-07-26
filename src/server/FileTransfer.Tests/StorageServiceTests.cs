@@ -1,12 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using FileTransfer.Common.Configuration;
-using FileTransfer.Common.Models;
-using FileTransfer.Common.Storage;
-using FileTransfer.RestAPI.Controllers;
 using FileTransfer.Services.Storage;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 
