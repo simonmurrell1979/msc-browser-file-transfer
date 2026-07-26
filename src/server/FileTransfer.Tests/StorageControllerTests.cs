@@ -385,6 +385,88 @@ namespace FileTransfer.Tests
 
         #endregion
 
+        #region AbortMultipartUploadUrlReturnsSuccess
+
+        [Fact]
+        public async Task AbortMultipartUploadUrlReturnsSuccess()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup AbortMultipartUploadAsync
+            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1", It.IsAny<List<UploadPart>>()))
+                .Returns(Task.CompletedTask);
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var AbortMultipartUploadRequest = new AbortMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1",
+                Parts = new List<UploadPart>
+                {
+                    new UploadPart { PartNumber = 1, ETag = "mockETag123" }
+                }
+            };
+            // Run the AbortMultipartUpload method
+            var result = await controller.AbortMultipartUpload(AbortMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.True(response.Success);
+
+        }
+
+        #endregion
+
+        #region AbortMultipartUploadUrlReturnsError
+
+        [Fact]
+        public async Task AbortMultipartUploadReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup AbortMultipartUploadAsync
+            mockStorageService.Setup(s => s.AbortMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1", It.IsAny<List<UploadPart>>()))
+                .ThrowsAsync(new AmazonS3Exception("One or more parts could not be found when completing the upload."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var AbortMultipartUploadRequest = new AbortMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1",
+                Parts = new List<UploadPart>
+                {
+                    new UploadPart { PartNumber = 1, ETag = "mockETag123" }
+                }
+            };
+            // Run the AbortMultipartUpload method
+            var result = await controller.AbortMultipartUpload(AbortMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("One or more parts could not be found when completing the upload.", response.ErrorMessage);
+
+        }
+
+        #endregion
+
     }
 
 }
