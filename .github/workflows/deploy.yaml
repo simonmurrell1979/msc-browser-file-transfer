@@ -1,6 +1,6 @@
 name: CI Deploy Tests
 
-on:
+on:                                                                         # Copied from existing .NET project
     push:
         branches:
         - main
