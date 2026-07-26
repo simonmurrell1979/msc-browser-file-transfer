@@ -264,6 +264,45 @@ namespace FileTransfer.Tests
 
         #endregion
 
+        #region GenerateMultipartUploadUrlReturnsError
+
+        [Fact]
+        public async Task GenerateMultipartUploadUrlReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup GeneratePutUrlAsync
+            mockStorageService.Setup(s => s.GenerateMultipartUploadUrlAsync("mockFile-1/testfile.txt", "mockFile-1", 1))
+                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was aborted."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var generateMultipartUploadUrlRequest = new GenerateMultipartUploadUrlRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1",
+                PartNumber = 1
+            };
+            // Run the GenerateMultipartUploadUrl method
+            var result = await controller.GenerateMultipartUploadUrl(generateMultipartUploadUrlRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("Multipart upload does not exist or was aborted.", response.ErrorMessage);
+
+        }
+
+        #endregion
+
     }
 
 }
