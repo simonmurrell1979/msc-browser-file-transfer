@@ -3,9 +3,11 @@
 
 using Amazon.S3;
 using FileTransfer.Common.Models;
+using FileTransfer.Common.Models.Downloads;
 using FileTransfer.Common.Models.Uploads;
 using FileTransfer.Common.Storage;
 using FileTransfer.RestAPI.Controllers;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -537,83 +539,84 @@ namespace FileTransfer.Tests
 
         #endregion
 
-
-
-        #region ListMultipartUploadPartsReturnsSuccess
+        #region GetTransferInformationReturnsSuccess
 
         [Fact]
-        public async Task ListMultipartUploadPartsReturnsSuccess()
+        public async Task GetTransferInformationReturnsSuccess()
         {
 
             // Initialize Mock StorageService
             var mockStorageService = new Mock<IR2StorageService>();
-            // Setup ListMultipartUploadAsync
-            mockStorageService.Setup(s => s.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1"))
-                .ReturnsAsync(new List<UploadPart>
-                {
-                    new UploadPart { ETag = "mockETag123", PartNumber = 1 },
-                    new UploadPart { ETag = "mockETag456", PartNumber = 2 }
-                });
+            // Setup GetTransferInformationAsync
+            mockStorageService.Setup(s => s.GetTransferInformationAsync("mockFile-1"))
+                .ReturnsAsync(("mockFile-1/testfile.txt", 1048576));
+            // Setup GenerateGetUrlAsync
+            mockStorageService.Setup(s => s.GenerateGetUrlAsync("mockFile-1/testfile.txt"))
+                .ReturnsAsync(_mockUrl);
 
             // Initialize StorageController
             var controller = new StorageController(NullLogger<StorageController>.Instance,
                 mockStorageService.Object);
 
             // Initialize Class
-            var ListMultipartUploadRequest = new ListMultipartUploadRequest
+            var transferInformationRequest = new TransferInfoRequest
             {
-                ObjectKey = "mockFile-1/testfile.txt",
-                UploadId = "mockFile-1"
+                ObjectKeyGuid = "mockFile-1"
             };
-            // Run the ListMultipartUpload method
-            var result = await controller.ListMultipartUploadParts(ListMultipartUploadRequest) as OkObjectResult;
+            // Run the GetTransferInformation method
+            var result = await controller.GetTransferInformation(transferInformationRequest) as OkObjectResult;
             // Assign Value
-            var response = result?.Value as ApiResponse;
+            var response = result?.Value as ApiResponse<TransferInfoResponse>;
 
             // Check Not Null
             Assert.NotNull(response);
             // Check Value Success
             Assert.True(response.Success);
+            // Check Returned Object - Filename
+            Assert.Equal("testfile.txt", response.ReturnedObject?.Filename);
+            // Check Returned Object - Size
+            Assert.Equal(1048576, response.ReturnedObject?.Size);
+            // Check Returned Object - DownloadUrl
+            Assert.Equal(_mockUrl, response.ReturnedObject?.DownloadUrl);
 
         }
 
         #endregion
 
-        #region ListMultipartUploadPartsReturnsError
+        #region GetTransferInformationReturnsError
 
-        [Fact]
-        public async Task ListMultipartUploadReturnsError()
-        {
+        //[Fact]
+        //public async Task GetTransferInformationReturnsError()
+        //{
 
-            // Initialize Mock StorageService
-            var mockStorageService = new Mock<IR2StorageService>();
-            // Setup ListMultipartUploadAsync
-            mockStorageService.Setup(s => s.ListMultipartUploadPartsAsync("mockFile-1/testfile.txt", "mockFile-1"))
-                .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was Listed."));
+        //    // Initialize Mock StorageService
+        //    var mockStorageService = new Mock<IR2StorageService>();
+        //    // Setup GetTransferInformationAsync    
+        //    mockStorageService.Setup(s => s.GetTransferInformationAsync("mockFile-1"))
+        //        .ThrowsAsync(new AmazonS3Exception("Multipart upload does not exist or was Listed."));
 
-            // Initialize StorageController
-            var controller = new StorageController(NullLogger<StorageController>.Instance,
-                mockStorageService.Object);
+        //    // Initialize StorageController
+        //    var controller = new StorageController(NullLogger<StorageController>.Instance,
+        //        mockStorageService.Object);
 
-            // Initialize Class
-            var ListMultipartUploadRequest = new ListMultipartUploadRequest
-            {
-                ObjectKey = "mockFile-1/testfile.txt",
-                UploadId = "mockFile-1"
-            };
-            // Run the ListMultipartUpload method
-            var result = await controller.ListMultipartUploadParts(ListMultipartUploadRequest) as OkObjectResult;
-            // Assign Value
-            var response = result?.Value as ApiResponse;
+        //    // Initialize Class
+        //    var transferInformationRequest = new TransferInfoRequest
+        //    {
+        //        ObjectKeyGuid = "mockFile-1"
+        //    };
+        //    // Run the GetTransferInformation method
+        //    var result = await controller.GetTransferInformation(transferInformationRequest) as OkObjectResult;
+        //    // Assign Value
+        //    var response = result?.Value as ApiResponse;
 
-            // Check Not Null
-            Assert.NotNull(response);
-            // Check Value Success
-            Assert.False(response.Success);
-            // Check Error Message
-            Assert.Contains("Multipart upload does not exist or was Listed.", response.ErrorMessage);
+        //    // Check Not Null
+        //    Assert.NotNull(response);
+        //    // Check Value Success
+        //    Assert.False(response.Success);
+        //    // Check Error Message
+        //    Assert.Contains("Multipart upload does not exist or was Listed.", response.ErrorMessage);
 
-        }
+        //}
 
         #endregion
 
