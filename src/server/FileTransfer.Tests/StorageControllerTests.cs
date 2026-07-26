@@ -343,6 +343,48 @@ namespace FileTransfer.Tests
 
         #endregion
 
+        #region CompleteMultipartUploadUrlReturnsError
+
+        [Fact]
+        public async Task CompleteMultipartUploadReturnsError()
+        {
+
+            // Initialize Mock StorageService
+            var mockStorageService = new Mock<IR2StorageService>();
+            // Setup CompleteMultipartUploadAsync
+            mockStorageService.Setup(s => s.CompleteMultipartUploadAsync("mockFile-1/testfile.txt", "mockFile-1", It.IsAny<List<UploadPart>>()))
+                .ThrowsAsync(new AmazonS3Exception("One or more parts could not be found when completing the upload."));
+
+            // Initialize StorageController
+            var controller = new StorageController(NullLogger<StorageController>.Instance,
+                mockStorageService.Object);
+
+            // Initialize Class
+            var completeMultipartUploadRequest = new CompleteMultipartUploadRequest
+            {
+                ObjectKey = "mockFile-1/testfile.txt",
+                UploadId = "mockFile-1",
+                Parts = new List<UploadPart>
+                {
+                    new UploadPart { PartNumber = 1, ETag = "mockETag123" }
+                }
+            };
+            // Run the CompleteMultipartUpload method
+            var result = await controller.CompleteMultipartUpload(completeMultipartUploadRequest) as OkObjectResult;
+            // Assign Value
+            var response = result?.Value as ApiResponse;
+
+            // Check Not Null
+            Assert.NotNull(response);
+            // Check Value Success
+            Assert.False(response.Success);
+            // Check Error Message
+            Assert.Contains("One or more parts could not be found when completing the upload.", response.ErrorMessage);
+
+        }
+
+        #endregion
+
     }
 
 }
