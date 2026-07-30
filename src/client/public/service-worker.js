@@ -707,6 +707,8 @@ var fileTransferUpload = new FileTransferUpload(
   (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
 var uploadInProgress = false;
+var benchmarkEncryption = new FileTransferEncryption();
+self.benchmarkEncryption = benchmarkEncryption;
 async function sendMessageToAllClients(message) {
   const clients = await self.clients.matchAll({ window: true });
   for (const client of clients) {

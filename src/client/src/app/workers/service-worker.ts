@@ -2,6 +2,7 @@ import { FileTransferApi } from "../shared/filetransferapi";
 import { FileTransferDb } from "../shared/filetransferdb";
 import { FileTransferUpload } from "../shared/filetransferupload";
 import { MessageType } from "../models/messagetype";
+import { FileTransferEncryption } from "../shared/filetransferencryption";
 
 // Initialize FileTransferApi/FileTransferDb
 const fileTransferApi = new FileTransferApi();
@@ -15,6 +16,17 @@ const fileTransferUpload = new FileTransferUpload(fileTransferApi,
 
 declare const self: ServiceWorkerGlobalScope;
 let uploadInProgress = false;
+
+// Adding Encryption Class for benchmarking purposes
+const benchmarkEncryption = new FileTransferEncryption();
+(self as any).benchmarkEncryption = benchmarkEncryption;
+
+async function benchmarkEncryptionThroughput() {
+
+    // Get encryption key
+    const encryptionKey = await benchmarkEncryption.getEncryptionKey();
+
+}
 
 async function sendMessageToAllClients(message: any): Promise<void> {
 
