@@ -26,7 +26,6 @@ const benchmarkEncryption = new FileTransferEncryption();
 // https://developer.mozilla.org/en-US/docs/Web/API/Performance/now
 // https://medium.com/@AlexanderObregon/getting-accurate-time-with-javascript-performance-now-ccd658a97ab3
 // https://medium.com/@vinaychhabra.dev/exploring-javascript-performance-measurement-with-performance-now-d79cb39dc269
-// 
 
 async function benchmarkEncryptionThroughput() {
 
