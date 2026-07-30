@@ -8,6 +8,7 @@ var environment = {
 var FileTransferApi = class {
   async getJson(url) {
     const response = await fetch(`${environment.apiBaseUrl}/Storage/${url}`);
+    this.checkResponseOk(response);
     return await response.json();
   }
   async postJson(url, body) {
@@ -18,6 +19,7 @@ var FileTransferApi = class {
       },
       body: JSON.stringify(body)
     });
+    this.checkResponseOk(response);
     return await response.json();
   }
   async getUploadUrl(objectKey) {
@@ -84,6 +86,11 @@ var FileTransferApi = class {
     };
     const response = await this.postJson(requestUrl, requestBody);
     return this.checkResponseWithData(response);
+  }
+  checkResponseOk(response) {
+    if (!response.ok) {
+      throw new Error(`Request failed with status: ${response.status}`);
+    }
   }
   checkResponse(response) {
     if (!response || !response.Success) {
