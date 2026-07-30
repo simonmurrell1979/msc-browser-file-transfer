@@ -709,6 +709,35 @@ var fileTransferUpload = new FileTransferUpload(
 var uploadInProgress = false;
 var benchmarkEncryption = new FileTransferEncryption();
 self.benchmarkEncryption = benchmarkEncryption;
+self.benchmarkEncryptionThroughput = benchmarkEncryptionThroughput;
+async function benchmarkEncryptionThroughput() {
+  const encryptionKey = await benchmarkEncryption.getEncryptionKey();
+  const sizes = [1, 2, 5, 10, 20, 50, 100];
+  const tableResults = [];
+  for (const size of sizes) {
+    const byteSize = size * 1024 * 1024;
+    const buffer = new ArrayBuffer(byteSize);
+    await benchmarkEncryption.encryptFilePart(encryptionKey, buffer);
+    const throughputRates = [];
+    for (let batchSize = 1; batchSize <= 10; batchSize++) {
+      const startTime = performance.now();
+      for (let i = 0; i < 10; i++) {
+        await benchmarkEncryption.encryptFilePart(encryptionKey, buffer);
+      }
+      const endTime = performance.now();
+      const throughput = size * 10 / ((endTime - startTime) / 1e3);
+      throughputRates.push(throughput);
+    }
+    throughputRates.sort((a, b) => a - b);
+    tableResults.push({
+      partSize: size,
+      medianMBs: throughputRates[Math.floor(throughputRates.length / 2)],
+      minMBs: throughputRates[0],
+      maxMBs: throughputRates[throughputRates.length - 1]
+    });
+  }
+  console.table(tableResults);
+}
 async function sendMessageToAllClients(message) {
   const clients = await self.clients.matchAll({ window: true });
   for (const client of clients) {
