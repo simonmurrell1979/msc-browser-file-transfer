@@ -524,7 +524,6 @@ var FileTransferUpload = class {
   _onCancelled;
   _partSize = 5 * 1024 * 1024;
   // 5MB
-  _logTimeSplit = true;
   // Public Variables
   partSize = this._partSize;
   constructor(api, db, logMessage2, onProgress, onComplete, onCancelled) {
@@ -601,16 +600,6 @@ var FileTransferUpload = class {
         partIndex,
         totalParts
       );
-    }
-    if (this._logTimeSplit) {
-      const totalTime = encryptElapsedTime + signElapsedTime + uploadElapsedTime + databaseElapsedTime;
-      if (totalTime > 0) {
-        const encryptPercentage = encryptElapsedTime / totalTime * 100;
-        const signPercentage = signElapsedTime / totalTime * 100;
-        const uploadPercentage = uploadElapsedTime / totalTime * 100;
-        const databasePercentage = databaseElapsedTime / totalTime * 100;
-        this._logMessage("File name: " + file.name + ",  File size: " + file.size + " bytes,  Part size: " + partSize + " bytes,  Total parts: " + totalParts + ",  Uploaded parts: " + uploadedParts.length + ", Total Time: " + totalTime.toFixed(2) + "ms, Time Split: Encrypt: " + encryptElapsedTime.toFixed(2) + "ms (" + encryptPercentage.toFixed(2) + "%), Sign: " + signElapsedTime.toFixed(2) + "ms (" + signPercentage.toFixed(2) + "%), Upload: " + uploadElapsedTime.toFixed(2) + "ms (" + uploadPercentage.toFixed(2) + "%),  Database: " + databaseElapsedTime.toFixed(2) + "ms (" + databasePercentage.toFixed(2) + "%)");
-      }
     }
   }
   async newUpload(file) {
@@ -730,37 +719,6 @@ var fileTransferUpload = new FileTransferUpload(
   (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
 );
 var uploadInProgress = false;
-var benchmarkEncryption = new FileTransferEncryption();
-self.benchmarkEncryption = benchmarkEncryption;
-self.benchmarkEncryptionThroughput = benchmarkEncryptionThroughput;
-async function benchmarkEncryptionThroughput() {
-  const encryptionKey = await benchmarkEncryption.getEncryptionKey();
-  const sizes = [1, 2, 5, 10, 20, 50, 100];
-  const tableResults = [];
-  for (const size of sizes) {
-    const byteSize = size * 1024 * 1024;
-    const buffer = new ArrayBuffer(byteSize);
-    await benchmarkEncryption.encryptFilePart(encryptionKey, buffer);
-    const throughputRates = [];
-    for (let batchSize = 1; batchSize <= 10; batchSize++) {
-      const startTime = performance.now();
-      for (let i = 0; i < 10; i++) {
-        await benchmarkEncryption.encryptFilePart(encryptionKey, buffer);
-      }
-      const endTime = performance.now();
-      const throughput = size * 10 / ((endTime - startTime) / 1e3);
-      throughputRates.push(throughput);
-    }
-    throughputRates.sort((a, b) => a - b);
-    tableResults.push({
-      partSize: size,
-      medianMBs: throughputRates[Math.floor(throughputRates.length / 2)],
-      minMBs: throughputRates[0],
-      maxMBs: throughputRates[throughputRates.length - 1]
-    });
-  }
-  console.table(tableResults);
-}
 async function sendMessageToAllClients(message) {
   const clients = await self.clients.matchAll({ window: true });
   for (const client of clients) {
