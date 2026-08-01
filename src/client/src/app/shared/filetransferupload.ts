@@ -14,6 +14,7 @@ export class FileTransferUpload {
     private readonly _onComplete: (uploadId: string, objectKey: string, password: string, integrityHash: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
+    private readonly _logTimeSplit = true; 
     // Public Variables
     public readonly partSize = this._partSize;
 
@@ -63,9 +64,15 @@ export class FileTransferUpload {
         skippedParts: Set<number>,
         uploadedParts: UploadPart[]) {
 
+        // Assign Value
+        let encryptElapsedTime = 0;
+        let signElapsedTime = 0;
+        let uploadElapsedTime = 0;
+        let databaseElapsedTime = 0;
+
         // Mock Encryption Key 
         const encryptionKey = await this._encryption.getEncryptionKey(password);
-    
+
         // Search for each part
         for (let i = 0; i < totalParts; i++) {
     
@@ -87,21 +94,33 @@ export class FileTransferUpload {
             const fileEnd = Math.min(fileStart + partSize, file.size);
             const fileChunk = file.slice(fileStart, fileEnd);
 
+            // Start Timer
+            const encryptStartTime = performance.now();
             // Encrypt File Chunk
             const chunkBytes = await fileChunk.arrayBuffer();
             // Generate Hash for Original Part
             const filePartHash = await crypto.subtle.digest("SHA-256", chunkBytes);
             // Encrypt File Part
             const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
+            // End Timer
+            encryptElapsedTime += performance.now() - encryptStartTime;
     
+            // Start Timer
+            const signStartTime = performance.now();
             // Generate Multipart Upload URL
             const multipartUploadUrl = await this._api.generateMultipartUploadUrl(objectKey, uploadId, partIndex);
+            // End Timer
+            signElapsedTime += performance.now() - signStartTime;
             
+            // Start Timer
+            const uploadStartTime = performance.now();
             // Upload to R2
             const uploadPartResponse = await fetch(multipartUploadUrl, {
                 method: "PUT",
                 body: encryptedChunk
             });
+            // End Timer
+            uploadElapsedTime += performance.now() - uploadStartTime;
             // Check Value
             if (!uploadPartResponse.ok) {
     
@@ -120,17 +139,45 @@ export class FileTransferUpload {
                 ETag: eTag
             });
     
+            // Start Timer
+            const databaseStartTime = performance.now();
             // Update Record
             await this._db.addUploadedPart(uploadId,
                 partIndex,
                 eTag,
                 this._encryption.encodeBase64(filePartHash));
+            // End Timer
+            databaseElapsedTime += performance.now() - databaseStartTime;
             // Report Progress
             this._onProgress(uploadId, 
                 objectKey,
                 partIndex, 
                 totalParts);
     
+        }
+
+        // Check Value
+        if (this._logTimeSplit) {
+
+            // Calculate Total Time
+            const totalTime = encryptElapsedTime + signElapsedTime + uploadElapsedTime + databaseElapsedTime;
+            // Check Value
+            if (totalTime > 0) {
+
+                // Assign Values
+                const encryptPercentage = (encryptElapsedTime / totalTime) * 100;
+                const signPercentage = (signElapsedTime / totalTime) * 100;
+                const uploadPercentage = (uploadElapsedTime / totalTime) * 100;
+                const databasePercentage = (databaseElapsedTime / totalTime) * 100;
+                // Log Time Split
+                this._logMessage("Total Time: " + totalTime.toFixed(2) + "ms, " +
+                    "Time Split: Encrypt: " + encryptElapsedTime.toFixed(2) + "ms (" + encryptPercentage.toFixed(2) + "%), " + 
+                    "Sign: " + signElapsedTime.toFixed(2) + "ms (" + signPercentage.toFixed(2) + "%), " + 
+                    "Upload: " + uploadElapsedTime.toFixed(2) + "ms (" + uploadPercentage.toFixed(2) + "%), " + 
+                    " Database: " + databaseElapsedTime.toFixed(2) + "ms (" + databasePercentage.toFixed(2) + "%)");
+
+            }
+
         }
     
     }
