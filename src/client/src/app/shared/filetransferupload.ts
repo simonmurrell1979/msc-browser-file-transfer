@@ -14,7 +14,6 @@ export class FileTransferUpload {
     private readonly _onComplete: (uploadId: string, objectKey: string, password: string, integrityHash: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
-    private readonly _logTimeSplit = true; 
     // Public Variables
     public readonly partSize = this._partSize;
 
@@ -154,31 +153,6 @@ export class FileTransferUpload {
                 partIndex, 
                 totalParts);
     
-        }
-
-        // Check Value
-        if (this._logTimeSplit) {
-
-            // Calculate Total Time
-            const totalTime = encryptElapsedTime + signElapsedTime + uploadElapsedTime + databaseElapsedTime;
-            // Check Value
-            if (totalTime > 0) {
-
-                // Assign Values
-                const encryptPercentage = (encryptElapsedTime / totalTime) * 100;
-                const signPercentage = (signElapsedTime / totalTime) * 100;
-                const uploadPercentage = (uploadElapsedTime / totalTime) * 100;
-                const databasePercentage = (databaseElapsedTime / totalTime) * 100;
-                // Log Time Split
-                this._logMessage("File name: " + file.name + ",  File size: " + file.size + " bytes,  Part size: " + partSize + " bytes,  Total parts: " + totalParts + ",  Uploaded parts: " + uploadedParts.length + ", " +
-                    "Total Time: " + totalTime.toFixed(2) + "ms, " +
-                    "Time Split: Encrypt: " + encryptElapsedTime.toFixed(2) + "ms (" + encryptPercentage.toFixed(2) + "%), " + 
-                    "Sign: " + signElapsedTime.toFixed(2) + "ms (" + signPercentage.toFixed(2) + "%), " + 
-                    "Upload: " + uploadElapsedTime.toFixed(2) + "ms (" + uploadPercentage.toFixed(2) + "%), " + 
-                    " Database: " + databaseElapsedTime.toFixed(2) + "ms (" + databasePercentage.toFixed(2) + "%)");
-
-            }
-
         }
     
     }
