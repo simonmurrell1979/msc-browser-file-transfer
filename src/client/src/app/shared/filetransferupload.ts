@@ -170,7 +170,8 @@ export class FileTransferUpload {
                 const uploadPercentage = (uploadElapsedTime / totalTime) * 100;
                 const databasePercentage = (databaseElapsedTime / totalTime) * 100;
                 // Log Time Split
-                this._logMessage("Total Time: " + totalTime.toFixed(2) + "ms, " +
+                this._logMessage("File name: " + file.name + ",  File size: " + file.size + " bytes,  Part size: " + partSize + " bytes,  Total parts: " + totalParts + ",  Uploaded parts: " + uploadedParts.length + ", " +
+                    "Total Time: " + totalTime.toFixed(2) + "ms, " +
                     "Time Split: Encrypt: " + encryptElapsedTime.toFixed(2) + "ms (" + encryptPercentage.toFixed(2) + "%), " + 
                     "Sign: " + signElapsedTime.toFixed(2) + "ms (" + signPercentage.toFixed(2) + "%), " + 
                     "Upload: " + uploadElapsedTime.toFixed(2) + "ms (" + uploadPercentage.toFixed(2) + "%), " + 
