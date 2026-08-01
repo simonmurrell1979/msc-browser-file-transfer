@@ -524,6 +524,7 @@ var FileTransferUpload = class {
   _onCancelled;
   _partSize = 5 * 1024 * 1024;
   // 5MB
+  _logTimeSplit = true;
   // Public Variables
   partSize = this._partSize;
   constructor(api, db, logMessage2, onProgress, onComplete, onCancelled) {
@@ -549,6 +550,10 @@ var FileTransferUpload = class {
     }
   }
   async uploadParts(file, objectKey, uploadId, password, partSize, totalParts, skippedParts, uploadedParts) {
+    let encryptElapsedTime = 0;
+    let signElapsedTime = 0;
+    let uploadElapsedTime = 0;
+    let databaseElapsedTime = 0;
     const encryptionKey = await this._encryption.getEncryptionKey(password);
     for (let i = 0; i < totalParts; i++) {
       const partIndex = i + 1;
@@ -559,14 +564,20 @@ var FileTransferUpload = class {
       const fileStart = i * partSize;
       const fileEnd = Math.min(fileStart + partSize, file.size);
       const fileChunk = file.slice(fileStart, fileEnd);
+      const encryptStartTime = performance.now();
       const chunkBytes = await fileChunk.arrayBuffer();
       const filePartHash = await crypto.subtle.digest("SHA-256", chunkBytes);
       const encryptedChunk = await this._encryption.encryptFilePart(encryptionKey, chunkBytes);
+      encryptElapsedTime += performance.now() - encryptStartTime;
+      const signStartTime = performance.now();
       const multipartUploadUrl = await this._api.generateMultipartUploadUrl(objectKey, uploadId, partIndex);
+      signElapsedTime += performance.now() - signStartTime;
+      const uploadStartTime = performance.now();
       const uploadPartResponse = await fetch(multipartUploadUrl, {
         method: "PUT",
         body: encryptedChunk
       });
+      uploadElapsedTime += performance.now() - uploadStartTime;
       if (!uploadPartResponse.ok) {
         this._logMessage("Failed to upload part " + partIndex + " with status: " + uploadPartResponse.status);
         throw new Error("Failed to upload part " + partIndex);
@@ -576,18 +587,30 @@ var FileTransferUpload = class {
         PartNumber: partIndex,
         ETag: eTag
       });
+      const databaseStartTime = performance.now();
       await this._db.addUploadedPart(
         uploadId,
         partIndex,
         eTag,
         this._encryption.encodeBase64(filePartHash)
       );
+      databaseElapsedTime += performance.now() - databaseStartTime;
       this._onProgress(
         uploadId,
         objectKey,
         partIndex,
         totalParts
       );
+    }
+    if (this._logTimeSplit) {
+      const totalTime = encryptElapsedTime + signElapsedTime + uploadElapsedTime + databaseElapsedTime;
+      if (totalTime > 0) {
+        const encryptPercentage = encryptElapsedTime / totalTime * 100;
+        const signPercentage = signElapsedTime / totalTime * 100;
+        const uploadPercentage = uploadElapsedTime / totalTime * 100;
+        const databasePercentage = databaseElapsedTime / totalTime * 100;
+        this._logMessage("Total Time: " + totalTime.toFixed(2) + "ms, Time Split: Encrypt: " + encryptElapsedTime.toFixed(2) + "ms (" + encryptPercentage.toFixed(2) + "%), Sign: " + signElapsedTime.toFixed(2) + "ms (" + signPercentage.toFixed(2) + "%), Upload: " + uploadElapsedTime.toFixed(2) + "ms (" + uploadPercentage.toFixed(2) + "%),  Database: " + databaseElapsedTime.toFixed(2) + "ms (" + databasePercentage.toFixed(2) + "%)");
+      }
     }
   }
   async newUpload(file) {
