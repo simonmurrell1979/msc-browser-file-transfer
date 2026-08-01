@@ -215,9 +215,6 @@ export class SendComponent {
             // Log Message
             case MessageType.LOGMESSAGE:
 
-                // Log Message
-                console.log("Service Worker Log")
-                console.log(message.message);
                 // Update Status Message
                 this.statusMessage.set(message.message);
                 // Exit
