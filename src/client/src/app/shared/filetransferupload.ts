@@ -221,9 +221,8 @@ export class FileTransferUpload {
 
                 // Log Message
                 this._logMessage("An error occurred during multipart upload: " + error.message);            
-
-                // Cancel Multipart Upload
-                await this.cancelUpload(objectKey, uploadId);
+                // Fail the upload
+                this._onFailed(uploadId, objectKey);
 
             }
 
@@ -313,9 +312,8 @@ export class FileTransferUpload {
     
                 // Log Message
                 this._logMessage("An error occurred during multipart upload: " + error.message);            
-    
-                // Cancel Multipart Upload
-                await this.cancelUpload(existingRecord.objectKey, uploadId);
+                // Fail the upload
+                this._onFailed(uploadId, existingRecord.objectKey);
     
             }
     

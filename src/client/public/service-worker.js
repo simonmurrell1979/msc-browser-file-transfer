@@ -634,7 +634,7 @@ var FileTransferUpload = class {
         await this.completeUpload(objectKey, uploadId, password, uploadedParts);
       } catch (error) {
         this._logMessage("An error occurred during multipart upload: " + error.message);
-        await this.cancelUpload(objectKey, uploadId);
+        this._onFailed(uploadId, objectKey);
       }
     } catch (error) {
       this._logMessage("An error occurred while uploading file: " + error.message);
@@ -672,7 +672,7 @@ var FileTransferUpload = class {
         await this.completeUpload(existingRecord.objectKey, uploadId, existingRecord.password, uploadedParts);
       } catch (error) {
         this._logMessage("An error occurred during multipart upload: " + error.message);
-        await this.cancelUpload(existingRecord.objectKey, uploadId);
+        this._onFailed(uploadId, existingRecord.objectKey);
       }
     } catch (error) {
       this._logMessage("An error occurred while uploading file: " + error.message);
