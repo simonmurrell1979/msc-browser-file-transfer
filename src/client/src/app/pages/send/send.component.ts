@@ -261,6 +261,14 @@ export class SendComponent {
                 // Exit
                 break;
 
+            // Failed Upload
+            case MessageType.FAILEDUPLOAD:
+
+                // Update Status Messages
+                this.statusMessage.set("Upload failed. Please try again.");
+                // Exit
+                break;
+
             // Unknown Message Type
             default:
 
