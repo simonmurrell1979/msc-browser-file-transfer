@@ -12,7 +12,8 @@ const fileTransferUpload = new FileTransferUpload(fileTransferApi,
     logMessage,
     (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => sendProgressEvent(MessageType.PROGRESSUPLOAD, uploadId, objectKey, partNumber, totalParts),
     (uploadId: string, objectKey: string, password: string, integrityHash: string) => sendCompleteEvent(MessageType.COMPLETEUPLOAD, uploadId, objectKey, password, integrityHash),
-    (uploadId: string, objectKey: string) => sendCancelEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey));
+    (uploadId: string, objectKey: string) => sendCancelEvent(MessageType.CANCELLEDUPLOAD, uploadId, objectKey),
+    (uploadId: string, objectKey: string) => sendFailedEvent(MessageType.FAILEDUPLOAD, uploadId, objectKey));
 
 declare const self: ServiceWorkerGlobalScope;
 let uploadInProgress = false;
@@ -60,6 +61,18 @@ function sendCompleteEvent(type: MessageType, uploadId: string, objectKey: strin
 
 // Send Cancel Event
 function sendCancelEvent(type: MessageType, uploadId: string, objectKey: string) {
+
+    // Post Message
+    sendMessageToAllClients({
+        type: type,
+        uploadId: uploadId,
+        objectKey: objectKey
+    });
+
+}
+
+// Send Failed Event
+function sendFailedEvent(type: MessageType, uploadId: string, objectKey: string) {
 
     // Post Message
     sendMessageToAllClients({
