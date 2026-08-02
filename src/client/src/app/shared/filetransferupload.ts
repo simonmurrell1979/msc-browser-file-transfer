@@ -13,6 +13,7 @@ export class FileTransferUpload {
     private readonly _onProgress: (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => void;
     private readonly _onComplete: (uploadId: string, objectKey: string, password: string, integrityHash: string) => void;
     private readonly _onCancelled: (uploadId: string, objectKey: string) => void;
+    private readonly _onFailed: (uploadId: string, objectKey: string) => void;
     private readonly _partSize = 5 * 1024 * 1024;   // 5MB
     // Public Variables
     public readonly partSize = this._partSize;
@@ -22,7 +23,8 @@ export class FileTransferUpload {
         logMessage?: (message: string) => void, 
         onProgress?: (uploadId: string, objectKey: string, partNumber: number, totalParts: number) => void,
         onComplete?: (uploadId: string, objectKey: string, password: string, integrityHash: string) => void, 
-        onCancelled?: (uploadId: string, objectKey: string) => void) {
+        onCancelled?: (uploadId: string, objectKey: string) => void, 
+        onFailed?: (uploadId: string, objectKey: string) => void) {
 
         // Initialize Classes
         this._api = api;
@@ -32,6 +34,7 @@ export class FileTransferUpload {
         this._onProgress = onProgress ?? (() => {});
         this._onComplete = onComplete ?? (() => {});
         this._onCancelled = onCancelled ?? (() => {});
+        this._onFailed = onFailed ?? (() => {});
 
     }
 
