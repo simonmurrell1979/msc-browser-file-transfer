@@ -522,11 +522,12 @@ var FileTransferUpload = class {
   _onProgress;
   _onComplete;
   _onCancelled;
+  _onFailed;
   _partSize = 5 * 1024 * 1024;
   // 5MB
   // Public Variables
   partSize = this._partSize;
-  constructor(api, db, logMessage2, onProgress, onComplete, onCancelled) {
+  constructor(api, db, logMessage2, onProgress, onComplete, onCancelled, onFailed) {
     this._api = api;
     this._db = db;
     this._encryption = new FileTransferEncryption();
@@ -536,6 +537,8 @@ var FileTransferUpload = class {
     this._onComplete = onComplete ?? (() => {
     });
     this._onCancelled = onCancelled ?? (() => {
+    });
+    this._onFailed = onFailed ?? (() => {
     });
   }
   async uploadFile(file) {
@@ -716,7 +719,8 @@ var fileTransferUpload = new FileTransferUpload(
   logMessage,
   (uploadId, objectKey, partNumber, totalParts) => sendProgressEvent("PROGRESSUPLOAD" /* PROGRESSUPLOAD */, uploadId, objectKey, partNumber, totalParts),
   (uploadId, objectKey, password, integrityHash) => sendCompleteEvent("COMPLETEUPLOAD" /* COMPLETEUPLOAD */, uploadId, objectKey, password, integrityHash),
-  (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey)
+  (uploadId, objectKey) => sendCancelEvent("CANCELLEDUPLOAD" /* CANCELLEDUPLOAD */, uploadId, objectKey),
+  (uploadId, objectKey) => sendFailedEvent("FAILEDUPLOAD" /* FAILEDUPLOAD */, uploadId, objectKey)
 );
 var uploadInProgress = false;
 async function sendMessageToAllClients(message) {
@@ -744,6 +748,13 @@ function sendCompleteEvent(type, uploadId, objectKey, password, integrityHash) {
   });
 }
 function sendCancelEvent(type, uploadId, objectKey) {
+  sendMessageToAllClients({
+    type,
+    uploadId,
+    objectKey
+  });
+}
+function sendFailedEvent(type, uploadId, objectKey) {
   sendMessageToAllClients({
     type,
     uploadId,
