@@ -81,6 +81,8 @@ export class DownloadComponent {
 
     private async downloadFileWithSaveFilePicker(transferInformation: TransferInfo): Promise<void> {
 
+        let writableStream: any = null;
+
         try {
 
             // https://developer.mozilla.org/en-US/docs/Web/API/Window/showOpenFilePicker
@@ -92,7 +94,7 @@ export class DownloadComponent {
             // Set Download State
             this.downloadState.set("downloading");
             // Create Writable Stream
-            const writableStream = await fileHandle.createWritable();
+            writableStream = await fileHandle.createWritable();
             
             // Get Decryption Key
             const decryptionKey = await this._encryptionService.getDecryptionKey(this.password);
@@ -165,6 +167,23 @@ export class DownloadComponent {
                 
                 // Exit
                 return;
+
+            }
+            // Check Value
+            if (writableStream != null) {
+
+                try {
+
+                    // Abort Stream
+                    await writableStream.abort();
+
+                }
+                catch (abortError: any) {
+
+                    // Log Error
+                    console.error("Error aborting writable stream:", abortError);
+
+                }
 
             }
             // Log Error
