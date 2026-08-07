@@ -188,6 +188,8 @@ export class DownloadComponent {
             }
             // Log Error
             console.error("Error downloading file:", error);
+            // Set Status Message
+            this.statusMessage.set("Download failed. The file could not be decrypted.");
             // Set Download State
             this.downloadState.set("ready");
 
