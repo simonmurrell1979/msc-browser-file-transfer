@@ -18,9 +18,9 @@ To start a local development server, run:
 ng serve
 ```
 
-## Testings
+## Tests
 
-To run the client-side testing using Vitest:
+To run the client-side tests using Vitest:
 
 ```bash
 ng test
