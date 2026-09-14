@@ -1,4 +1,4 @@
-# FileTransferClient
+# File Transfer Client
 
 Angular client for the Resilient and Confidential Browser-Based File Transfer Application.
 
