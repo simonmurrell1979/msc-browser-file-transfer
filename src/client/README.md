@@ -32,6 +32,10 @@ ng test
 
 ![Angular client running](../../docs/screenshots/angular.png)
 
+## Test Results
+
+![Vitest running](../../docs/screenshots/angulartesting.png.png)
+
 ---
 
 [← Back to main README](../../README.md)
