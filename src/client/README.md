@@ -34,7 +34,7 @@ ng test
 
 ## Test Results
 
-![Vitest running](../../docs/screenshots/angulartesting.png)
+![Vitest test results](../../docs/screenshots/angulartesting.png)
 
 ---
 

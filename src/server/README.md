@@ -28,6 +28,10 @@ dotnet test
 
 ![ASP.NET Core API running](../../docs/screenshots/aspnetcore.png)
 
+## Test Results
+
+![xUnit test results](../../docs/screenshots/aspnetcoretesting.png)
+
 ---
 
 [← Back to main README](../../README.md)
