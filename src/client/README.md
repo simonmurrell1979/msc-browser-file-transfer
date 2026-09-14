@@ -30,4 +30,4 @@ Once the server is running, open your browser and navigate to `http://localhost:
 
 ## Running Application
 
-- [Angular client running](../../docs/screenshots/angular.png)
+![Angular client running](../../docs/screenshots/angular.png)

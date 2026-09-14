@@ -24,3 +24,6 @@ To run the server-side tests using xUnit:
 dotnet test
 ```
 
+## Running Application
+
+![ASP.NET Core API running](../../docs/screenshots/aspnetcore.png)
