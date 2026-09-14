@@ -20,10 +20,10 @@ A browser-based file transfer pipeline integrating chunked resumable upload with
 
 ## Repository structure
 
-- `/spikes` - spiked based prototypes, index shown below
+- `/spikes` - spike-based prototypes, index shown below
 - `/src` - source code for client and server application (REST API / Angular application)
-- [Angular client application](src/client/readme.md) - Angular client application
-- [ASP.NET Core REST API](src/server/readme.md) - ASP.NET Core REST API
+    - [Angular client application](src/client/readme.md)
+    - [ASP.NET Core REST API](src/server/readme.md)
 
 ## Spikes
 
