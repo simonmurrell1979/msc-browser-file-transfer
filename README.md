@@ -5,12 +5,15 @@ MSc Computing final project (File Transfer Application) - Birkbeck, University o
 ## Project Details
 
 - **Author:** Simon Murrell
-- **Supervisor:** Martyn Harris
 - **Academic year:** April to September 2026
 
 ## Overview
 
 A browser-based file transfer pipeline integrating chunked resumable upload with chunked client-side encryption, designed to deliver large files reliably and confidentially within the constraints of the modern browser execution environment.
+
+## Running Application
+
+![Running application](./docs/screenshots/apprunning.png)
 
 ## Stack
 
