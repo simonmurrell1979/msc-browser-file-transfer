@@ -12,7 +12,7 @@ import { FileTransferApi } from "./filetransferapi";
 
 describe("Mocking Functions", () => {
 
-    it("Mock very basic function", () => {
+    it("Mock very basic function", async () => {
     
         // Create a mock function
         const mockFn = vi.fn().mockResolvedValue("Hello World!");
@@ -21,11 +21,11 @@ describe("Mocking Functions", () => {
         // Assert that the mock function was called
         expect(mockFn).toHaveBeenCalledTimes(1);
         // Check Value returned by the mock function
-        expect(result).resolves.toBe("Hello World!");
+        await expect(result).resolves.toBe("Hello World!");
 
     });
 
-    it("Mock multiupload function", () => {
+    it("Mock multiupload function", async () => {
 
         // Build Mock API Functions
         const api = {
@@ -34,7 +34,7 @@ describe("Mocking Functions", () => {
         // Call the mock function
         const uploadId = api.initiateMultipartUpload();
         // Expect
-        expect(uploadId).resolves.toBe("mockFile-1");
+        await expect(uploadId).resolves.toBe("mockFile-1");
 
         // Check that the mock function was called
         expect(api.initiateMultipartUpload).toHaveBeenCalledTimes(1);
