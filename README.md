@@ -44,4 +44,4 @@ Each isolated prototype is a runnable snapshot that includes its own README. Eac
 
 ## Status
 
-In development.
+Development complete.
