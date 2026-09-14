@@ -27,3 +27,7 @@ dotnet test
 ## Running Application
 
 ![ASP.NET Core API running](../../docs/screenshots/aspnetcore.png)
+
+---
+
+[Back to main README](../../README.md)

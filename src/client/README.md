@@ -31,3 +31,7 @@ Once the server is running, open your browser and navigate to `http://localhost:
 ## Running Application
 
 ![Angular client running](../../docs/screenshots/angular.png)
+
+---
+
+[Back to main README](../../README.md)
